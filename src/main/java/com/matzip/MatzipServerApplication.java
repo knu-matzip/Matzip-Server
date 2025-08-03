@@ -1,4 +1,4 @@
-package com.matzip.matzip.server;
+package com.matzip;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
