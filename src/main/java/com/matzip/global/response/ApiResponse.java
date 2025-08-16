@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+
+import static java.util.Collections.*;
 
 @Getter
 @Builder
@@ -33,14 +36,27 @@ public class ApiResponse<T> {
                 .data(data)
                 .build();
     }
-    
+
     /**
      * 성공 응답 생성 (데이터 없음)
+     * DELETE, PATCH 등 데이터 반환이 필요 없는 요청에 사용
      */
-    public static <T> ApiResponse<T> success() {
+    public static <T> ApiResponse<T> successWithoutData() {
         return ApiResponse.<T>builder()
                 .status("OK")
                 .timestamp(LocalDateTime.now())
+                // data 필드는 null로 유지
+                .build();
+    }
+
+    /**
+     * 성공 응답 생성 (빈 리스트)
+     */
+    public static <T> ApiResponse<T> successWithEmptyList() {
+        return ApiResponse.<T>builder()
+                .status("OK")
+                .timestamp(LocalDateTime.now())
+                .data((T) emptyList()) // data 필드에 빈 리스트를 명시적으로 할당
                 .build();
     }
     
