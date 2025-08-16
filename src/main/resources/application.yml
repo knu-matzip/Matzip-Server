@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: knu-matzip
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc.time_zone: Asia/Seoul
+
+
+server:
+  port: 8080
