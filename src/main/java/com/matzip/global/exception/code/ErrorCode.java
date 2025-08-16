@@ -34,18 +34,18 @@ public enum ErrorCode {
 
     // Menu Errors (3500번대)
     MENU_NOT_FOUND(3500, HttpStatus.NOT_FOUND, "메뉴를 찾을 수 없습니다."),
-    RECOMMENDED_MENU_LIMIT_EXCEEDED(3502, HttpStatus.BAD_REQUEST, "추천 메뉴는 최대 3개까지 선택할 수 있습니다."),
+    RECOMMENDED_MENU_LIMIT_EXCEEDED(3501, HttpStatus.BAD_REQUEST, "추천 메뉴는 최대 3개까지 선택할 수 있습니다."),
 
     // Category Errors (4000번대)
     CATEGORY_NOT_FOUND(4000, HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
-    CATEGORY_LIMIT_EXCEEDED(4003, HttpStatus.BAD_REQUEST, "카테고리는 최대 5개까지 등록할 수 있습니다."),
+    CATEGORY_LIMIT_EXCEEDED(4001, HttpStatus.BAD_REQUEST, "카테고리는 최대 5개까지 등록할 수 있습니다."),
 
     // Tag Errors (4500번대)
     TAG_NOT_FOUND(4500, HttpStatus.NOT_FOUND, "태그를 찾을 수 없습니다."),
-    TAG_LIMIT_EXCEEDED(4503, HttpStatus.BAD_REQUEST, "태그는 최대 10개까지 등록할 수 있습니다."),
+    TAG_LIMIT_EXCEEDED(4501, HttpStatus.BAD_REQUEST, "태그는 최대 10개까지 등록할 수 있습니다."),
 
-    // Photo Errors (5500번대)
-    PHOTO_NOT_FOUND(5500, HttpStatus.NOT_FOUND, "사진을 찾을 수 없습니다."),
+    // Photo Errors (5000번대)
+    PHOTO_NOT_FOUND(5000, HttpStatus.NOT_FOUND, "사진을 찾을 수 없습니다."),
 
     // Validation Errors (6000번대)
     VALIDATION_ERROR(6000, HttpStatus.BAD_REQUEST, "입력값 검증에 실패했습니다."),
