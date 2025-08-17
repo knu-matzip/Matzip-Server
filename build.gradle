@@ -34,8 +34,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	
-	//Auth0 JWT
+
+	// jwt
 	implementation 'com.auth0:java-jwt:4.4.0'
 }
 
