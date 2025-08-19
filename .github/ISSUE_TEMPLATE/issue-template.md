@@ -1,20 +1,3 @@
----
-name: 이슈 템플릿
-about: 이슈 템플릿
-title: ''
-labels: ''
-assignees: ''
-
----
-
----
-name: 일반 이슈 템플릿
-about: 버그 리포트, 기능 요청, 문서 등 모든 이슈에 사용
-title: "[이슈 유형] 제목 작성"
-labels: ''
-assignees: ''
-
----
 
 ## 📌 이슈 설명
 
