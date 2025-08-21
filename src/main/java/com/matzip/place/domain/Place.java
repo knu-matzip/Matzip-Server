@@ -46,9 +46,14 @@ public class Place {
     @Column(name = "like_count", nullable = false)
     private Integer likeCount = 0; // 기본값을 0으로 초기화
 
+    @Enumerated(EnumType.STRING) // DB에는 문자열(DAEGU, SANGJU)로 저장
+    @Column(nullable = false)
+    private Campus campus;
+
 
     @Builder
-    private Place(User creator, Long kakaoPlaceId, String name, String address, BigDecimal latitude, BigDecimal longitude, String description) {
+    private Place(User creator, Long kakaoPlaceId, String name, String address,
+                  BigDecimal latitude, BigDecimal longitude, String description, Campus campus) {
         this.creator = creator;
         this.kakaoPlaceId = kakaoPlaceId;
         this.name = name;
@@ -56,5 +61,6 @@ public class Place {
         this.latitude = latitude;
         this.longitude = longitude;
         this.description = description;
+        this.campus = campus;
     }
 }
