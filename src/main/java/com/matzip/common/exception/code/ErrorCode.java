@@ -1,4 +1,4 @@
-package com.matzip.global.exception.code;
+package com.matzip.common.exception.code;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

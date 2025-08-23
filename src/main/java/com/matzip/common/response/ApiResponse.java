@@ -1,12 +1,12 @@
-package com.matzip.global.response;
+package com.matzip.common.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.matzip.common.exception.code.ErrorCode;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 
 import static java.util.Collections.*;
 
@@ -77,7 +77,7 @@ public class ApiResponse<T> {
     /**
      * 실패 응답 생성 (ErrorCode 사용)
      */
-    public static <T> ApiResponse<T> error(com.matzip.global.exception.code.ErrorCode errorCode) {
+    public static <T> ApiResponse<T> error(ErrorCode errorCode) {
         return ApiResponse.<T>builder()
                 .status("ERROR")
                 .timestamp(LocalDateTime.now())
@@ -91,7 +91,7 @@ public class ApiResponse<T> {
     /**
      * 실패 응답 생성 (ErrorCode + 상세 메시지)
      */
-    public static <T> ApiResponse<T> error(com.matzip.global.exception.code.ErrorCode errorCode, String detailMessage) {
+    public static <T> ApiResponse<T> error(ErrorCode errorCode, String detailMessage) {
         return ApiResponse.<T>builder()
                 .status("ERROR")
                 .timestamp(LocalDateTime.now())

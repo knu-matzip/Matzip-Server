@@ -1,6 +1,6 @@
 package com.matzip.place.domain;
 
-import com.matzip.user.User;
+import com.matzip.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -1,7 +1,7 @@
-package com.matzip.global.exception;
+package com.matzip.common.exception;
 
-import com.matzip.global.exception.code.ErrorCode;
-import com.matzip.global.response.ApiResponse;
+import com.matzip.common.exception.code.ErrorCode;
+import com.matzip.common.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;

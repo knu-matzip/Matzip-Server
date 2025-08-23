@@ -1,6 +1,6 @@
-package com.matzip.global.exception;
+package com.matzip.common.exception;
 
-import com.matzip.global.exception.code.ErrorCode;
+import com.matzip.common.exception.code.ErrorCode;
 
 public class PlaceRegistrationException extends BaseException {
     

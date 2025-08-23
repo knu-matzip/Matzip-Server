@@ -1,6 +1,6 @@
-package com.matzip.user;
+package com.matzip.user.domain;
 
-import com.matzip.global.entity.BaseEntity;
+import com.matzip.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

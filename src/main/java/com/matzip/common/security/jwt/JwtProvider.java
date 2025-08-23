@@ -1,4 +1,4 @@
-package com.matzip.global.security.jwt;
+package com.matzip.common.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
