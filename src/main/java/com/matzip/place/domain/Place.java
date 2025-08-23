@@ -1,12 +1,12 @@
 package com.matzip.place.domain;
 
+import com.matzip.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.awt.*;
 import java.math.BigDecimal;
 
 @Entity
