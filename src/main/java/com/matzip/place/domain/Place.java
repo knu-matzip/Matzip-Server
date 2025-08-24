@@ -44,7 +44,7 @@ public class Place {
     private String description;
 
     @Column(name = "like_count", nullable = false)
-    private Integer likeCount = 0; // 기본값을 0으로 초기화
+    private int likeCount = 0; // 기본값을 0으로 초기화
 
 
     @Builder
