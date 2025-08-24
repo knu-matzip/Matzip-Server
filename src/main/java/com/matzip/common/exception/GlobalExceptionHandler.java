@@ -20,44 +20,11 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 public class GlobalExceptionHandler {
     
     /**
-     * 비즈니스 로직 예외 처리
+     * BaseException을 상속받는 모든 커스텀 예외 처리
      */
-    @ExceptionHandler(BusinessException.class)
-    protected ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException e) {
-        log.error("BusinessException: {}", e.getMessage());
-        return ResponseEntity
-                .status(e.getErrorCode().getStatus())
-                .body(ApiResponse.error(e.getErrorCode(), e.getMessage()));
-    }
-    
-    /**
-     * 검증 예외 처리
-     */
-    @ExceptionHandler(ValidationException.class)
-    protected ResponseEntity<ApiResponse<Void>> handleValidationException(ValidationException e) {
-        log.error("ValidationException: {}", e.getMessage());
-        return ResponseEntity
-                .status(e.getErrorCode().getStatus())
-                .body(ApiResponse.error(e.getErrorCode(), e.getMessage()));
-    }
-    
-    /**
-     * 카카오 API 예외 처리
-     */
-    @ExceptionHandler(KakaoApiException.class)
-    protected ResponseEntity<ApiResponse<Void>> handleKakaoApiException(KakaoApiException e) {
-        log.error("KakaoApiException: {}", e.getMessage());
-        return ResponseEntity
-                .status(e.getErrorCode().getStatus())
-                .body(ApiResponse.error(e.getErrorCode(), e.getMessage()));
-    }
-    
-    /**
-     * 맛집 등록 예외 처리
-     */
-    @ExceptionHandler(PlaceRegistrationException.class)
-    protected ResponseEntity<ApiResponse<Void>> handlePlaceRegistrationException(PlaceRegistrationException e) {
-        log.error("PlaceRegistrationException: {}", e.getMessage());
+    @ExceptionHandler(BaseException.class)
+    protected ResponseEntity<ApiResponse<Void>> handleBaseException(BaseException e) {
+        log.error("{}: {}", e.getClass().getSimpleName(), e.getMessage());
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(ApiResponse.error(e.getErrorCode(), e.getMessage()));
