@@ -3,6 +3,7 @@ package com.matzip.place.api.response;
 import com.matzip.common.dto.LocationDto;
 import com.matzip.common.dto.MenuDto;
 import com.matzip.common.dto.PhotoDto;
+import com.matzip.place.domain.Campus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,6 +15,7 @@ public class PlaceCheckResponseDto {
 
     private Boolean alreadyRegistered; // 우리 서비스에 이미 등록된 가게인지 여부
     private Long kakaoPlaceId;
+    private Campus campus;
     private PlaceInfo place;
     private List<MenuDto> menus; // 카카오맵에 등록된 메뉴 정보
 
