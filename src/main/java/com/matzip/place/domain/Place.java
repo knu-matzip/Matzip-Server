@@ -1,6 +1,5 @@
 package com.matzip.place.domain;
 
-import com.matzip.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -20,10 +19,9 @@ public class Place {
     @Column(name = "place_id")
     private Long id;
 
-    // user_id (FK)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User creator;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "campus", nullable = false)
+    private Campus campus;
 
     @Column(name = "kakao_place_id", unique = true, nullable = false)
     private Long kakaoPlaceId;
@@ -48,9 +46,9 @@ public class Place {
 
 
     @Builder
-    private Place(User creator, Long kakaoPlaceId, String name, String address, BigDecimal latitude, BigDecimal longitude, String description) {
-        this.creator = creator;
+    private Place(Long kakaoPlaceId, Campus campus, String name, String address, BigDecimal latitude, BigDecimal longitude, String description) {
         this.kakaoPlaceId = kakaoPlaceId;
+        this.campus = campus;
         this.name = name;
         this.address = address;
         this.latitude = latitude;
