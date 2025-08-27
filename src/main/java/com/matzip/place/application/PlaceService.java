@@ -15,10 +15,9 @@ public interface PlaceService {
     PlaceCheckResponseDto checkPlace(Long kakaoPlaceId);
 
     /**
-     * 새로운 맛집 스팟을 최종 등록합니다.
+     * 새로운 맛집을 최종 등록
      * @param requestDto 등록 요청 데이터
-     * @param userId 로그인한 사용자의 ID (비로그인 시 Optional.empty())
-     * @return 생성된 맛집 스팟의 ID
+     * @return 생성된 맛집의 ID
      */
-    Long registerPlace(PlaceRequestDto requestDto, Optional<Long> userId);
+    Long registerPlace(PlaceRequestDto requestDto);
 }

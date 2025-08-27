@@ -9,5 +9,5 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class PlaceTagId implements Serializable {
     private Long place;
-    private Integer tag;
+    private Long tag;
 }

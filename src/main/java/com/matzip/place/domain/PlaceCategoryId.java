@@ -9,5 +9,5 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class PlaceCategoryId implements Serializable {
     private Long place;
-    private Integer category;
+    private Long category;
 }
