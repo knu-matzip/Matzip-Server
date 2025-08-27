@@ -1,7 +1,12 @@
 package com.matzip.place.infra;
 
+import com.matzip.place.domain.Place;
 import com.matzip.place.domain.PlaceTag;
+import com.matzip.place.domain.PlaceTagId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PlaceTagRepository extends JpaRepository<PlaceTag, Long> {
+import java.util.List;
+
+public interface PlaceTagRepository extends JpaRepository<PlaceTag, PlaceTagId> {
+    List<PlaceTag> findAllByPlace(Place place);
 }

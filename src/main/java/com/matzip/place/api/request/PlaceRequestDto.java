@@ -1,5 +1,6 @@
 package com.matzip.place.api.request;
 
+import com.matzip.common.dto.LocationDto;
 import com.matzip.place.domain.Campus;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -17,12 +18,21 @@ public class PlaceRequestDto {
     @NotNull(message = "캠퍼스 정보는 필수입니다.")
     private Campus campus;
 
+    @NotEmpty(message = "가게 이름은 필수입니다.")
+    private String name;
+
+    @NotEmpty(message = "주소는 필수입니다.")
+    private String address;
+
+    @NotNull(message = "위치 정보는 필수입니다.")
+    private LocationDto location;
+
     private String description;
 
     @NotEmpty(message = "메뉴 정보는 최소 1개 이상이어야 합니다.")
     private List<MenuInfo> menus;
 
-    @Size(max = 10, message = "태그는 최대 3개까지 선택할 수 있습니다.")
+    @Size(max = 3, message = "태그는 최대 3개까지 선택할 수 있습니다.")
     private List<Long> tagIds;
 
     @NotEmpty(message = "카테고리는 최소 1개 이상 선택해야 합니다.")
