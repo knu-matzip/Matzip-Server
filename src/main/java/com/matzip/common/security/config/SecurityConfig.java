@@ -1,7 +1,7 @@
 package com.matzip.common.security.config;
 
 
-import com.matzip.common.security.jwt.JwtAuthenticationFilter;
+import com.matzip.common.security.jwt.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

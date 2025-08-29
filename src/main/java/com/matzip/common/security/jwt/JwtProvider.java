@@ -19,7 +19,10 @@ public class JwtProvider {
     private String secretKey;
 
     @Value("${jwt.expiration-time}")
-    private long expirationTime;
+    private long accessTokenExpirationTime;
+
+    @Value("${jwt.refresh-expiration-time}")
+    private long refreshTokenExpirationTime; // 리프레시 토큰 만료 시간
 
     private SecretKey key;
 
@@ -31,12 +34,23 @@ public class JwtProvider {
     /**
      * Access Token 생성
      */
-    public String createToken(Long userId) {
+    public String createAccessToken(Long userId) {
+        return createToken(userId, accessTokenExpirationTime);
+    }
+
+    /**
+     * Refresh Token 생성
+     */
+    public String createRefreshToken(Long userId) {
+        return createToken(userId, refreshTokenExpirationTime);
+    }
+
+    private String createToken(Long userId, long expirationTime) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationTime);
 
         return Jwts.builder()
-                .subject(String.valueOf(userId)) // 토큰의 주체로 userId 저장
+                .subject(String.valueOf(userId))
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(key)
