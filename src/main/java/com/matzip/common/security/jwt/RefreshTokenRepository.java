@@ -1,6 +1,6 @@
-package com.matzip.common.security.jwt.repository;
+package com.matzip.common.security.jwt;
 
-import com.matzip.common.security.jwt.entity.RefreshToken;
+import com.matzip.auth.domain.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

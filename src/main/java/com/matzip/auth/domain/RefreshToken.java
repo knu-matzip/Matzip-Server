@@ -1,4 +1,4 @@
-package com.matzip.common.security.jwt.entity;
+package com.matzip.auth.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
