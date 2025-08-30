@@ -24,9 +24,9 @@ public class Menu {
     private String name;
 
     @Column(nullable = false)
-    private Integer price;
+    private int price;
 
     @Column(name = "is_recommended", nullable = false)
-    private Boolean isRecommended = false;
+    private boolean isRecommended = false;
 
 }
