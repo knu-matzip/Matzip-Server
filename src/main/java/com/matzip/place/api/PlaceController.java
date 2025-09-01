@@ -1,5 +1,6 @@
 package com.matzip.place.api;
 
+import com.matzip.common.response.ApiResponse;
 import com.matzip.place.api.request.PlaceCheckRequestDto;
 import com.matzip.place.api.request.PlaceRequestDto;
 import com.matzip.place.api.response.PlaceCheckResponseDto;
@@ -18,13 +19,15 @@ public class PlaceController {
 
     // 프리뷰
     @GetMapping("/preview")
-    public PlaceCheckResponseDto preview(@Valid @ModelAttribute PlaceCheckRequestDto req) {
-        return placeService.preview(req);
+    public ApiResponse<PlaceCheckResponseDto> preview(@Valid @ModelAttribute PlaceCheckRequestDto req) {
+        PlaceCheckResponseDto data = placeService.preview(req); // 서비스 결과 DTO
+        return ApiResponse.success(data);                       // 공통 응답 형태로 래핑
     }
 
     // 등록
     @PostMapping
-    public PlaceRegisterResponseDto register(@Valid @RequestBody PlaceRequestDto req) {
-        return placeService.register(req);
+    public ApiResponse<PlaceRegisterResponseDto> register(@Valid @RequestBody PlaceRequestDto req) {
+        PlaceRegisterResponseDto data = placeService.register(req);
+        return ApiResponse.success(data);
     }
 }

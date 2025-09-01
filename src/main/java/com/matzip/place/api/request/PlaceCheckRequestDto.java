@@ -18,6 +18,4 @@ public class PlaceCheckRequestDto {
     @NotNull
     private Long kakaoPlaceId;
 
-    @NotNull
-    private Campus campus;
 }
