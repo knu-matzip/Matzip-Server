@@ -2,6 +2,7 @@ package com.matzip.place.api.request;
 
 import com.matzip.common.dto.LocationDto;
 import com.matzip.place.domain.Campus;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

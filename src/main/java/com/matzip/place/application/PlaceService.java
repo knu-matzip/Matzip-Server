@@ -15,10 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,28 +35,39 @@ public class PlaceService {
 
     /**
      * 가게 정보 확인 프리뷰
-     * 프론트가 알고 있는 (name/address/location/campus)를 서버에 전달
-     * 서버는 KakaoApiClient로 메뉴와 사진만 더하여 응답
      */
     public PlaceCheckResponseDto preview(PlaceCheckRequestDto req) {
         final Long kakaoPlaceId = req.getKakaoPlaceId();
 
-        if (placeRepository.existsByKakaoPlaceId(kakaoPlaceId)) {
-            throw new PlaceAlreadyExistsException("이미 등록된 맛집입니다. kakaoPlaceId=" + kakaoPlaceId);
-        }
+        // 1) 이미 등록 여부 조회 (예외 X, 불리언으로 응답)
+        boolean already = placeRepository.existsByKakaoPlaceId(kakaoPlaceId);
 
-        // 2) Kakao에서 메뉴, 사진 수집
+        // 2) 카카오(패널)에서 메뉴/사진 수집
         KakaoApiClient.MenusAndPhotos mp = kakaoApiClient.getMenusAndPhotos(kakaoPlaceId);
 
-        // 3) 프리뷰 응답 합치기(프론트가 전달한 정보 + Kakao)
+        // 3) 메뉴를 프리뷰 전용 DTO(MenuItem)로 변환 (isRecommended=false)
+        List<PlaceCheckResponseDto.MenuItem> menuItems = new ArrayList<>();
+        List<MenuDto> srcMenus = mp.menus();
+        for (MenuDto m : srcMenus) {
+            PlaceCheckResponseDto.MenuItem item = PlaceCheckResponseDto.MenuItem.builder()
+                    .name(m.getName())
+                    .price(m.getPrice())
+                    .isRecommended(false) // 프리뷰 단계: 사용자 선택 전이므로 항상 false
+                    .build();
+            menuItems.add(item);
+        }
+
+        // 4) 사진은 공용 PhotoDto를 그대로 전달
+        List<PhotoDto> photos = mp.photos();
+
+        // 5) 평탄화된 DTO로 응답 조립
         return PlaceCheckResponseDto.builder()
-                .alreadyRegistered(false)
-                .kakaoPlaceId(kakaoPlaceId)
-                .campus(req.getCampus())
-                .place(PlaceCheckResponseDto.PlaceInfo.builder()
-                        .photos(mp.photos())
-                        .build())
-                .menus(mp.menus())
+                .alreadyRegistered(already)
+//                .placeName(req.getName())        // TODO 서버 신뢰 소스(공식 검색/스냅샷)로 대체
+//                .address(req.getAddress())       // TODO 서버 신뢰 소스로 대체
+//                .location(req.getLocation())     // TODO 서버 신뢰 소스로 대체
+                .photos(photos)
+                .menus(menuItems)
                 .build();
     }
 
