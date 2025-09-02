@@ -49,6 +49,7 @@ public class KakaoApiClient {
                     .retrieve()
                     .body(JsonNode.class);
 
+
             // 1) 기본 정보 추출
             String confirmId = text(panel.at("/summary"), "confirm_id");
             if (confirmId == null || confirmId.isBlank()) {
@@ -70,9 +71,8 @@ public class KakaoApiClient {
             String finalAddress = firstNonBlank(addressRoad, addressDisp, addressJibun);
 
             // 좌표: lon/lat 명시 필드 사용
-            JsonNode point = panel.at("/summary/point");
-            double latitude  = parseDouble(text(point, "lat"));
-            double longitude = parseDouble(text(point, "lon"));
+            double latitude  = requireNumber(panel.at("/summary/point/lat"), "summary.point.lat");
+            double longitude = requireNumber(panel.at("/summary/point/lon"), "summary.point.lon");
 
             // 2) 메뉴/사진 추출
             List<MenuDto> menus = extractMenus(panel);
@@ -217,6 +217,13 @@ public class KakaoApiClient {
         if (isNotBlank(b)) return b;
         if (isNotBlank(c)) return c;
         return null;
+    }
+
+    private static double requireNumber(JsonNode node, String path) {
+        if (node == null || node.isMissingNode() || !node.isNumber()) {
+            throw new KakaoApiException("panel3 필드 누락/형식 오류: " + path, null);
+        }
+        return node.asDouble();
     }
 
     /**
