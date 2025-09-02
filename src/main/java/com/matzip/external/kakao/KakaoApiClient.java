@@ -35,16 +35,50 @@ public class KakaoApiClient {
         this.restClient = restClient;
     }
 
-    // 메뉴, 사진만 추출해서 반환
-    public MenusAndPhotos getMenusAndPhotos(long placeId) {
+    /**
+     * panel3를 한 번 호출하여 기본 정보(이름/주소/좌표/confirm_id) + 메뉴 + 사진을 모두 수집
+     * 프론트는 kakaoPlaceId(String)만 전달.
+     * 서버는 panel3의 /summary/confirm_id와 정확히 일치하는지 검증
+     * 주소는 panel3 기준 우선순위(road → disp → jibun)로 결정
+     */
+    public PanelSnapshot getPanelSnapshot(String kakaoPlaceId) {
         try {
             JsonNode panel = restClient.get()
-                    .uri("/places/panel3/{placeId}", placeId)
+                    .uri("/places/panel3/{placeId}", kakaoPlaceId) // String ID 사용
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .body(JsonNode.class);
 
-            return new MenusAndPhotos(extractMenus(panel), extractPhotos(panel));
+            // 1) 기본 정보 추출
+            String confirmId = text(panel.at("/summary"), "confirm_id");
+            if (confirmId == null || confirmId.isBlank()) {
+                throw new KakaoApiException("panel3 응답에 confirm_id가 없습니다. placeId=" + kakaoPlaceId, null);
+            }
+            // 요청 kakaoPlaceId와 응답 confirm_id가 불일치하면 저장/표시를 중단
+            if (!kakaoPlaceId.equals(confirmId)) {
+                throw new KakaoApiException("요청 kakaoPlaceId와 응답 confirm_id가 일치하지 않습니다. req=" +
+                        kakaoPlaceId + ", resp=" + confirmId, null);
+            }
+
+            String placeName = text(panel.at("/summary"), "name");
+
+            // 주소 우선순위: road → disp → jibun
+            JsonNode addr = panel.at("/summary/address");
+            String addressRoad = text(addr, "road");
+            String addressDisp  = text(addr, "disp");
+            String addressJibun = text(addr, "jibun");
+            String finalAddress = firstNonBlank(addressRoad, addressDisp, addressJibun);
+
+            // 좌표: lon/lat 명시 필드 사용
+            JsonNode point = panel.at("/summary/point");
+            double latitude  = parseDouble(text(point, "lat"));
+            double longitude = parseDouble(text(point, "lon"));
+
+            // 2) 메뉴/사진 추출
+            List<MenuDto> menus = extractMenus(panel);
+            List<PhotoDto> photos = extractPhotos(panel);
+
+            return new PanelSnapshot(confirmId, placeName, finalAddress, latitude, longitude, menus, photos);
         } catch (RestClientResponseException e) {
             throw new KakaoApiException(
                     "Kakao panel3 호출 실패: status=" + e.getStatusCode().value() +
@@ -52,7 +86,10 @@ public class KakaoApiClient {
         }
     }
 
-    // 실제 응답 구조에 맞춘 메뉴 추출: /menu/menus/items
+
+    // ======= 추출 로직 =======
+
+    // /menu/menus/items
     private static List<MenuDto> extractMenus(JsonNode root) {
         List<MenuDto> list = new ArrayList<>();
         JsonNode items = root.at("/menu/menus/items");
@@ -61,14 +98,13 @@ public class KakaoApiClient {
                 String name = text(item, "name");
                 if (name == null || name.isBlank()) continue;
 
-                // price는 정수로 내려오며, -1은 '가격 미표기' 의미로 간주
+                // Kakao: price가 -1이면 "미표기"로 간주 -> 0으로 정규화
                 int price = 0;
                 JsonNode priceNode = item.get("price");
                 if (priceNode != null && priceNode.isInt()) {
                     int raw = priceNode.asInt();
                     price = (raw >= 0) ? raw : 0;
                 } else {
-                    // 혹시 문자열로 내려오는 경우 방어로직
                     String priceText = text(item, "price");
                     price = parsePrice(priceText);
                 }
@@ -83,7 +119,7 @@ public class KakaoApiClient {
     }
 
     /**
-     * 실제 응답 구조에 맞춘 사진 추출 (합산):
+     * 사진은 세 출처를 합산:
      * 1) /menu/menus/photos[*].url
      * 2) /photos/photos[*].url
      * 3) /blog_review/reviews[*].photos[*].url
@@ -99,7 +135,7 @@ public class KakaoApiClient {
                 String url = text(p, "url");
                 if (isNotBlank(url)) {
                     list.add(PhotoDto.builder()
-                            .photoId(null)
+                            .photoId(null) // 외부 photo_id가 있을 수도 있으나 불일치 케이스가 있어 우선 null
                             .photoUrl(url)
                             .displayOrder(order++)
                             .build());
@@ -145,6 +181,8 @@ public class KakaoApiClient {
         return list;
     }
 
+    // ======= 유틸 =======
+
     private static boolean isNotBlank(String s) {
         return s != null && !s.isBlank();
     }
@@ -165,7 +203,35 @@ public class KakaoApiClient {
         }
     }
 
-    public record MenusAndPhotos(List<MenuDto> menus, List<PhotoDto> photos) {}
+    private static double parseDouble(String s) {
+        if (s == null || s.isBlank()) return 0.0d;
+        try {
+            return Double.parseDouble(s);
+        } catch (NumberFormatException e) {
+            return 0.0d;
+        }
+    }
+
+    private static String firstNonBlank(String a, String b, String c) {
+        if (isNotBlank(a)) return a;
+        if (isNotBlank(b)) return b;
+        if (isNotBlank(c)) return c;
+        return null;
+    }
+
+    /**
+     * panel3에서 뽑은 스냅샷(서버 신뢰 소스).
+     * 등록 시 클라이언트가 보내는 값은 무시하고 아래 값 사용
+     */
+    public record PanelSnapshot(
+            String confirmId,
+            String placeName,
+            String address,
+            double latitude,
+            double longitude,
+            List<MenuDto> menus,
+            List<PhotoDto> photos
+    ) {}
 
     public static class KakaoApiException extends RuntimeException {
         public KakaoApiException(String message, Throwable cause) { super(message, cause); }
