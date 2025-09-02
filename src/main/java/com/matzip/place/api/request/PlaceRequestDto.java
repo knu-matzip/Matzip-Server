@@ -13,7 +13,7 @@ import java.util.List;
 public class PlaceRequestDto {
 
     @NotNull(message = "카카오 장소 ID는 필수입니다.")
-    private Long kakaoPlaceId;
+    private String kakaoPlaceId;
 
     @NotNull(message = "캠퍼스 정보는 필수입니다.")
     private Campus campus;

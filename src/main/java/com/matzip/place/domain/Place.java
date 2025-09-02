@@ -24,7 +24,7 @@ public class Place {
     private Campus campus;
 
     @Column(name = "kakao_place_id", unique = true, nullable = false)
-    private Long kakaoPlaceId;
+    private String kakaoPlaceId;
 
     @Column(name = "place_name", nullable = false, length = 100)
     private String name;
@@ -46,7 +46,7 @@ public class Place {
 
 
     @Builder
-    private Place(Long kakaoPlaceId, Campus campus, String name, String address, BigDecimal latitude, BigDecimal longitude, String description) {
+    private Place(String kakaoPlaceId, Campus campus, String name, String address, BigDecimal latitude, BigDecimal longitude, String description) {
         this.kakaoPlaceId = kakaoPlaceId;
         this.campus = campus;
         this.name = name;

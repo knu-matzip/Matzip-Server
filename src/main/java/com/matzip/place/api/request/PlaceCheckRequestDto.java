@@ -17,6 +17,6 @@ import lombok.Setter;
 public class PlaceCheckRequestDto {
 
     @NotNull
-    private Long kakaoPlaceId;
+    private String kakaoPlaceId;
 
 }
