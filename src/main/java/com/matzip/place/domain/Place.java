@@ -32,11 +32,11 @@ public class Place {
     @Column(nullable = false, length = 255)
     private String address;
 
-    @Column(nullable = false, precision = 10, scale = 8)
-    private BigDecimal latitude;
+    @Column(nullable = false)
+    private double latitude;
 
-    @Column(nullable = false, precision = 11, scale = 8)
-    private BigDecimal longitude;
+    @Column(nullable = false)
+    private double longitude;
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -46,7 +46,7 @@ public class Place {
 
 
     @Builder
-    private Place(String kakaoPlaceId, Campus campus, String name, String address, BigDecimal latitude, BigDecimal longitude, String description) {
+    private Place(String kakaoPlaceId, Campus campus, String name, String address, double latitude, double longitude, String description) {
         this.kakaoPlaceId = kakaoPlaceId;
         this.campus = campus;
         this.name = name;

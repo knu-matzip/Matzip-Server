@@ -1,8 +1,8 @@
 package com.matzip.place.application;
 
+import com.matzip.common.dto.LocationDto;
 import com.matzip.common.dto.MenuDto;
 import com.matzip.common.dto.PhotoDto;
-import com.matzip.common.exception.PlaceAlreadyExistsException;
 import com.matzip.external.kakao.KakaoApiClient;
 import com.matzip.place.api.request.PlaceCheckRequestDto;
 import com.matzip.place.api.request.PlaceRequestDto;
@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.matzip.external.kakao.KakaoApiClient.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,36 +39,58 @@ public class PlaceService {
      * 가게 정보 확인 프리뷰
      */
     public PlaceCheckResponseDto preview(PlaceCheckRequestDto req) {
-        final Long kakaoPlaceId = req.getKakaoPlaceId();
+        final String kakaoPlaceId = req.getKakaoPlaceId();
 
-        // 1) 이미 등록 여부 조회 (예외 X, 불리언으로 응답)
+        // 이미 등록 여부 조회
         boolean already = placeRepository.existsByKakaoPlaceId(kakaoPlaceId);
+        if (already) {
+            // 이미 등록된 경우: 패널 호출 없이 최소 정보만 응답 후 반환
+            // 주소는 빈 문자열("")
+            // 사진/메뉴는 빈 배열
+            // placeId, placeName, location 은 DB 기준으로 채움
+            Optional<Place> maybe = placeRepository.findByKakaoPlaceId(kakaoPlaceId);
+            if (maybe.isEmpty()) {
+                // 경합 상황 방어(존재 체크 직후 삭제 등)
+                throw new IllegalStateException("등록된 맛집 조회에 실패했습니다. kakaoPlaceId=" + kakaoPlaceId);
+            }
+            Place p = maybe.get();
 
-        // 2) 카카오(패널)에서 메뉴/사진 수집
-        KakaoApiClient.MenusAndPhotos mp = kakaoApiClient.getMenusAndPhotos(kakaoPlaceId);
-
-        // 3) 메뉴를 프리뷰 전용 DTO(MenuItem)로 변환 (isRecommended=false)
-        List<PlaceCheckResponseDto.MenuItem> menuItems = new ArrayList<>();
-        List<MenuDto> srcMenus = mp.menus();
-        for (MenuDto m : srcMenus) {
-            PlaceCheckResponseDto.MenuItem item = PlaceCheckResponseDto.MenuItem.builder()
-                    .name(m.getName())
-                    .price(m.getPrice())
-                    .isRecommended(false) // 프리뷰 단계: 사용자 선택 전이므로 항상 false
+            return PlaceCheckResponseDto.builder()
+                    .alreadyRegistered(true)
+                    .placeId(p.getId())
+                    .placeName(p.getName())
+                    .address("")
+                    .location(LocationDto.of(p.getLatitude(), p.getLongitude()))
+                    .photos(Collections.emptyList())
+                    .menus(Collections.emptyList())
                     .build();
-            menuItems.add(item);
         }
 
-        // 4) 사진은 공용 PhotoDto를 그대로 전달
-        List<PhotoDto> photos = mp.photos();
+        // 미등록이면 panel3에서 정보 가져오기
+        final String kakaoPlaceIdStr = String.valueOf(kakaoPlaceId);
+        KakaoApiClient.PanelSnapshot snap = kakaoApiClient.getPanelSnapshot(kakaoPlaceIdStr);
 
-        // 5) 평탄화된 DTO로 응답 조립
+        // 메뉴를 프리뷰 전용 DTO로 변환 (isRecommended=false 고정)
+        List<PlaceCheckResponseDto.MenuItem> menuItems = new ArrayList<>();
+        List<MenuDto> srcMenus = snap.menus();
+        if (srcMenus != null) {
+            for (MenuDto m : srcMenus) {
+                PlaceCheckResponseDto.MenuItem item = PlaceCheckResponseDto.MenuItem.builder()
+                        .name(m.getName())
+                        .price(m.getPrice())
+                        .isRecommended(false) // 프리뷰 단계이므로 항상 false
+                        .build();
+                menuItems.add(item);
+            }
+        }
+
         return PlaceCheckResponseDto.builder()
-                .alreadyRegistered(already)
-//                .placeName(req.getName())        // TODO 서버 신뢰 소스(공식 검색/스냅샷)로 대체
-//                .address(req.getAddress())       // TODO 서버 신뢰 소스로 대체
-//                .location(req.getLocation())     // TODO 서버 신뢰 소스로 대체
-                .photos(photos)
+                .alreadyRegistered(false)
+                .placeId(null) // 미등록 프리뷰에서는 null
+                .placeName(snap.placeName())
+                .address(snap.address())
+                .location(LocationDto.of(snap.latitude(), snap.longitude()))
+                .photos(snap.photos())
                 .menus(menuItems)
                 .build();
     }
@@ -76,7 +100,7 @@ public class PlaceService {
      */
     @Transactional
     public PlaceRegisterResponseDto register(PlaceRequestDto req) {
-        final Long kakaoPlaceId = req.getKakaoPlaceId();
+        final String kakaoPlaceId = req.getKakaoPlaceId();
 
         // 1) 멱등 처리(이미 등록된 경우 기존 데이터 반환)
         Optional<Place> maybe = placeRepository.findByKakaoPlaceId(kakaoPlaceId);
@@ -87,76 +111,99 @@ public class PlaceService {
             return PlaceRegisterResponseDto.from(exists, existsCategories, existsTags);
         }
 
-        // 2) Place 저장
+        // 2) panel3 스냅샷으로 데이터 확보
+        PanelSnapshot snap = kakaoApiClient.getPanelSnapshot(kakaoPlaceId);
+
+        // 3) Place 저장
         Place place = Place.builder()
                 .campus(req.getCampus())
                 .kakaoPlaceId(kakaoPlaceId)
-                .name(req.getName())
-                .address(req.getAddress())
-                .latitude(req.getLocation().getLatitude())
-                .longitude(req.getLocation().getLongitude())
+                .name(snap.placeName())
+                .address(snap.address())
+                .latitude(snap.latitude())
+                .longitude(snap.longitude())
                 .description(req.getDescription())
                 .build();
         placeRepository.save(place);
 
-        // 3) 카테고리, 태그 연관 저장
-        List<Category> categories = categoryRepository.findAllById(req.getCategoryIds());
-        if (categories.size() != req.getCategoryIds().size()) {
+        // 4) 카테고리 저장
+        List<Long> categoryIds = req.getCategoryIds();
+        List<Category> categories = categoryRepository.findAllById(categoryIds);
+        if (categories.size() != categoryIds.size()) {
             throw new IllegalArgumentException("유효하지 않은 categoryId가 포함되어 있습니다.");
         }
         for (Category c : categories) {
             placeCategoryRepository.save(new PlaceCategory(place, c));
         }
 
-        // 태그(선택) 여러 개
-        List<Tag> tags = Collections.emptyList();
-        if (req.getTagIds() != null && !req.getTagIds().isEmpty()) {
-            tags = tagRepository.findAllById(req.getTagIds());
-            // 누락 검증(선택사항)
-            if (tags.size() != req.getTagIds().size()) {
+        // 5) 태그 저장
+        List<Tag> tags = new ArrayList<Tag>();
+        List<Long> tagIds = req.getTagIds();
+        if (tagIds != null && !tagIds.isEmpty()) {
+            List<Tag> found = tagRepository.findAllById(tagIds);
+            if (found.size() != tagIds.size()) {
                 throw new IllegalArgumentException("유효하지 않은 tagId가 포함되어 있습니다.");
             }
-            for (Tag t : tags) {
+            for (Tag t : found) {
                 placeTagRepository.save(new PlaceTag(place, t));
+                tags.add(t);
             }
         }
 
-        // 4) Kakao에서 메뉴, 사진 수집 후 저장
-        KakaoApiClient.MenusAndPhotos mp = kakaoApiClient.getMenusAndPhotos(kakaoPlaceId);
-
-        // 4-1) 사진 url 저장
+        // 6) 사진 저장
         LocalDateTime now = LocalDateTime.now();
-        for (PhotoDto pd : mp.photos()) {
-            photoRepository.save(
-                    Photo.builder()
-                            .place(place)
-                            .photoUrl(pd.getPhotoUrl())
-                            .displayOrder(pd.getDisplayOrder() != null ? pd.getDisplayOrder() : 0)
-                            .fetchedAt(now)
-                            .build()
-            );
+        List<PhotoDto> photos = snap.photos();
+        if (photos != null) {
+            for (int i = 0; i < photos.size(); i++) {
+                PhotoDto pd = photos.get(i);
+                int order = (pd.getDisplayOrder() != null) ? pd.getDisplayOrder() : i;
+                photoRepository.save(
+                        Photo.builder()
+                                .place(place)
+                                .photoUrl(pd.getPhotoUrl())
+                                .displayOrder(order)
+                                .fetchedAt(now)
+                                .build()
+                );
+            }
         }
 
-        // 4-2) 메뉴 저장
-        Map<String, PlaceRequestDto.MenuInfo> requestedMenuByName =
-                req.getMenus().stream().collect(Collectors.toMap(PlaceRequestDto.MenuInfo::getName, m -> m, (a, b) -> a));
-
-        for (MenuDto md : mp.menus()) {
-            PlaceRequestDto.MenuInfo fromRequest = requestedMenuByName.get(md.getName());
-            boolean isRec = fromRequest != null && Boolean.TRUE.equals(fromRequest.getIsRecommended());
-            int price = md.getPrice(); // Kakao 파싱 가격(없으면 0)
-
-            menuRepository.save(
-                    Menu.builder()
-                            .place(place)
-                            .name(md.getName())
-                            .price(price)
-                            .isRecommended(isRec)
-                            .build()
-            );
+        // 7) 메뉴 저장
+        // 요청으로 들어온 메뉴에서 "추천 여부"만 사용하기 위해 이름 -> 추천여부 매핑 생성
+        Map<String, Boolean> recommendedByName = new HashMap<String, Boolean>();
+        List<PlaceRequestDto.MenuInfo> reqMenus = req.getMenus();
+        if (reqMenus != null) {
+            for (PlaceRequestDto.MenuInfo mi : reqMenus) {
+                if (mi != null && mi.getName() != null) {
+                    // 마지막 값 우선(중복 이름 방어)
+                    recommendedByName.put(mi.getName(), Boolean.TRUE.equals(mi.getIsRecommended()));
+                }
+            }
         }
 
-        // 5) 응답 조합
+        List<MenuDto> menus = snap.menus();
+        if (menus != null) {
+            for (MenuDto md : menus) {
+                String name = md.getName();
+                int price = md.getPrice(); // panel3 파싱 가격
+                boolean isRec = false;
+                if (name != null && recommendedByName.containsKey(name)) {
+                    Boolean v = recommendedByName.get(name);
+                    isRec = (v != null) && v.booleanValue();
+                }
+
+                menuRepository.save(
+                        Menu.builder()
+                                .place(place)
+                                .name(name)
+                                .price(price)
+                                .isRecommended(isRec)
+                                .build()
+                );
+            }
+        }
+
+        // 8) 응답 조합
         return PlaceRegisterResponseDto.from(place, categories, tags);
     }
 
