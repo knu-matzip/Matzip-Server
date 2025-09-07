@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class MenuDto {
-    private Long productId;
+    private Long menuId;
     private String name;
     private int price;
 

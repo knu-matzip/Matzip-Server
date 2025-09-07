@@ -123,7 +123,7 @@ public class KakaoApiClient {
                 }
 
                 list.add(MenuDto.builder()
-                        .productId(productId)
+                        .menuId(productId)
                         .name(name)
                         .price(price)
                         .build());

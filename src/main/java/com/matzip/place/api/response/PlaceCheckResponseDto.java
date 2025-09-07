@@ -26,7 +26,7 @@ public class PlaceCheckResponseDto {
     @Getter
     @Builder
     public static class MenuItem {
-        private Long productId;
+        private Long menuId;
         private String name;
         private int price;
         private boolean isRecommended; // 프리뷰 기본값: false
