@@ -91,7 +91,7 @@ public class PlaceService {
                 .address(snap.address())
                 .location(LocationDto.of(snap.latitude(), snap.longitude()))
                 .photos(snap.photos())
-                .menus(menuItems)
+                .menus(snap.menus())
                 .build();
     }
 

@@ -8,9 +8,10 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
-
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class KakaoApiClient {
@@ -92,9 +93,21 @@ public class KakaoApiClient {
     // /menu/menus/items
     private static List<MenuDto> extractMenus(JsonNode root) {
         List<MenuDto> list = new ArrayList<>();
+
         JsonNode items = root.at("/menu/menus/items");
         if (items != null && items.isArray()) {
             for (JsonNode item : items) {
+
+                JsonNode idNode = item.get("product_id");
+                if (idNode == null || !idNode.canConvertToLong()) {
+                    continue; // 식별 불가 항목 스킵
+                }
+
+                long productId = idNode.asLong();
+                if (productId <= 0L) {
+                    continue;
+                }
+
                 String name = text(item, "name");
                 if (name == null || name.isBlank()) continue;
 
@@ -110,6 +123,7 @@ public class KakaoApiClient {
                 }
 
                 list.add(MenuDto.builder()
+                        .productId(productId)
                         .name(name)
                         .price(price)
                         .build());
@@ -119,59 +133,76 @@ public class KakaoApiClient {
     }
 
     /**
-     * 사진은 세 출처를 합산:
-     * 1) /menu/menus/photos[*].url
-     * 2) /photos/photos[*].url
-     * 3) /blog_review/reviews[*].photos[*].url
+     * 사진은 세 출처 합산
      */
     private static List<PhotoDto> extractPhotos(JsonNode root) {
         List<PhotoDto> list = new ArrayList<>();
         int order = 0;
 
-        // 1) menu.menus.photos
-        JsonNode menuPhotos = root.at("/menu/menus/photos");
-        if (menuPhotos != null && menuPhotos.isArray()) {
-            for (JsonNode p : menuPhotos) {
-                String url = text(p, "url");
-                if (isNotBlank(url)) {
-                    list.add(PhotoDto.builder()
-                            .photoId(null) // 외부 photo_id가 있을 수도 있으나 불일치 케이스가 있어 우선 null
-                            .photoUrl(url)
-                            .displayOrder(order++)
-                            .build());
+        // URL 중복 제거용
+        Set<String> dedup = new HashSet<String>();
+
+        // 1) /menu/menus/photos[*]
+        JsonNode menus = root.at("/menu/menus");
+        if (menus != null && menus.isArray()) {
+            for (JsonNode group : menus) {
+                JsonNode menuPhotos = group.path("photos");
+                if (menuPhotos != null && menuPhotos.isArray()) {
+                    for (JsonNode p : menuPhotos) {
+                        String url = text(p, "photo_url"); // 일부는 url, 일부는 photo_url일 수 있어 둘 다 시도
+                        if (url == null) url = text(p, "url");
+                        Long pid = numberToLongOrNull(p.get("photo_id"));
+
+                        if (isNotBlank(url) && !dedup.contains(url)) {
+                            list.add(PhotoDto.builder()
+                                    .photoId(pid)             // 있으면 세팅, 없으면 null
+                                    .photoUrl(url)
+                                    .displayOrder(order++)
+                                    .build());
+                            dedup.add(url);
+                        }
+                    }
                 }
             }
         }
 
-        // 2) photos.photos
+        // 2) /photos/photos[*]
         JsonNode globalPhotos = root.at("/photos/photos");
         if (globalPhotos != null && globalPhotos.isArray()) {
             for (JsonNode p : globalPhotos) {
-                String url = text(p, "url");
-                if (isNotBlank(url)) {
+                String url = text(p, "photo_url");
+                if (url == null) url = text(p, "url");
+                Long pid = numberToLongOrNull(p.get("photo_id"));
+
+                if (isNotBlank(url) && !dedup.contains(url)) {
                     list.add(PhotoDto.builder()
-                            .photoId(null)
+                            .photoId(pid)
                             .photoUrl(url)
                             .displayOrder(order++)
                             .build());
+                    dedup.add(url);
                 }
             }
         }
 
-        // 3) blog_review.reviews[*].photos[*]
+        // 3) /blog_review/reviews[*].photos[*]
         JsonNode reviews = root.at("/blog_review/reviews");
         if (reviews != null && reviews.isArray()) {
             for (JsonNode r : reviews) {
                 JsonNode reviewPhotos = r.path("photos");
                 if (reviewPhotos != null && reviewPhotos.isArray()) {
                     for (JsonNode p : reviewPhotos) {
-                        String url = text(p, "url");
-                        if (isNotBlank(url)) {
+                        String url = text(p, "photo_url");
+                        if (url == null) url = text(p, "url");
+                        Long pid = numberToLongOrNull(p.get("photo_id"));
+
+                        if (isNotBlank(url) && !dedup.contains(url)) {
                             list.add(PhotoDto.builder()
-                                    .photoId(null)
+                                    .photoId(pid)
                                     .photoUrl(url)
                                     .displayOrder(order++)
                                     .build());
+                            dedup.add(url);
                         }
                     }
                 }
@@ -224,6 +255,12 @@ public class KakaoApiClient {
             throw new KakaoApiException("panel3 필드 누락/형식 오류: " + path, null);
         }
         return node.asDouble();
+    }
+
+    private static Long numberToLongOrNull(JsonNode node) {
+        if (node == null || node.isNull()) return null;
+        if (node.canConvertToLong()) return node.asLong();
+        return null;
     }
 
     /**
