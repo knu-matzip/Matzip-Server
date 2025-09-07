@@ -57,7 +57,6 @@ public class PlaceService {
 
             return PlaceCheckResponseDto.builder()
                     .alreadyRegistered(true)
-                    .placeId(p.getId())
                     .placeName(p.getName())
                     .address("")
                     .location(LocationDto.of(p.getLatitude(), p.getLongitude()))
@@ -86,7 +85,6 @@ public class PlaceService {
 
         return PlaceCheckResponseDto.builder()
                 .alreadyRegistered(false)
-                .placeId(null) // 미등록 프리뷰에서는 null
                 .placeName(snap.placeName())
                 .address(snap.address())
                 .location(LocationDto.of(snap.latitude(), snap.longitude()))
