@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
  */
 @Component
 @RequiredArgsConstructor
-public class KakaoApiClient {
+public class KakaoLoginApiClient {
 
     private static final String TOKEN_HOST = "https://kauth.kakao.com";
     private static final String API_HOST   = "https://kapi.kakao.com";
