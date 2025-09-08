@@ -6,10 +6,11 @@ import com.matzip.auth.api.dto.TokenReissueRequest;
 import com.matzip.auth.api.dto.TokenResponse;
 import com.matzip.auth.application.AuthService;
 import com.matzip.auth.application.dto.ReissueResult;
+import com.matzip.common.config.AuthRedirectProperties;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.common.response.ApiResponse;
-import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 
-import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -30,35 +30,7 @@ public class AuthController {
     private static final String RT_COOKIE_PATH = "/api/v1/auth";
 
     private final AuthService authService;
-
-    /**
-     * 카카오 로그인: 인가 코드 -> 카카오 토큰 교환/유저 조회 -> 우리 서비스 JWT 발급
-     */
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody KakaoLoginRequest request) {
-        LoginResponse response = authService.login(request);
-
-        ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
-
-        if (StringUtils.hasText(response.getRefreshToken())) {
-            // Refresh Token은 바디에 실지 않고 HttpOnly 쿠키로만 내려옴
-            ResponseCookie rtCookie = buildRtCookie(response.getRefreshToken(), response.getRefreshTokenExpiresIn());
-            builder.header(SET_COOKIE, rtCookie.toString());
-
-            response = LoginResponse.builder()
-                    .tokenType(response.getTokenType())
-                    .accessToken(response.getAccessToken())
-                    .accessTokenExpiresIn(response.getAccessTokenExpiresIn())
-                    .userId(response.getUserId())
-                    .nickname(response.getNickname())
-                    .profileImageUrl(response.getProfileImageUrl())
-                    .firstLogin(response.isFirstLogin())
-                    .build();
-        }
-
-        ApiResponse<LoginResponse> payload = ApiResponse.success(response);
-        return builder.body(payload);
-    }
+    private final AuthRedirectProperties redirectProperties;
 
     /**
      * 토큰 재발급
@@ -103,6 +75,35 @@ public class AuthController {
                 .sameSite("Lax")     // 도메인 구조에 따라 None/Strict로 조정
                 .path(RT_COOKIE_PATH)
                 .maxAge(Duration.ofMillis(maxAgeMs))
+                .build();
+    }
+
+    @GetMapping("/callback")
+    public ResponseEntity<Void> kakaoCallback(
+            @RequestParam("code") @NotBlank String code,
+            @RequestParam(name = "state", required = false) String state
+    ) {
+        // 1) 서버에서 로그인 실행 (code -> 토큰교환/유저조회 -> JWT 발급)
+        LoginResponse res = authService.login(new KakaoLoginRequest(code));
+
+        // 2) Refresh Token을 HttpOnly 쿠키로 설정 (Acess Token은 바디/URL에 싣지 않음)
+        ResponseCookie rtCookie = ResponseCookie.from(RT_COOKIE_NAME, res.getRefreshToken())
+                .httpOnly(true)
+                .secure(redirectProperties.isCookieSecure())     // 로컬은 false, 운영은 true
+                .sameSite(redirectProperties.getCookieSameSite())// "Lax" 또는 "None"
+                .path(RT_COOKIE_PATH)
+                .maxAge(Duration.ofMillis(res.getRefreshTokenExpiresIn()))
+                .build();
+
+        // 3) 프론트 성공 URL로 302 리다이렉트 (필요 시 state를 그대로 붙여 전달)
+        String location = redirectProperties.getSuccessUri();
+        if (state != null && !state.isBlank()) {
+            location = location + (location.contains("?") ? "&" : "?") + "state=" + state;
+        }
+
+        return ResponseEntity.status(302)
+                .header("Set-Cookie", rtCookie.toString())
+                .header("Location", location)
                 .build();
     }
 }

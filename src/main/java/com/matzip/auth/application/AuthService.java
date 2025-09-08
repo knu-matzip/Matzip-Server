@@ -60,12 +60,12 @@ public class AuthService {
 
         if (user == null) {
             String nickname = nickNameGenerator.generate();
-            String profileUrl = profileImagePicker.pick();
+//            String profileUrl = profileImagePicker.pick();
 
             user = User.builder()
                     .kakaoId(kakaoUser.getId())
                     .nickname(nickname)
-                    .profileImageUrl(profileUrl) // TODO: FK 전환 시 제거하고 ProfileImage 엔티티 참조로 변경
+//                    .profileImageUrl(profileUrl) // TODO: FK 전환 시 제거하고 ProfileImage 엔티티 참조로 변경
                     .build();
 
             user = userRepository.save(user);
@@ -96,7 +96,7 @@ public class AuthService {
                 .refreshTokenExpiresIn(refreshTokenTtlMs())
                 .userId(user.getId())
                 .nickname(user.getNickname())
-                .profileImageUrl(user.getProfileImageUrl()) // TODO: FK 전환 시 DTO 매핑에서 user.getProfileImage().getImageUrl() 사용
+//                .profileImageUrl(user.getProfileImageUrl()) // TODO: FK 전환 시 DTO 매핑에서 user.getProfileImage().getImageUrl() 사용
                 .firstLogin(firstLogin)
                 .build();
     }
