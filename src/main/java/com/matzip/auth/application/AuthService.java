@@ -26,7 +26,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final KakaoLoginApiClient kakaoLoginApiClient;
-    private RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
     private final JwtProperties jwtProps;
 
