@@ -22,7 +22,7 @@ import java.time.Duration;
 import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 @RestController
-@RequestMapping("/api/vi/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
