@@ -38,7 +38,7 @@ public class AuthController {
 
     private final KakaoProperties kakaoProperties;
     private final StateGenerator stateGenerator;
-    private KakaoAuthorizeUrlBuilder kakaoAuthorizeUrlBuilder;
+    private final KakaoAuthorizeUrlBuilder kakaoAuthorizeUrlBuilder;
 
     @GetMapping("/authorize")
     public ResponseEntity<Void> authorize() {
