@@ -5,8 +5,11 @@ import com.matzip.auth.api.dto.LoginResponse;
 import com.matzip.auth.api.dto.TokenReissueRequest;
 import com.matzip.auth.api.dto.TokenResponse;
 import com.matzip.auth.application.AuthService;
+import com.matzip.auth.application.util.KakaoAuthorizeUrlBuilder;
+import com.matzip.auth.application.util.StateGenerator;
 import com.matzip.auth.application.dto.ReissueResult;
 import com.matzip.common.config.AuthRedirectProperties;
+import com.matzip.common.config.KakaoProperties;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.common.response.ApiResponse;
@@ -27,10 +30,40 @@ import java.time.Duration;
 public class AuthController {
 
     private static final String RT_COOKIE_NAME = "RT";
+    private static final String STATE_COOKIE_NAME = "STATE";
     private static final String RT_COOKIE_PATH = "/api/v1/auth";
 
     private final AuthService authService;
     private final AuthRedirectProperties redirectProperties;
+
+    private final KakaoProperties kakaoProperties;
+    private final StateGenerator stateGenerator;
+    private KakaoAuthorizeUrlBuilder kakaoAuthorizeUrlBuilder;
+
+    @GetMapping("/authorize")
+    public ResponseEntity<Void> authorize() {
+        if (!StringUtils.hasText(kakaoProperties.getClientId()) || !StringUtils.hasText(kakaoProperties.getRedirectUri())) {
+            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "카카오 OAuth 설정(clientId/redirectUri)이 누락되었습니다.");
+        }
+
+        // 1) state 생성 후 HttpOnly 쿠키로 저장
+        String state = stateGenerator.generate();
+        ResponseCookie stateCookie = ResponseCookie.from(STATE_COOKIE_NAME, state)
+                .httpOnly(true)
+                .secure(redirectProperties.isCookieSecure())
+                .sameSite(redirectProperties.getCookieSameSite())
+                .path(RT_COOKIE_PATH)
+                .maxAge(Duration.ofMinutes(5))
+                .build();
+
+        // 2) 카카오 authorize URL 구성
+        String authorizeUrl = kakaoAuthorizeUrlBuilder.build(state);
+
+        return ResponseEntity.status(302)
+                .header(HttpHeaders.SET_COOKIE, stateCookie.toString())
+                .header(HttpHeaders.LOCATION, authorizeUrl)
+                .build();
+    }
 
     /**
      * 토큰 재발급
