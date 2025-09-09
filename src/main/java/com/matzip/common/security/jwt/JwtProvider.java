@@ -2,6 +2,7 @@ package com.matzip.common.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SecurityException;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,7 +81,7 @@ public class JwtProvider {
             return true;
         } catch (ExpiredJwtException e) {
             log.warn("JWT expired at {}", e.getClaims().getExpiration());
-        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+        } catch (SecurityException | MalformedJwtException e) {
             log.warn("JWT signature invalid or malformed: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
             log.warn("JWT illegal argument (null/empty?): {}", e.getMessage());
