@@ -3,6 +3,7 @@ package com.matzip.common.security.jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import java.util.Date;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+@Slf4j
 @Component
 public class JwtProvider {
 
@@ -76,9 +78,16 @@ public class JwtProvider {
         try {
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
             return true;
+        } catch (ExpiredJwtException e) {
+            log.warn("JWT expired at {}", e.getClaims().getExpiration());
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+            log.warn("JWT signature invalid or malformed: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.warn("JWT illegal argument (null/empty?): {}", e.getMessage());
         } catch (Exception e) {
-            return false;
+            log.warn("JWT validate failed: {}", e.getMessage());
         }
+        return false;
     }
 
 }
