@@ -28,6 +28,10 @@ public class BaseEntity implements Serializable {
     protected BaseEntity() {
     }
 
+    protected BaseEntity(Long id) {
+        this.id = id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
