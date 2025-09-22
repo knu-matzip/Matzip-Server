@@ -39,6 +39,8 @@ public class PlaceRequestDto {
     @Size(max = 5, message = "카테고리는 최대 5개까지 선택할 수 있습니다.")
     private List<Long> categoryIds;
 
+    private Long registeredBy; // 등록자 ID (nullable)
+
     // 메뉴 정보를 담는 내부 DTO
     @Getter
     @NoArgsConstructor

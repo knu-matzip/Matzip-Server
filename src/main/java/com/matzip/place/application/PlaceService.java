@@ -10,6 +10,8 @@ import com.matzip.place.api.response.PlaceCheckResponseDto;
 import com.matzip.place.api.response.PlaceRegisterResponseDto;
 import com.matzip.place.domain.*;
 import com.matzip.place.infra.*;
+import com.matzip.user.domain.User;
+import com.matzip.user.infra.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,7 @@ public class PlaceService {
     private final TagRepository tagRepository;
     private final PlaceCategoryRepository placeCategoryRepository;
     private final PlaceTagRepository placeTagRepository;
+    private final UserRepository userRepository;
 
     /**
      * 가게 정보 확인 프리뷰
@@ -112,7 +115,14 @@ public class PlaceService {
         // 2) panel3 스냅샷으로 데이터 확보
         PanelSnapshot snap = kakaoApiClient.getPanelSnapshot(kakaoPlaceId);
 
-        // 3) Place 저장
+        // 3) 등록자 정보 조회 (nullable)
+        User registeredBy = null;
+        if (req.getRegisteredBy() != null) {
+            registeredBy = userRepository.findById(req.getRegisteredBy())
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다. userId=" + req.getRegisteredBy()));
+        }
+
+        // 4) Place 저장
         Place place = Place.builder()
                 .campus(req.getCampus())
                 .kakaoPlaceId(kakaoPlaceId)
@@ -121,10 +131,11 @@ public class PlaceService {
                 .latitude(snap.latitude())
                 .longitude(snap.longitude())
                 .description(req.getDescription())
+                .registeredBy(registeredBy)
                 .build();
         placeRepository.save(place);
 
-        // 4) 카테고리 저장
+        // 5) 카테고리 저장
         List<Long> categoryIds = req.getCategoryIds();
         List<Category> categories = categoryRepository.findAllById(categoryIds);
         if (categories.size() != categoryIds.size()) {
@@ -134,7 +145,7 @@ public class PlaceService {
             placeCategoryRepository.save(new PlaceCategory(place, c));
         }
 
-        // 5) 태그 저장
+        // 6) 태그 저장
         List<Tag> tags = new ArrayList<Tag>();
         List<Long> tagIds = req.getTagIds();
         if (tagIds != null && !tagIds.isEmpty()) {
@@ -148,7 +159,7 @@ public class PlaceService {
             }
         }
 
-        // 6) 사진 저장
+        // 7) 사진 저장
         LocalDateTime now = LocalDateTime.now();
         List<PhotoDto> photos = snap.photos();
         if (photos != null) {
@@ -166,7 +177,7 @@ public class PlaceService {
             }
         }
 
-        // 7) 메뉴 저장
+        // 8) 메뉴 저장
         // 요청으로 들어온 메뉴에서 "추천 여부"만 사용하기 위해 이름 -> 추천여부 매핑 생성
         Map<String, Boolean> recommendedByName = new HashMap<String, Boolean>();
         List<PlaceRequestDto.MenuInfo> reqMenus = req.getMenus();
@@ -201,7 +212,7 @@ public class PlaceService {
             }
         }
 
-        // 8) 응답 조합
+        // 9) 응답 조합
         return PlaceRegisterResponseDto.from(place, categories, tags);
     }
 

@@ -1,12 +1,12 @@
 package com.matzip.place.domain;
 
+import com.matzip.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "place")
@@ -44,9 +44,13 @@ public class Place {
     @Column(name = "like_count", nullable = false)
     private Integer likeCount = 0; // 기본값을 0으로 초기화
 
+    @ManyToOne
+    @JoinColumn(name = "registered_by")
+    private User registeredBy; // 등록자 (nullable - 비회원도 등록 가능)
+
 
     @Builder
-    private Place(String kakaoPlaceId, Campus campus, String name, String address, double latitude, double longitude, String description) {
+    private Place(String kakaoPlaceId, Campus campus, String name, String address, double latitude, double longitude, String description, User registeredBy) {
         this.kakaoPlaceId = kakaoPlaceId;
         this.campus = campus;
         this.name = name;
@@ -54,5 +58,6 @@ public class Place {
         this.latitude = latitude;
         this.longitude = longitude;
         this.description = description;
+        this.registeredBy = registeredBy;
     }
 }
