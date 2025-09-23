@@ -48,9 +48,13 @@ public class Place {
     @JoinColumn(name = "registered_by")
     private User registeredBy; // 등록자 (nullable - 비회원도 등록 가능)
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private PlaceStatus status = PlaceStatus.PENDING; // 기본값은 승인 대기
+
 
     @Builder
-    private Place(String kakaoPlaceId, Campus campus, String name, String address, double latitude, double longitude, String description, User registeredBy) {
+    private Place(String kakaoPlaceId, Campus campus, String name, String address, double latitude, double longitude, String description, User registeredBy, PlaceStatus status) {
         this.kakaoPlaceId = kakaoPlaceId;
         this.campus = campus;
         this.name = name;
@@ -59,5 +63,26 @@ public class Place {
         this.longitude = longitude;
         this.description = description;
         this.registeredBy = registeredBy;
+        this.status = status != null ? status : PlaceStatus.PENDING;
+    }
+
+
+    // Place를 승인 상태로 변경
+    public void approve() {
+        this.status = PlaceStatus.APPROVED;
+    }
+
+    public void reject() {
+        this.status = PlaceStatus.REJECTED;
+    }
+
+    // 승인된 Place인지 확인
+    public boolean isApproved() {
+        return this.status == PlaceStatus.APPROVED;
+    }
+
+    // 승인 대기 중인 Place인지 확인
+    public boolean isPending() {
+        return this.status == PlaceStatus.PENDING;
     }
 }

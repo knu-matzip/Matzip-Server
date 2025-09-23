@@ -103,7 +103,7 @@ public class PlaceService {
     public PlaceRegisterResponseDto register(PlaceRequestDto req) {
         final String kakaoPlaceId = req.getKakaoPlaceId();
 
-        // 1) 멱등 처리(이미 등록된 경우 기존 데이터 반환)
+        // 1) 멱등 처리(이미 등록 요청이 있는 경우 기존 데이터 반환)
         Optional<Place> maybe = placeRepository.findByKakaoPlaceId(kakaoPlaceId);
         if (maybe.isPresent()) {
             Place exists = maybe.get();
@@ -122,7 +122,7 @@ public class PlaceService {
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다. userId=" + req.getRegisteredBy()));
         }
 
-        // 4) Place 저장
+        // 4) Place 저장 (승인 대기 상태로 저장)
         Place place = Place.builder()
                 .campus(req.getCampus())
                 .kakaoPlaceId(kakaoPlaceId)
@@ -132,6 +132,7 @@ public class PlaceService {
                 .longitude(snap.longitude())
                 .description(req.getDescription())
                 .registeredBy(registeredBy)
+                .status(PlaceStatus.PENDING)
                 .build();
         placeRepository.save(place);
 
@@ -215,6 +216,13 @@ public class PlaceService {
         // 9) 응답 조합
         return PlaceRegisterResponseDto.from(place, categories, tags);
     }
+
+    // ===== 관리자 기능 (TODO: Admin 페이지 개발 시 구현) =====
+    /**
+     * TODO: 관리자가 Place 등록 요청을 승인하는 메서드
+     * TODO: 관리자가 Place 등록 요청을 거부하는 메서드
+     * TODO: 관리자가 승인 대기 중인 Place 목록을 조회하는 메서드
+     */
 
     // ===== 내부 헬퍼 =====
 

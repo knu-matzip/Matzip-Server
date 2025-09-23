@@ -30,4 +30,12 @@ public class PlaceController {
         PlaceRegisterResponseDto data = placeService.register(req);
         return ApiResponse.success(data);
     }
+
+    // ===== 관리자 기능 (TODO: Admin 페이지 개발 시 구현) =====
+    
+    /**
+     * TODO: 관리자가 Place 등록 요청을 승인하는 API
+     * TODO: 관리자가 Place 등록 요청을 거부하는 API
+     * TODO: 관리자가 승인 대기 중인 Place 목록을 조회하는 API
+     */
 }
