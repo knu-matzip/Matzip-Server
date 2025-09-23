@@ -13,6 +13,11 @@ import lombok.NoArgsConstructor;
 @Table(name = "place")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AttributeOverrides({
+    @AttributeOverride(name = "id", column = @Column(name = "place_id")),
+    @AttributeOverride(name = "createdAt", column = @Column(name = "created_at")),
+    @AttributeOverride(name = "updatedAt", column = @Column(name = "updated_at"))
+})
 public class Place extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
