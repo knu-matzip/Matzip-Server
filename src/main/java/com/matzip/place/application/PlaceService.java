@@ -8,8 +8,10 @@ import com.matzip.place.api.request.PlaceCheckRequestDto;
 import com.matzip.place.api.request.PlaceRequestDto;
 import com.matzip.place.api.response.PlaceCheckResponseDto;
 import com.matzip.place.api.response.PlaceRegisterResponseDto;
+import com.matzip.place.application.port.PlaceTempStore.PlaceSnapshot;
 import com.matzip.place.domain.*;
 import com.matzip.place.infra.*;
+import com.matzip.place.application.port.PlaceTempStore;
 import com.matzip.user.domain.User;
 import com.matzip.user.infra.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.matzip.external.kakao.KakaoApiClient.*;
+import static com.matzip.place.api.request.PlaceRequestDto.*;
+import static com.matzip.place.api.response.PlaceCheckResponseDto.*;
+import static com.matzip.place.application.port.PlaceTempStore.PlaceSnapshot.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +42,7 @@ public class PlaceService {
     private final PlaceCategoryRepository placeCategoryRepository;
     private final PlaceTagRepository placeTagRepository;
     private final UserRepository userRepository;
+    private final PlaceTempStore placeTempStore;
 
     /**
      * 가게 정보 확인 프리뷰
@@ -58,7 +64,7 @@ public class PlaceService {
             }
             Place p = maybe.get();
 
-            return PlaceCheckResponseDto.builder()
+            return builder()
                     .alreadyRegistered(true)
                     .placeName(p.getName())
                     .address("")
@@ -70,14 +76,18 @@ public class PlaceService {
 
         // 미등록이면 panel3에서 정보 가져오기
         final String kakaoPlaceIdStr = String.valueOf(kakaoPlaceId);
-        KakaoApiClient.PanelSnapshot snap = kakaoApiClient.getPanelSnapshot(kakaoPlaceIdStr);
+        PanelSnapshot snap = kakaoApiClient.getPanelSnapshot(kakaoPlaceIdStr);
+
+        // 캐시에 스냅샷 저장 (등록 시 재사용)
+        PlaceSnapshot cachedSnapshot = createPlaceSnapshot(snap);
+        placeTempStore.put(cachedSnapshot);
 
         // 메뉴를 프리뷰 전용 DTO로 변환 (isRecommended=false 고정)
-        List<PlaceCheckResponseDto.MenuItem> menuItems = new ArrayList<>();
+        List<MenuItem> menuItems = new ArrayList<>();
         List<MenuDto> srcMenus = snap.menus();
         if (srcMenus != null) {
             for (MenuDto m : srcMenus) {
-                PlaceCheckResponseDto.MenuItem item = PlaceCheckResponseDto.MenuItem.builder()
+                MenuItem item = MenuItem.builder()
                         .name(m.getName())
                         .price(m.getPrice())
                         .isRecommended(false) // 프리뷰 단계이므로 항상 false
@@ -86,7 +96,7 @@ public class PlaceService {
             }
         }
 
-        return PlaceCheckResponseDto.builder()
+        return builder()
                 .alreadyRegistered(false)
                 .placeName(snap.placeName())
                 .address(snap.address())
@@ -112,8 +122,8 @@ public class PlaceService {
             return PlaceRegisterResponseDto.from(exists, existsCategories, existsTags);
         }
 
-        // 2) panel3 스냅샷으로 데이터 확보
-        PanelSnapshot snap = kakaoApiClient.getPanelSnapshot(kakaoPlaceId);
+        // 2) 캐시에서 스냅샷 조회 (프리뷰 단계에서 저장된 데이터 사용)
+        PlaceSnapshot cachedSnapshot = placeTempStore.findById(kakaoPlaceId);
 
         // 3) 등록자 정보 조회 (nullable)
         User registeredBy = null;
@@ -126,10 +136,10 @@ public class PlaceService {
         Place place = Place.builder()
                 .campus(req.getCampus())
                 .kakaoPlaceId(kakaoPlaceId)
-                .name(snap.placeName())
-                .address(snap.address())
-                .latitude(snap.latitude())
-                .longitude(snap.longitude())
+                .name(cachedSnapshot.getPlaceName())
+                .address(cachedSnapshot.getAddress())
+                .latitude(cachedSnapshot.getLatitude())
+                .longitude(cachedSnapshot.getLongitude())
                 .description(req.getDescription())
                 .registeredBy(registeredBy)
                 .status(PlaceStatus.PENDING)
@@ -162,15 +172,14 @@ public class PlaceService {
 
         // 7) 사진 저장
         LocalDateTime now = LocalDateTime.now();
-        List<PhotoDto> photos = snap.photos();
+        List<SPhoto> photos = cachedSnapshot.getPhotos();
         if (photos != null) {
-            for (int i = 0; i < photos.size(); i++) {
-                PhotoDto pd = photos.get(i);
-                int order = (pd.getDisplayOrder() != null) ? pd.getDisplayOrder() : i;
+            for (SPhoto sp : photos) {
+                int order = sp.getDisplayOrder();
                 photoRepository.save(
                         Photo.builder()
                                 .place(place)
-                                .photoUrl(pd.getPhotoUrl())
+                                .photoUrl(sp.getPhotoUrl())
                                 .displayOrder(order)
                                 .fetchedAt(now)
                                 .build()
@@ -181,9 +190,9 @@ public class PlaceService {
         // 8) 메뉴 저장
         // 요청으로 들어온 메뉴에서 "추천 여부"만 사용하기 위해 이름 -> 추천여부 매핑 생성
         Map<String, Boolean> recommendedByName = new HashMap<String, Boolean>();
-        List<PlaceRequestDto.MenuInfo> reqMenus = req.getMenus();
+        List<MenuInfo> reqMenus = req.getMenus();
         if (reqMenus != null) {
-            for (PlaceRequestDto.MenuInfo mi : reqMenus) {
+            for (MenuInfo mi : reqMenus) {
                 if (mi != null && mi.getName() != null) {
                     // 마지막 값 우선(중복 이름 방어)
                     recommendedByName.put(mi.getName(), Boolean.TRUE.equals(mi.getIsRecommended()));
@@ -191,11 +200,11 @@ public class PlaceService {
             }
         }
 
-        List<MenuDto> menus = snap.menus();
+        List<SMenu> menus = cachedSnapshot.getMenus();
         if (menus != null) {
-            for (MenuDto md : menus) {
-                String name = md.getName();
-                int price = md.getPrice(); // panel3 파싱 가격
+            for (SMenu sm : menus) {
+                String name = sm.getName();
+                int price = sm.getPrice(); // 캐싱된 스냅샷에서 가격
                 boolean isRec = false;
                 if (name != null && recommendedByName.containsKey(name)) {
                     Boolean v = recommendedByName.get(name);
@@ -213,7 +222,10 @@ public class PlaceService {
             }
         }
 
-        // 9) 응답 조합
+        // 9) 캐시에서 스냅샷 제거
+        placeTempStore.remove(kakaoPlaceId);
+
+        // 10) 응답 조합
         return PlaceRegisterResponseDto.from(place, categories, tags);
     }
 
@@ -225,6 +237,41 @@ public class PlaceService {
      */
 
     // ===== 내부 헬퍼 =====
+
+    /**
+     * KakaoApiClient.PanelSnapshot을 PlaceTempStore.PlaceSnapshot으로 변환
+     */
+    private PlaceSnapshot createPlaceSnapshot(PanelSnapshot snap) {
+        // 메뉴 변환
+        List<SMenu> sMenus = new ArrayList<>();
+        if (snap.menus() != null) {
+            for (MenuDto md : snap.menus()) {
+                sMenus.add(new SMenu(md.getName(), md.getPrice()));
+            }
+        }
+
+        // 사진 변환
+        List<SPhoto> sPhotos = new ArrayList<>();
+        if (snap.photos() != null) {
+            for (PhotoDto pd : snap.photos()) {
+                sPhotos.add(new SPhoto(
+                    null, // photoId는 null로 설정
+                    pd.getPhotoUrl(),
+                    pd.getDisplayOrder() != null ? pd.getDisplayOrder() : 0
+                ));
+            }
+        }
+
+        return new PlaceSnapshot(
+            snap.confirmId(), // confirmId를 사용
+            snap.placeName(),
+            snap.address(),
+            snap.latitude(),
+            snap.longitude(),
+            sMenus,
+            sPhotos
+        );
+    }
 
     // Place 기준으로 연결된 Category 목록을 조회
     private List<Category> extractCategoriesByPlace(Place place) {

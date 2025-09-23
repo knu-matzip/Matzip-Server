@@ -1,4 +1,4 @@
-package com.matzip.matzip.server;
+package com.matzip.server;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

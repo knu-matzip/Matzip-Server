@@ -1,5 +1,6 @@
 package com.matzip.place.domain;
 
+import com.matzip.common.entity.BaseEntity;
 import com.matzip.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -12,12 +13,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "place")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Place {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "place_id")
-    private Long id;
+public class Place extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "campus", nullable = false)

@@ -19,5 +19,5 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     List<Place> findByStatus(PlaceStatus status);
 
     // 등록자별 Place 조회 (사용자가 자신이 등록한 Place 상태 확인용)
-    List<Place> findByRegisteredByIdOrderByCreatedAtDesc(Long registeredById);
+    List<Place> findByRegisteredByIdOrderByIdDesc(Long registeredById);
 }
