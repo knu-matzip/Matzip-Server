@@ -3,7 +3,7 @@ package com.matzip.place.application;
 import com.matzip.common.dto.LocationDto;
 import com.matzip.common.dto.MenuDto;
 import com.matzip.common.dto.PhotoDto;
-import com.matzip.place.infra.KakaoApiClient;
+import com.matzip.place.infra.kakao.KakaoApiClient;
 import com.matzip.place.api.request.PlaceCheckRequestDto;
 import com.matzip.place.api.request.PlaceRequestDto;
 import com.matzip.place.api.response.PlaceCheckResponseDto;
