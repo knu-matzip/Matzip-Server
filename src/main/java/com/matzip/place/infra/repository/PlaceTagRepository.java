@@ -1,4 +1,4 @@
-package com.matzip.place.infra;
+package com.matzip.place.infra.repository;
 
 import com.matzip.place.domain.Place;
 import com.matzip.place.domain.PlaceTag;

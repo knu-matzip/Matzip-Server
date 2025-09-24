@@ -1,4 +1,4 @@
-package com.matzip.external.kakao;
+package com.matzip.place.infra;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.matzip.common.dto.MenuDto;

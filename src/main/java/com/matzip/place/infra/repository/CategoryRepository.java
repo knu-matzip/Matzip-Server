@@ -1,4 +1,4 @@
-package com.matzip.place.infra;
+package com.matzip.place.infra.repository;
 
 import com.matzip.place.domain.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
