@@ -1,6 +1,7 @@
 package com.matzip.common.security.jwt.filter;
 
 import com.matzip.common.security.jwt.JwtProvider;
+import com.matzip.common.security.UserPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null && jwtProvider.validateToken(token)) {
             // 3. 토큰이 유효하면 인증 정보를 생성하여 SecurityContext에 저장
             Long userId = jwtProvider.getUserId(token);
-            Authentication authentication = new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
+            UserPrincipal userPrincipal = new UserPrincipal(userId);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(userPrincipal, null, Collections.emptyList());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
