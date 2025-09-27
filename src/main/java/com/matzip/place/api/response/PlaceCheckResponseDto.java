@@ -13,18 +13,25 @@ import java.util.List;
 public class PlaceCheckResponseDto {
 
     private Boolean alreadyRegistered; // 우리 서비스에 이미 등록된 가게인지 여부
-    private Long kakaoPlaceId;
-    private PlaceInfo place;
-    private List<MenuDto> menus; // 카카오맵에 등록된 메뉴 정보
 
-    // 가게 기본 정보
+    private String placeName;
+    private String address;
+    private LocationDto location;
+
+    // 미등록 프리뷰: 실제 사진/메뉴로 채움
+    // 이미 등록: 빈 배열
+    private List<PhotoDto> photos;
+    private List<MenuDto> menus;
+
     @Getter
     @Builder
-    public static class PlaceInfo {
+    public static class MenuItem {
+        private Long menuId;
         private String name;
-        private String address;
-        private LocationDto location;
-        private List<PhotoDto> photos; // 카카오맵에 등록된 사진 정보
+        private int price;
+        private boolean isRecommended; // 프리뷰 기본값: false
     }
+
+
 
 }
