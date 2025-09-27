@@ -1,5 +1,6 @@
-package com.matzip.common.security.jwt;
+package com.matzip.common.security.jwt.filter;
 
+import com.matzip.common.security.jwt.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

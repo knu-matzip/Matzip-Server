@@ -15,7 +15,7 @@ public class RecommendedMenuDto {
         return RecommendedMenuDto.builder()
                 .name(menu.getName())
                 .price(menu.getPrice())
-                .isRecommended(menu.getIsRecommended())
+                .isRecommended(menu.isRecommended())
                 .build();
     }
 }

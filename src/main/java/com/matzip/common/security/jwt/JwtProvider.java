@@ -2,7 +2,9 @@ package com.matzip.common.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SecurityException;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +14,7 @@ import java.util.Date;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+@Slf4j
 @Component
 public class JwtProvider {
 
@@ -19,7 +22,10 @@ public class JwtProvider {
     private String secretKey;
 
     @Value("${jwt.expiration-time}")
-    private long expirationTime;
+    private long accessTokenExpirationTime;
+
+    @Value("${jwt.refresh-expiration-time}")
+    private long refreshTokenExpirationTime; // 리프레시 토큰 만료 시간
 
     private SecretKey key;
 
@@ -31,12 +37,23 @@ public class JwtProvider {
     /**
      * Access Token 생성
      */
-    public String createToken(Long userId) {
+    public String createAccessToken(Long userId) {
+        return createToken(userId, accessTokenExpirationTime);
+    }
+
+    /**
+     * Refresh Token 생성
+     */
+    public String createRefreshToken(Long userId) {
+        return createToken(userId, refreshTokenExpirationTime);
+    }
+
+    private String createToken(Long userId, long expirationTime) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationTime);
 
         return Jwts.builder()
-                .subject(String.valueOf(userId)) // 토큰의 주체로 userId 저장
+                .subject(String.valueOf(userId))
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(key)
@@ -62,9 +79,16 @@ public class JwtProvider {
         try {
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
             return true;
+        } catch (ExpiredJwtException e) {
+            log.warn("JWT expired at {}", e.getClaims().getExpiration());
+        } catch (SecurityException | MalformedJwtException e) {
+            log.warn("JWT signature invalid or malformed: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.warn("JWT illegal argument (null/empty?): {}", e.getMessage());
         } catch (Exception e) {
-            return false;
+            log.warn("JWT validate failed: {}", e.getMessage());
         }
+        return false;
     }
 
 }
