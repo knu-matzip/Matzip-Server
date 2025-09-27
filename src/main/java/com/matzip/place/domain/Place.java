@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Table(name = "place")
 @Getter
@@ -55,7 +54,8 @@ public class Place extends BaseEntity {
 
 
     @Builder
-    private Place(String kakaoPlaceId, Campus campus, String name, String address, double latitude, double longitude, String description, User registeredBy, PlaceStatus status) {
+    private Place(Long id, String kakaoPlaceId, Campus campus, String name, String address, double latitude, double longitude, String description, User registeredBy, PlaceStatus status) {
+        super(id);
         this.kakaoPlaceId = kakaoPlaceId;
         this.campus = campus;
         this.name = name;

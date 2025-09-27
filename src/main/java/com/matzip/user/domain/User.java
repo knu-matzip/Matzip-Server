@@ -1,7 +1,11 @@
 package com.matzip.user.domain;
 
 import com.matzip.common.entity.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -27,7 +31,8 @@ public class User extends BaseEntity {
     }
 
     @Builder
-    private User(Long kakaoId, String nickname, String profileImageUrl) {
+    private User(Long id, Long kakaoId, String nickname, String profileImageUrl) {
+        super(id);
         this.kakaoId = kakaoId;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
