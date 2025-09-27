@@ -52,7 +52,11 @@ public enum ErrorCode {
 
     // External API Errors (7000번대)
     KAKAO_API_ERROR(7000, HttpStatus.SERVICE_UNAVAILABLE, "카카오 API 호출 중 오류가 발생했습니다."),
-    KAKAO_PLACE_SEARCH_ERROR(7001, HttpStatus.NOT_FOUND, "카카오맵에서 해당 장소를 찾을 수 없습니다.");
+    KAKAO_PLACE_SEARCH_ERROR(7001, HttpStatus.NOT_FOUND, "카카오맵에서 해당 장소를 찾을 수 없습니다."),
+    KAKAO_PANEL3_CALL_FAILED(7002, HttpStatus.SERVICE_UNAVAILABLE, "카카오 panel3 API 호출에 실패했습니다."),
+    KAKAO_CONFIRM_ID_MISSING(7003, HttpStatus.BAD_REQUEST, "카카오 API 응답에 confirm_id가 없습니다."),
+    KAKAO_CONFIRM_ID_MISMATCH(7004, HttpStatus.BAD_REQUEST, "요청 kakaoPlaceId와 응답 confirm_id가 일치하지 않습니다."),
+    KAKAO_PANEL3_FIELD_ERROR(7005, HttpStatus.BAD_REQUEST, "카카오 panel3 응답 필드에 오류가 있습니다.");
 
     private final int code;
     private final HttpStatus status;

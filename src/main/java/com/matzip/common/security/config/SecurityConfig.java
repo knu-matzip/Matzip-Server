@@ -31,7 +31,7 @@ public class SecurityConfig {
                         // 로그인 API, 회원가입 API 등은 인증 없이 접근 허용
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         // 그 외 모든 요청은 인증 필요
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
 
                 // 직접 구현한 JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 추가
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

@@ -2,6 +2,7 @@ package com.matzip.place.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,5 +29,13 @@ public class Menu {
 
     @Column(name = "is_recommended", nullable = false)
     private boolean isRecommended = false;
+
+    @Builder
+    public Menu(Place place, String name, Integer price, Boolean isRecommended) {
+        this.place = place;
+        this.name = name;
+        this.price = price;
+        this.isRecommended = isRecommended;
+    }
 
 }

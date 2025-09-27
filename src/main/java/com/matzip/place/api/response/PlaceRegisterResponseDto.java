@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Builder
-public class PlaceListResponseDto {
+public class PlaceRegisterResponseDto {
 
     private Long placeId;
     private String placeName;
@@ -22,8 +22,8 @@ public class PlaceListResponseDto {
     private List<TagDto> tags;
 
     // 서비스 계층에서 모든 정보를 조합하여 DTO로 변환
-    public static PlaceListResponseDto from(Place place, List<Category> categories, List<Tag> tags) {
-        return PlaceListResponseDto.builder()
+    public static PlaceRegisterResponseDto from(Place place, List<Category> categories, List<Tag> tags) {
+        return PlaceRegisterResponseDto.builder()
                 .placeId(place.getId())
                 .placeName(place.getName())
                 .address(place.getAddress())
