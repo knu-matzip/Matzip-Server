@@ -3,6 +3,7 @@ package com.matzip.lottery.service;
 import com.matzip.lottery.domain.Ticket;
 import com.matzip.lottery.repository.TicketRepository;
 import com.matzip.place.domain.Place;
+import com.matzip.place.domain.PlaceStatus;
 import com.matzip.user.domain.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +38,8 @@ class TicketIssuanceServiceTest {
                 .build();
         Place place = Place.builder()
                 .id(1L)
+                .status(PlaceStatus.APPROVED)
+                .registeredBy(user)
                 .build();
 
         //when
@@ -58,6 +61,8 @@ class TicketIssuanceServiceTest {
                 .build();
         Place place = Place.builder()
                 .id(1L)
+                .status(PlaceStatus.APPROVED)
+                .registeredBy(user)
                 .build();
 
         //when & then
@@ -72,6 +77,40 @@ class TicketIssuanceServiceTest {
     @Test
     @DisplayName("등록이 완료되지 않은 장소에 대해서는 응모권이 발급되지 않는다.")
     void issueTicket_PlaceNotAccepted() {
-        // TODO: Place에 status 추가 및 검증 로직 구현 후 테스트 작성
+        //given
+        User user = User.builder()
+                .id(1L)
+                .build();
+        Place place = Place.builder()
+                .id(1L)
+                .status(PlaceStatus.PENDING)
+                .build();
+
+        //when & then
+        Assertions.assertThatThrownBy(() -> ticketIssuanceService.issueTicket(user, place))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("등록 요청이 승인된 장소가 아닙니다.");
+    }
+
+    @Test
+    @DisplayName("등록자가 아닌 경우 응모권이 발급되지 않는다.")
+    void issueTicket_NotRegistrant() {
+        //given
+        User user = User.builder()
+                .id(1L)
+                .build();
+        User registrant = User.builder()
+                .id(2L)
+                .build();
+        Place place = Place.builder()
+                .id(1L)
+                .status(PlaceStatus.APPROVED)
+                .registeredBy(registrant)
+                .build();
+
+        //when & then
+        Assertions.assertThatThrownBy(() -> ticketIssuanceService.issueTicket(user, place))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("등록자만 응모권을 발급받을 수 있습니다.");
     }
 }
