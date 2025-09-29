@@ -2,12 +2,16 @@ package com.matzip.place.api;
 
 import com.matzip.common.response.ApiResponse;
 import com.matzip.common.security.UserPrincipal;
+import com.matzip.place.api.request.MapSearchRequestDto;
+import com.matzip.place.api.response.MapSearchResponseDto;
 import com.matzip.place.api.response.PlaceDetailResponseDto;
 import com.matzip.place.application.PlaceReadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/places")
@@ -18,9 +22,6 @@ public class PlaceReadController {
 
     /**
      * 맛집 상세 정보 조회
-     * @param placeId 조회할 맛집 ID
-     * @param userPrincipal 현재 인증된 사용자 정보 (선택적)
-     * @return 맛집 상세 정보
      */
     @GetMapping("/{placeId}")
     public ResponseEntity<ApiResponse<PlaceDetailResponseDto>> getPlaceDetail(
@@ -31,5 +32,16 @@ public class PlaceReadController {
         PlaceDetailResponseDto placeDetail = placeReadService.getPlaceDetail(placeId, userId);
         
         return ResponseEntity.ok(ApiResponse.success(placeDetail));
+    }
+
+    /**
+     * 지도 범위 내 맛집 조회
+     */
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<MapSearchResponseDto>>> getPlacesInMap(
+            @ModelAttribute MapSearchRequestDto requestDto) {
+
+        List<MapSearchResponseDto> places = placeReadService.findPlacesInMapBounds(requestDto);
+        return ResponseEntity.ok(ApiResponse.success(places));
     }
 }

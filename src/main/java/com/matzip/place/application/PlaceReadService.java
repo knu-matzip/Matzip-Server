@@ -2,6 +2,8 @@ package com.matzip.place.application;
 
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
+import com.matzip.place.api.request.MapSearchRequestDto;
+import com.matzip.place.api.response.MapSearchResponseDto;
 import com.matzip.place.api.response.PlaceDetailResponseDto;
 import com.matzip.place.domain.*;
 import com.matzip.place.infra.repository.*;
@@ -22,6 +24,7 @@ public class PlaceReadService {
     private final PhotoRepository photoRepository;
     private final PlaceCategoryRepository placeCategoryRepository;
     private final PlaceTagRepository placeTagRepository;
+
 
     public PlaceDetailResponseDto getPlaceDetail(Long placeId, Long userId) {
 
@@ -50,5 +53,33 @@ public class PlaceReadService {
         boolean isLiked = false; // TODO: 실제 좋아요 기능 구현 시 userId로 확인
 
         return PlaceDetailResponseDto.from(place, photos, menus, categories, tags, isLiked);
+    }
+
+    public List<MapSearchResponseDto> findPlacesInMapBounds(MapSearchRequestDto requestDto) {
+        List<Place> places = placeRepository.findWithinBounds(
+                requestDto.getMinLat(),
+                requestDto.getMaxLat(),
+                requestDto.getMinLng(),
+                requestDto.getMaxLng()
+        );
+
+        // 각 Place에 대해 연관 데이터 조회 및 DTO 변환
+        return places.stream()
+                .map(place -> {
+                    List<Photo> photos = photoRepository.findByPlaceOrderByDisplayOrderAsc(place);
+                    
+                    List<PlaceCategory> placeCategories = placeCategoryRepository.findAllByPlace(place);
+                    List<Category> categories = placeCategories.stream()
+                            .map(PlaceCategory::getCategory)
+                            .collect(Collectors.toList());
+                    
+                    List<PlaceTag> placeTags = placeTagRepository.findAllByPlace(place);
+                    List<Tag> tags = placeTags.stream()
+                            .map(PlaceTag::getTag)
+                            .collect(Collectors.toList());
+                    
+                    return MapSearchResponseDto.from(place, photos, categories, tags);
+                })
+                .collect(Collectors.toList());
     }
 }

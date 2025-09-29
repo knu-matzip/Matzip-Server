@@ -3,6 +3,8 @@ package com.matzip.place.infra.repository;
 import com.matzip.place.domain.Place;
 import com.matzip.place.domain.PlaceStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,4 +22,10 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     // 등록자별 Place 조회 (사용자가 자신이 등록한 Place 상태 확인용)
     List<Place> findByRegisteredByIdOrderByIdDesc(Long registeredById);
+
+    @Query("SELECT p FROM Place p WHERE p.latitude BETWEEN :minLat AND :maxLat AND p.longitude BETWEEN :minLng AND :maxLng AND p.status = 'APPROVED'")
+    List<Place> findWithinBounds(
+            @Param("minLat") double minLat, @Param("maxLat") double maxLat,
+            @Param("minLng") double minLng, @Param("maxLng") double maxLng
+    );
 }
