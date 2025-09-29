@@ -11,4 +11,6 @@ public class MapSearchRequestDto {
     private Double maxLat;
     private Double minLng;
     private Double maxLng;
+    private Double userLat;
+    private Double userLng;
 }

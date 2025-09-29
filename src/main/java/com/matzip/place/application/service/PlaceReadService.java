@@ -45,12 +45,27 @@ public class PlaceReadService {
     }
 
     public List<MapSearchResponseDto> findPlacesInMapBounds(MapSearchRequestDto requestDto) {
-        List<Place> places = placeRepository.findWithinBounds(
-                requestDto.getMinLat(),
-                requestDto.getMaxLat(),
-                requestDto.getMinLng(),
-                requestDto.getMaxLng()
-        );
+        List<Place> places;
+
+        // 사용자 위치 정보가 있으면 거리순 정렬 쿼리 호출
+        if (requestDto.getUserLat() != null && requestDto.getUserLng() != null) {
+            places = placeRepository.findWithinBoundsAndSortByDistance(
+                    requestDto.getMinLat(),
+                    requestDto.getMaxLat(),
+                    requestDto.getMinLng(),
+                    requestDto.getMaxLng(),
+                    requestDto.getUserLat(),
+                    requestDto.getUserLng()
+            );
+        } else {
+            // 사용자 위치 정보가 없으면 기존 쿼리 호출
+            places = placeRepository.findWithinBounds(
+                    requestDto.getMinLat(),
+                    requestDto.getMaxLat(),
+                    requestDto.getMinLng(),
+                    requestDto.getMaxLng()
+            );
+        }
 
         return places.stream()
                 .map(place -> {

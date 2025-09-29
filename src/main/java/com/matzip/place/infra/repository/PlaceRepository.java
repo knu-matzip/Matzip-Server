@@ -23,9 +23,27 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     // 등록자별 Place 조회 (사용자가 자신이 등록한 Place 상태 확인용)
     List<Place> findByRegisteredByIdOrderByIdDesc(Long registeredById);
 
+    /**
+     * 지도 범위 내 맛집 조회 (정렬 없음)
+     */
     @Query("SELECT p FROM Place p WHERE p.latitude BETWEEN :minLat AND :maxLat AND p.longitude BETWEEN :minLng AND :maxLng AND p.status = 'APPROVED'")
     List<Place> findWithinBounds(
             @Param("minLat") double minLat, @Param("maxLat") double maxLat,
             @Param("minLng") double minLng, @Param("maxLng") double maxLng
+    );
+
+    /**
+     * 지도 범위 내 맛집을 조회하고, 사용자 위치 기준으로 가까운 순으로 정렬하는 쿼리
+     */
+    @Query(value = "SELECT * FROM place p " +
+            "WHERE p.latitude BETWEEN :minLat AND :maxLat " +
+            "  AND p.longitude BETWEEN :minLng AND :maxLng " +
+            "  AND p.status = 'APPROVED' " +
+            "ORDER BY ST_DISTANCE_SPHERE(POINT(:userLng, :userLat), POINT(p.longitude, p.latitude)) ASC ",
+            nativeQuery = true)
+    List<Place> findWithinBoundsAndSortByDistance(
+            @Param("minLat") double minLat, @Param("maxLat") double maxLat,
+            @Param("minLng") double minLng, @Param("maxLng") double maxLng,
+            @Param("userLat") double userLat, @Param("userLng") double userLng
     );
 }
