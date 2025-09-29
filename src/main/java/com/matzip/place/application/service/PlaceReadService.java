@@ -1,4 +1,4 @@
-package com.matzip.place.application;
+package com.matzip.place.application.service;
 
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;

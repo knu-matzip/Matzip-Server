@@ -1,11 +1,11 @@
-package com.matzip.place.api;
+package com.matzip.place.api.controller;
 
 import com.matzip.common.response.ApiResponse;
 import com.matzip.place.api.request.PlaceCheckRequestDto;
 import com.matzip.place.api.request.PlaceRequestDto;
 import com.matzip.place.api.response.PlaceCheckResponseDto;
 import com.matzip.place.api.response.PlaceRegisterResponseDto;
-import com.matzip.place.application.PlaceService;
+import com.matzip.place.application.service.PlaceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

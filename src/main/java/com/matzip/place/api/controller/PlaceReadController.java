@@ -1,11 +1,11 @@
-package com.matzip.place.api;
+package com.matzip.place.api.controller;
 
 import com.matzip.common.response.ApiResponse;
 import com.matzip.common.security.UserPrincipal;
 import com.matzip.place.api.request.MapSearchRequestDto;
 import com.matzip.place.api.response.MapSearchResponseDto;
 import com.matzip.place.api.response.PlaceDetailResponseDto;
-import com.matzip.place.application.PlaceReadService;
+import com.matzip.place.application.service.PlaceReadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
