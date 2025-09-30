@@ -86,4 +86,14 @@ public class Place extends BaseEntity {
     public boolean isPending() {
         return this.status == PlaceStatus.PENDING;
     }
+
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decrementLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
+    }
 }

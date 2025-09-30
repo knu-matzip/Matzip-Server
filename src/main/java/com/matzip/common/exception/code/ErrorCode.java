@@ -31,6 +31,9 @@ public enum ErrorCode {
     PLACE_NOT_FOUND(3000, HttpStatus.NOT_FOUND, "맛집을 찾을 수 없습니다."),
     PLACE_ALREADY_EXISTS(3001, HttpStatus.CONFLICT, "이미 등록된 맛집입니다."),
     PLACE_PERMISSION_DENIED(3002, HttpStatus.FORBIDDEN, "해당 맛집을 수정 또는 삭제할 권한이 없습니다."),
+    
+    // Place Like Errors (3100번대)
+    LIKE_NOT_FOUND(3101, HttpStatus.NOT_FOUND, "찜한 기록을 찾을 수 없습니다."),
 
     // Menu Errors (3500번대)
     MENU_NOT_FOUND(3500, HttpStatus.NOT_FOUND, "메뉴를 찾을 수 없습니다."),
