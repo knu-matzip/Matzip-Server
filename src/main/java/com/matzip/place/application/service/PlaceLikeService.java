@@ -3,6 +3,7 @@ package com.matzip.place.application.service;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.place.api.response.LikedPlaceResponseDto;
+import com.matzip.place.api.response.PlaceLikeResponseDto;
 import com.matzip.place.domain.entity.*;
 import com.matzip.place.infra.repository.PlaceCategoryRepository;
 import com.matzip.place.infra.repository.PlaceLikeRepository;
@@ -28,16 +29,18 @@ public class PlaceLikeService {
     private final PlaceTagRepository placeTagRepository;
 
     @Transactional
-    public void addLike(Long userId, Long placeId) {
+    public PlaceLikeResponseDto addLike(Long userId, Long placeId) {
         User user = findUserById(userId);
         Place place = findPlaceById(placeId);
 
         placeLikeRepository.save(PlaceLike.of(user, place));
         place.incrementLikeCount();
+        
+        return PlaceLikeResponseDto.addLike(placeId);
     }
 
     @Transactional
-    public void removeLike(Long userId, Long placeId) {
+    public PlaceLikeResponseDto removeLike(Long userId, Long placeId) {
         User user = findUserById(userId);
         Place place = findPlaceById(placeId);
 
@@ -46,6 +49,8 @@ public class PlaceLikeService {
 
         placeLikeRepository.delete(placeLike);
         place.decrementLikeCount();
+        
+        return PlaceLikeResponseDto.removeLike(placeId);
     }
 
     @Transactional(readOnly = true)
