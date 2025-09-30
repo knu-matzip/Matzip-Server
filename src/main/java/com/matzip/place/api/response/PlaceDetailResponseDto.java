@@ -1,8 +1,11 @@
 package com.matzip.place.api.response;
 
-import com.matzip.common.dto.*;
 import com.matzip.place.api.RecommendedMenuDto;
 import com.matzip.place.domain.entity.*;
+import com.matzip.place.dto.CategoryDto;
+import com.matzip.place.dto.LocationDto;
+import com.matzip.place.dto.PhotoDto;
+import com.matzip.place.dto.TagDto;
 import lombok.Builder;
 import lombok.Getter;
 

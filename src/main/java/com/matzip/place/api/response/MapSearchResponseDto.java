@@ -1,9 +1,9 @@
 package com.matzip.place.api.response;
 
-import com.matzip.common.dto.CategoryDto;
-import com.matzip.common.dto.LocationDto;
-import com.matzip.common.dto.PhotoDto;
-import com.matzip.common.dto.TagDto;
+import com.matzip.place.dto.CategoryDto;
+import com.matzip.place.dto.LocationDto;
+import com.matzip.place.dto.PhotoDto;
+import com.matzip.place.dto.TagDto;
 import com.matzip.place.domain.entity.Category;
 import com.matzip.place.domain.entity.Photo;
 import com.matzip.place.domain.entity.Place;

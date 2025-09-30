@@ -1,8 +1,8 @@
 package com.matzip.place.infra.kakao;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.matzip.common.dto.MenuDto;
-import com.matzip.common.dto.PhotoDto;
+import com.matzip.place.dto.MenuDto;
+import com.matzip.place.dto.PhotoDto;
 import com.matzip.common.exception.KakaoApiException;
 import com.matzip.common.exception.code.ErrorCode;
 import org.springframework.http.HttpHeaders;

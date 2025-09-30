@@ -1,4 +1,4 @@
-package com.matzip.common.dto;
+package com.matzip.place.dto;
 
 import lombok.Builder;
 import lombok.Getter;

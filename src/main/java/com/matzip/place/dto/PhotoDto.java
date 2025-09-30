@@ -1,4 +1,4 @@
-package com.matzip.common.dto;
+package com.matzip.place.dto;
 
 import com.matzip.place.domain.entity.Photo;
 import lombok.Builder;
