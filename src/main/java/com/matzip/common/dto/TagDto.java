@@ -1,6 +1,6 @@
 package com.matzip.common.dto;
 
-import com.matzip.place.domain.Tag;
+import com.matzip.place.domain.entity.Tag;
 import lombok.Builder;
 import lombok.Getter;
 

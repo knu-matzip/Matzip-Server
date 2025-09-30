@@ -9,7 +9,7 @@ import com.matzip.place.api.request.PlaceCheckRequestDto;
 import com.matzip.place.api.request.PlaceRequestDto;
 import com.matzip.place.api.response.PlaceCheckResponseDto;
 import com.matzip.place.application.port.PlaceTempStore;
-import com.matzip.place.domain.Category;
+import com.matzip.place.domain.entity.Category;
 import com.matzip.place.domain.Campus;
 import com.matzip.place.infra.repository.*;
 import com.matzip.user.infra.UserRepository;

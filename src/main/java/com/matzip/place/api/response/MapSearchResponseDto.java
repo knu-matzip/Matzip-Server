@@ -4,7 +4,10 @@ import com.matzip.common.dto.CategoryDto;
 import com.matzip.common.dto.LocationDto;
 import com.matzip.common.dto.PhotoDto;
 import com.matzip.common.dto.TagDto;
-import com.matzip.place.domain.*;
+import com.matzip.place.domain.entity.Category;
+import com.matzip.place.domain.entity.Photo;
+import com.matzip.place.domain.entity.Place;
+import com.matzip.place.domain.entity.Tag;
 import lombok.Builder;
 import lombok.Getter;
 

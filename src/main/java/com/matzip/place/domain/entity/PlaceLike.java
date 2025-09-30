@@ -1,4 +1,4 @@
-package com.matzip.place.domain;
+package com.matzip.place.domain.entity;
 
 import com.matzip.common.entity.BaseEntity;
 import com.matzip.user.domain.User;

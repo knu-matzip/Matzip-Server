@@ -1,7 +1,7 @@
 package com.matzip.place.infra.repository;
 
-import com.matzip.place.domain.Place;
-import com.matzip.place.domain.PlaceLike;
+import com.matzip.place.domain.entity.Place;
+import com.matzip.place.domain.entity.PlaceLike;
 import com.matzip.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

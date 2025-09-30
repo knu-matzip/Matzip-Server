@@ -2,9 +2,9 @@ package com.matzip.place.api.response;
 
 import com.matzip.common.dto.CategoryDto;
 import com.matzip.common.dto.TagDto;
-import com.matzip.place.domain.Category;
-import com.matzip.place.domain.Place;
-import com.matzip.place.domain.Tag;
+import com.matzip.place.domain.entity.Category;
+import com.matzip.place.domain.entity.Place;
+import com.matzip.place.domain.entity.Tag;
 import lombok.Builder;
 import lombok.Getter;
 

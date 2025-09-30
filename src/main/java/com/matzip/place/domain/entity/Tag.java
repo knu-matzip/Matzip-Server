@@ -1,4 +1,4 @@
-package com.matzip.place.domain;
+package com.matzip.place.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

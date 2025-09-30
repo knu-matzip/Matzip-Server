@@ -1,6 +1,6 @@
 package com.matzip.place.api;
 
-import com.matzip.place.domain.Menu;
+import com.matzip.place.domain.entity.Menu;
 import lombok.Builder;
 import lombok.Getter;
 

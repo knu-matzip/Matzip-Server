@@ -3,7 +3,7 @@ package com.matzip.place.application.service;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.place.api.response.LikedPlaceResponseDto;
-import com.matzip.place.domain.*;
+import com.matzip.place.domain.entity.*;
 import com.matzip.place.infra.repository.PlaceCategoryRepository;
 import com.matzip.place.infra.repository.PlaceLikeRepository;
 import com.matzip.place.infra.repository.PlaceRepository;

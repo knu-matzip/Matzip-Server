@@ -1,4 +1,4 @@
-package com.matzip.place.domain;
+package com.matzip.place.domain.entity;
 
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
