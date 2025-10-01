@@ -1,8 +1,29 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/knu_matzip?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
-    username: ${DB_USER}
-    password: ${DB_PASS}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
   jpa:
     hibernate:
       ddl-auto: validate
+
+logging:
+  level:
+    com.matzip: INFO
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  expiration-time: 3600000
+  refresh-expiration-time: 1209600000 # 14일
+
+oauth2:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID}
+    redirect-uri: ${KAKAO_PROD_REDIRECT_URI}
+
+auth:
+  redirect:
+    success-uri: ${KAKAO_FRONT_REDIRECT_URI}
+    cookie-secure: true
+    cookie-same-site: Lax
