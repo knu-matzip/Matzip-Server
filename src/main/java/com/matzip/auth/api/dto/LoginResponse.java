@@ -22,6 +22,7 @@ public class LoginResponse {
     private Long   userId;
     private String nickname;
     private String profileImageUrl;
+    private String profileBackgroundHexCode;
 
     // 부가 정보
     private boolean firstLogin;               // 최초 로그인 여부(랜덤 닉네임/프로필 부여 확인용)

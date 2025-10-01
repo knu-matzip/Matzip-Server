@@ -20,8 +20,13 @@ public class User extends BaseEntity {
     @Column(nullable = false, length = 30)
     private String nickname;
 
-    @Column(name = "profile_image_url")
-    private String profileImageUrl;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "profile_image", length = 40)
+    private ProfileImage profileImage;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "profile_background", length = 20)
+    private ProfileBackground profileBackground;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
@@ -31,16 +36,14 @@ public class User extends BaseEntity {
     }
 
     @Builder
-    private User(Long id, Long kakaoId, String nickname, String profileImageUrl) {
+    private User(Long id, Long kakaoId, String nickname) {
         super(id);
         this.kakaoId = kakaoId;
         this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
     }
 
-    // 닉네임/프로필 업데이트 메서드
-    public void updateProfile(String nickname, String profileImageUrl) {
-        this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
+    public void setProfile(ProfileImage image, ProfileBackground background) {
+        this.profileImage = image;
+        this.profileBackground = background;
     }
 }
