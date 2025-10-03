@@ -1,4 +1,4 @@
-package com.matzip.place.application;
+package com.matzip.place.application.service;
 
 import com.matzip.common.dto.LocationDto;
 import com.matzip.common.dto.MenuDto;
