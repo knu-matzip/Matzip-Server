@@ -25,7 +25,10 @@ public class PlaceReadService {
     private final PlaceCategoryRepository placeCategoryRepository;
     private final PlaceTagRepository placeTagRepository;
 
+    @Transactional
     public PlaceDetailResponseDto getPlaceDetail(Long placeId, Long userId) {
+
+        placeRepository.incrementViewCount(placeId);
 
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));

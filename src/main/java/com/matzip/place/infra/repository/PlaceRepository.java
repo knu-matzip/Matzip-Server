@@ -3,6 +3,7 @@ package com.matzip.place.infra.repository;
 import com.matzip.place.domain.Place;
 import com.matzip.place.domain.PlaceStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -46,4 +47,8 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
             @Param("minLng") double minLng, @Param("maxLng") double maxLng,
             @Param("userLat") double userLat, @Param("userLng") double userLng
     );
+
+    @Modifying
+    @Query("UPDATE Place p SET p.viewCount = p.viewCount + 1 WHERE p.id = :placeId")
+    void incrementViewCount(@Param("placeId") Long placeId);
 }

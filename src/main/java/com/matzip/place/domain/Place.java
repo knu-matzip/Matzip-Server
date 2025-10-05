@@ -44,6 +44,9 @@ public class Place extends BaseEntity {
     @Column(name = "like_count", nullable = false)
     private int likeCount = 0; // 기본값을 0으로 초기화
 
+    @Column(name = "view_count")
+    private int viewCount = 0;
+
     @ManyToOne
     @JoinColumn(name = "registered_by")
     private User registeredBy; // 등록자 (nullable - 비회원도 등록 가능)
