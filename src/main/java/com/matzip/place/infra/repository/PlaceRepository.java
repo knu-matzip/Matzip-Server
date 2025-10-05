@@ -2,6 +2,7 @@ package com.matzip.place.infra.repository;
 
 import com.matzip.place.domain.Place;
 import com.matzip.place.domain.PlaceStatus;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -46,4 +47,8 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
             @Param("minLng") double minLng, @Param("maxLng") double maxLng,
             @Param("userLat") double userLat, @Param("userLng") double userLng
     );
+
+    @EntityGraph(attributePaths = {"placeCategories", "placeCategories.category", "placeTags", "placeTags.tag"})
+    @Query("SELECT DISTINCT place FROM Place place WHERE place.status = 'PENDING'")
+    List<Place> findPendingPlaces();
 }
