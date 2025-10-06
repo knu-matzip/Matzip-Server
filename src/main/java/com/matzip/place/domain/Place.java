@@ -8,6 +8,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Entity
 @Table(name = "place")
 @Getter
@@ -52,6 +58,17 @@ public class Place extends BaseEntity {
     @Column(name = "status", nullable = false)
     private PlaceStatus status = PlaceStatus.PENDING; // 기본값은 승인 대기
 
+    @OneToMany(mappedBy = "place")
+    private Set<PlaceCategory> placeCategories = new HashSet<>();
+
+    @OneToMany(mappedBy = "place")
+    private Set<PlaceTag> placeTags = new HashSet<>();
+
+    @OneToMany(mappedBy = "place")
+    private List<Menu> menus = new ArrayList<>();
+
+    @OneToMany(mappedBy = "place")
+    private List<Photo> photos = new ArrayList<>();
 
     @Builder
     private Place(Long id, String kakaoPlaceId, Campus campus, String name, String address, double latitude, double longitude, String description, User registeredBy, PlaceStatus status) {
@@ -85,5 +102,19 @@ public class Place extends BaseEntity {
     // 승인 대기 중인 Place인지 확인
     public boolean isPending() {
         return this.status == PlaceStatus.PENDING;
+    }
+
+    public List<Category> getCategories() {
+        return this.placeCategories.stream()
+                .map(PlaceCategory::getCategory)
+                .sorted(Comparator.comparing(Category::getId))
+                .toList();
+    }
+
+    public List<Tag> getTags() {
+        return this.placeTags.stream()
+                .map(PlaceTag::getTag)
+                .sorted(Comparator.comparing(Tag::getId))
+                .toList();
     }
 }

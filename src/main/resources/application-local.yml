@@ -6,6 +6,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
 #  security:
 #    oauth2:
 #      client:
@@ -41,3 +45,8 @@ auth:
     success-uri: http://localhost:3000/login/success # 임시, 프론트에 확인 필요
     cookie-secure: false     # 로컬 HTTP 테스트면 false
     cookie-same-site: Lax
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
