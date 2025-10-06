@@ -33,6 +33,10 @@ public class PlaceLikeService {
         User user = findUserById(userId);
         Place place = findPlaceById(placeId);
 
+        if (placeLikeRepository.existsByUserAndPlace(user, place)) {
+            throw new BusinessException(ErrorCode.ALREADY_LIKED_PLACE);
+        }
+
         placeLikeRepository.save(PlaceLike.of(user, place));
         place.incrementLikeCount();
         

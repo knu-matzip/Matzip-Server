@@ -15,4 +15,6 @@ public interface PlaceLikeRepository extends JpaRepository<PlaceLike, Long> {
 
     // 사용자의 찜 목록 조회를 위해 사용 (최신순 정렬)
     List<PlaceLike> findAllByUserOrderByCreatedAtDesc(User user);
+
+    boolean existsByUserAndPlace(User user, Place place);
 }

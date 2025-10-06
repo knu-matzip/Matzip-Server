@@ -34,6 +34,7 @@ public enum ErrorCode {
     
     // Place Like Errors (3100번대)
     LIKE_NOT_FOUND(3101, HttpStatus.NOT_FOUND, "찜한 기록을 찾을 수 없습니다."),
+    ALREADY_LIKED_PLACE(3102, HttpStatus.CONFLICT, "이미 찜한 가게입니다."),
 
     // Menu Errors (3500번대)
     MENU_NOT_FOUND(3500, HttpStatus.NOT_FOUND, "메뉴를 찾을 수 없습니다."),
