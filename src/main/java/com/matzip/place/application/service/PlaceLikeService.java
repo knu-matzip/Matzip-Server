@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,11 +49,10 @@ public class PlaceLikeService {
         User user = findUserById(userId);
         Place place = findPlaceById(placeId);
 
-        PlaceLike placeLike = placeLikeRepository.findByUserAndPlace(user, place)
-                .orElseThrow(() -> new BusinessException(ErrorCode.LIKE_NOT_FOUND));
-
-        placeLikeRepository.delete(placeLike);
-        place.decrementLikeCount();
+        placeLikeRepository.findByUserAndPlace(user, place).ifPresent(placeLike -> {
+            placeLikeRepository.delete(placeLike);
+            place.decrementLikeCount();
+        });
         
         return PlaceLikeResponseDto.removeLike(placeId);
     }
