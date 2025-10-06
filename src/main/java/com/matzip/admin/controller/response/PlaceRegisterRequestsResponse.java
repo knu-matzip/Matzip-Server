@@ -1,4 +1,4 @@
-package com.matzip.admin.controller.dto;
+package com.matzip.admin.controller.response;
 
 import com.matzip.common.dto.CategoryDto;
 import com.matzip.common.dto.TagDto;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @Builder
 public record PlaceRegisterRequestsResponse(Long placeId, String placeName, LocalDate requestDate, Campus campus,
-                                            String address, List<CategoryDto> categories, List<TagDto> tags) {
+                                            List<CategoryDto> categories, List<TagDto> tags) {
 
     public static PlaceRegisterRequestsResponse from(Place place) {
         return PlaceRegisterRequestsResponse.builder()
@@ -19,7 +19,6 @@ public record PlaceRegisterRequestsResponse(Long placeId, String placeName, Loca
                 .placeName(place.getName())
                 .requestDate(place.getCreatedAt().toLocalDate())
                 .campus(place.getCampus())
-                .address(place.getAddress())
                 .categories(place.getCategories()
                         .stream()
                         .map(CategoryDto::from)

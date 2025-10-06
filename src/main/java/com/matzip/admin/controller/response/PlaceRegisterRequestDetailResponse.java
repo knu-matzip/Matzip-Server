@@ -1,4 +1,4 @@
-package com.matzip.admin.controller.dto;
+package com.matzip.admin.controller.response;
 
 import com.matzip.common.dto.CategoryDto;
 import com.matzip.common.dto.LocationDto;
