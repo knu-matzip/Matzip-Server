@@ -5,6 +5,7 @@ import com.matzip.place.domain.DailyViewCount;
 import com.matzip.place.domain.Place;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -22,4 +23,9 @@ public interface DailyViewCountRepository extends JpaRepository<DailyViewCount, 
             @Param("date") LocalDate date,
             Pageable pageable
     );
+
+
+    @Modifying
+    @Query("UPDATE DailyViewCount d SET d.count = d.count + 1 WHERE d.place.id = :placeId AND d.viewDate = :date")
+    int incrementDailyViewCount(@Param("placeId") Long placeId, @Param("date") LocalDate date);
 }

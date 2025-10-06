@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -131,22 +130,17 @@ public class PlaceReadService {
         return new PlaceRelatedData(photos, categories, tags);
     }
 
-    /**
-     * DailyViewCount 테이블에 일일 조회수 증가
-     */
     private void incrementDailyViewCount(Long placeId) {
-        Place place = placeRepository.findById(placeId).orElse(null);
-        if (place == null) return;
-        
         LocalDate today = LocalDate.now();
-        Optional<DailyViewCount> existingCount = dailyViewCountRepository.findByPlaceAndViewDate(place, today);
-        
-        if (existingCount.isPresent()) {
-            DailyViewCount dailyViewCount = existingCount.get();
-            dailyViewCount.incrementCount();
-        } else {
-            DailyViewCount newDailyViewCount = new DailyViewCount(place, today, 1);
-            dailyViewCountRepository.save(newDailyViewCount);
+
+        int updatedRows = dailyViewCountRepository.incrementDailyViewCount(placeId, today);
+
+        if (updatedRows == 0) {
+            Place place = placeRepository.findById(placeId).orElse(null);
+            if (place != null) {
+                DailyViewCount newDailyViewCount = new DailyViewCount(place, today, 1);
+                dailyViewCountRepository.save(newDailyViewCount);
+            }
         }
     }
 
