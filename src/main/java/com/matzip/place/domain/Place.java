@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -62,6 +63,12 @@ public class Place extends BaseEntity {
 
     @OneToMany(mappedBy = "place")
     private Set<PlaceTag> placeTags = new HashSet<>();
+
+    @OneToMany(mappedBy = "place")
+    private List<Menu> menus = new ArrayList<>();
+
+    @OneToMany(mappedBy = "place")
+    private List<Photo> photos = new ArrayList<>();
 
     @Builder
     private Place(Long id, String kakaoPlaceId, Campus campus, String name, String address, double latitude, double longitude, String description, User registeredBy, PlaceStatus status) {

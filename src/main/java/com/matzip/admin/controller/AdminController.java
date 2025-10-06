@@ -1,9 +1,13 @@
 package com.matzip.admin.controller;
 
+import com.matzip.admin.controller.dto.PlaceRegisterRequestDetailResponse;
 import com.matzip.admin.controller.dto.PlaceRegisterRequestsResponse;
+import com.matzip.common.exception.BusinessException;
+import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.common.response.ApiResponse;
 import com.matzip.place.infra.repository.PlaceRepository;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +29,17 @@ public class AdminController {
                 .stream()
                 .map(PlaceRegisterRequestsResponse::from)
                 .toList();
+
+        return ApiResponse.success(data);
+    }
+
+    @GetMapping("/requests/places/{placeId}")
+    public ApiResponse<PlaceRegisterRequestDetailResponse> findPlaceRegisterRequestDetail(
+            @PathVariable("placeId") Long placeId
+    ) {
+        PlaceRegisterRequestDetailResponse data = placeRepository.findByIdWithCategoriesAndTags(placeId)
+                .map(PlaceRegisterRequestDetailResponse::from)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
 
         return ApiResponse.success(data);
     }

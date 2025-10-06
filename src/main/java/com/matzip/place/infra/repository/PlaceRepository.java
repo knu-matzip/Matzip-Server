@@ -51,4 +51,8 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     @EntityGraph(attributePaths = {"placeCategories", "placeCategories.category", "placeTags", "placeTags.tag"})
     @Query("SELECT DISTINCT place FROM Place place WHERE place.status = 'PENDING'")
     List<Place> findPendingPlaces();
+
+    @EntityGraph(attributePaths = {"placeCategories", "placeCategories.category", "placeTags", "placeTags.tag"})
+    @Query("SELECT DISTINCT place FROM Place place WHERE place.id = :id")
+    Optional<Place> findByIdWithCategoriesAndTags(@Param("id") Long id);
 }
