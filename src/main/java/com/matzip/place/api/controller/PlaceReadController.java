@@ -5,7 +5,9 @@ import com.matzip.common.security.UserPrincipal;
 import com.matzip.place.api.request.MapSearchRequestDto;
 import com.matzip.place.api.response.MapSearchResponseDto;
 import com.matzip.place.api.response.PlaceDetailResponseDto;
+import com.matzip.place.api.response.PlaceRankingResponseDto;
 import com.matzip.place.application.service.PlaceReadService;
+import com.matzip.place.domain.Campus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -43,5 +45,14 @@ public class PlaceReadController {
 
         List<MapSearchResponseDto> places = placeReadService.findPlacesInMapBounds(requestDto);
         return ResponseEntity.ok(ApiResponse.success(places));
+    }
+
+    @GetMapping("/ranking")
+    public ResponseEntity<ApiResponse<List<PlaceRankingResponseDto>>> getRanking(
+            @RequestParam String sort,
+            @RequestParam Campus campus) {
+
+        List<PlaceRankingResponseDto> ranking = placeReadService.getRanking(campus, sort);
+        return ResponseEntity.ok(ApiResponse.success(ranking));
     }
 }
