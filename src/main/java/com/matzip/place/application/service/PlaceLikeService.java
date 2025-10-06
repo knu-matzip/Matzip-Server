@@ -15,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -60,20 +62,30 @@ public class PlaceLikeService {
     @Transactional(readOnly = true)
     public List<LikedPlaceResponseDto> getLikedPlaces(Long userId) {
         User user = findUserById(userId);
-        List<PlaceLike> likes = placeLikeRepository.findAllByUserOrderByCreatedAtDesc(user);
 
-        return likes.stream()
-                .map(like -> {
-                    Place place = like.getPlace();
+        List<PlaceLike> likes = placeLikeRepository.findAllByUserWithPlace(user);
+        List<Place> places = likes.stream().map(PlaceLike::getPlace).collect(Collectors.toList());
 
-                    List<Category> categories = placeCategoryRepository.findAllByPlace(place).stream()
-                            .map(PlaceCategory::getCategory)
-                            .collect(Collectors.toList());
+        if (places.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-                    List<Tag> tags = placeTagRepository.findAllByPlace(place).stream()
-                            .map(PlaceTag::getTag)
-                            .collect(Collectors.toList());
+        Map<Long, List<Category>> placeIdToCategories = placeCategoryRepository.findAllByPlaceIn(places).stream()
+                .collect(Collectors.groupingBy(
+                        pc -> pc.getPlace().getId(),
+                        Collectors.mapping(PlaceCategory::getCategory, Collectors.toList())
+                ));
 
+        Map<Long, List<Tag>> placeIdToTags = placeTagRepository.findAllByPlaceIn(places).stream()
+                .collect(Collectors.groupingBy(
+                        pt -> pt.getPlace().getId(),
+                        Collectors.mapping(PlaceTag::getTag, Collectors.toList())
+                ));
+
+        return places.stream()
+                .map(place -> {
+                    List<Category> categories = placeIdToCategories.getOrDefault(place.getId(), Collections.emptyList());
+                    List<Tag> tags = placeIdToTags.getOrDefault(place.getId(), Collections.emptyList());
                     return LikedPlaceResponseDto.from(place, categories, tags);
                 })
                 .collect(Collectors.toList());

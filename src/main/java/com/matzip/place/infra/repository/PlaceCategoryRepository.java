@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface PlaceCategoryRepository extends JpaRepository<PlaceCategory, PlaceCategoryId> {
     List<PlaceCategory> findAllByPlace(Place place);
+
+    List<PlaceCategory> findAllByPlaceIn(List<Place> places);
 }

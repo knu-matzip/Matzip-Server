@@ -4,6 +4,8 @@ import com.matzip.place.domain.entity.Place;
 import com.matzip.place.domain.entity.PlaceLike;
 import com.matzip.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +19,7 @@ public interface PlaceLikeRepository extends JpaRepository<PlaceLike, Long> {
     List<PlaceLike> findAllByUserOrderByCreatedAtDesc(User user);
 
     boolean existsByUserAndPlace(User user, Place place);
+
+    @Query("SELECT pl FROM PlaceLike pl JOIN FETCH pl.place p WHERE pl.user = :user ORDER BY pl.createdAt DESC")
+    List<PlaceLike> findAllByUserWithPlace(@Param("user") User user);
 }

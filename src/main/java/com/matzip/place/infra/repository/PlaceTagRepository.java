@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface PlaceTagRepository extends JpaRepository<PlaceTag, PlaceTagId> {
     List<PlaceTag> findAllByPlace(Place place);
+
+    List<PlaceTag> findAllByPlaceIn(List<Place> places);
 }
