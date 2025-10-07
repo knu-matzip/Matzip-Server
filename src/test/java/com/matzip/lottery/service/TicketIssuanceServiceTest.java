@@ -3,6 +3,7 @@ package com.matzip.lottery.service;
 import com.matzip.lottery.domain.Ticket;
 import com.matzip.lottery.repository.TicketRepository;
 import com.matzip.place.domain.Place;
+import com.matzip.place.domain.PlaceStatus;
 import com.matzip.user.domain.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +38,7 @@ class TicketIssuanceServiceTest {
                 .build();
         Place place = Place.builder()
                 .id(1L)
+                .status(PlaceStatus.APPROVED)
                 .build();
 
         //when
@@ -58,6 +60,7 @@ class TicketIssuanceServiceTest {
                 .build();
         Place place = Place.builder()
                 .id(1L)
+                .status(PlaceStatus.APPROVED)
                 .build();
 
         //when & then
