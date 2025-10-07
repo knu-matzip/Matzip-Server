@@ -3,6 +3,7 @@ package com.matzip.lottery.service;
 import com.matzip.lottery.domain.Ticket;
 import com.matzip.lottery.repository.TicketRepository;
 import com.matzip.place.domain.Place;
+import com.matzip.place.domain.PlaceStatus;
 import com.matzip.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,9 @@ public class TicketIssuanceService {
     }
 
     private void validatePlaceRegistrationAccepted(Place place) {
-        // TODO: Place에 status 추가 및 검증 로직 구현
+        if (place.getStatus() != PlaceStatus.APPROVED) {
+            throw new IllegalStateException("[이벤트 응모권 발급] 맛집 등록 요청이 승인되지 않았습니다.");
+        }
     }
 
     private void validateAlreadyIssued(User user, Place place) {
