@@ -54,7 +54,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/events/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // 그 외 모든 요청은 인증 필요
                         .anyRequest().permitAll()
                 )
                 // 직접 구현한 JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 추가
