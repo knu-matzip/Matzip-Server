@@ -36,14 +36,12 @@ public class User extends BaseEntity {
     }
 
     @Builder
-    private User(Long id, Long kakaoId, String nickname) {
+    private User(Long id, Long kakaoId, String nickname, ProfileImage profileImage, ProfileBackground profileBackground) {
         super(id);
         this.kakaoId = kakaoId;
         this.nickname = nickname;
+        this.profileImage = profileImage;
+        this.profileBackground = profileBackground;
     }
 
-    public void setProfile(ProfileImage image, ProfileBackground background) {
-        this.profileImage = image;
-        this.profileBackground = background;
-    }
 }

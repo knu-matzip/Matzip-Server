@@ -13,6 +13,8 @@ import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.common.security.jwt.JwtProvider;
 import com.matzip.common.security.jwt.RefreshTokenRepository;
+import com.matzip.user.domain.ProfileBackground;
+import com.matzip.user.domain.ProfileImage;
 import com.matzip.user.domain.User;
 import com.matzip.user.infra.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -60,13 +62,15 @@ public class AuthService {
 
         if (user == null) {
             String nickname = nickNameGenerator.generate();
+            ProfileImage profileImage = profileAssignment.getRandomProfileImage();
+            ProfileBackground profileBackground = profileAssignment.getRandomProfileBackground();
 
             user = User.builder()
                     .kakaoId(kakaoUser.getId())
                     .nickname(nickname)
+                    .profileImage(profileImage)
+                    .profileBackground(profileBackground)
                     .build();
-
-            profileAssignment.assignRandomProfile(user);
 
             user = userRepository.save(user);
             firstLogin = true;
