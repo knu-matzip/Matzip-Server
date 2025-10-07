@@ -23,7 +23,7 @@ public record LotteryEventResponse(Long eventId, PrizeResponse prize, int totalW
                 .participantsCount(participantsCount)
                 .usedTicketsCount(usedTicketsCount)
                 .remainingTicketsCount(remainingTicketsCount)
-                .eventEndDate(lotteryEvent.getEndDate())
+                .eventEndDate(lotteryEvent.getEndDateTime())
                 .build();
     }
 

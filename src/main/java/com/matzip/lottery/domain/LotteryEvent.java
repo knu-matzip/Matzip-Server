@@ -20,15 +20,15 @@ public class LotteryEvent extends BaseEntity {
     private int winnersCount;
 
     @Column(nullable = false)
-    private LocalDateTime endDate;
+    private LocalDateTime endDateTime;
 
     protected LotteryEvent() {
     }
 
     @Builder
-    public LotteryEvent(Prize prize, int winnersCount, LocalDateTime endDate) {
+    public LotteryEvent(Prize prize, int winnersCount, LocalDateTime endDateTime) {
         this.prize = prize;
         this.winnersCount = winnersCount;
-        this.endDate = endDate;
+        this.endDateTime = endDateTime;
     }
 }
