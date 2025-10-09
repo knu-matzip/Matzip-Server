@@ -2,6 +2,7 @@ package com.matzip.lottery.repository;
 
 import com.matzip.lottery.domain.Ticket;
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Lock;
 
 import java.util.List;
@@ -17,5 +18,5 @@ public interface TicketRepository {
     int countByUserIdAndStatus(Long userId, Ticket.Status status);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    List<Ticket> findByUserIdAndStatus(Long userId, Ticket.Status status);
+    List<Ticket> findByUserIdAndStatus(Long userId, Ticket.Status status, Sort sort);
 }

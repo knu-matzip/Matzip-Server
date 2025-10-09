@@ -13,7 +13,7 @@ public class UserFixtures {
 
     public static User createUserWith(String identifier) {
         return User.builder()
-                .kakaoId(new Random(1000000).nextLong())
+                .kakaoId(new Random().nextLong())
                 .nickname(identifier)
                 .profileImage(ProfileImage.CAT)
                 .profileBackground(ProfileBackground.COLOR_01)
