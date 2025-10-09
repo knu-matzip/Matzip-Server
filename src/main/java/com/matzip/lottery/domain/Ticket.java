@@ -25,10 +25,8 @@ public class Ticket extends BaseEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(10)")
     private Status status;
 
-    // TODO: 연관관계 매핑 필요한 경우 추가
     private Long userId;
 
-    // TODO: 연관관계 매핑 필요한 경우 추가
     @Column(unique = true)
     private Long placeId;
 

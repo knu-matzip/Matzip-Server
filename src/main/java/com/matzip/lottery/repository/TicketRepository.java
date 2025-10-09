@@ -12,4 +12,6 @@ public interface TicketRepository {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Ticket> findByUserIdAndPlaceId(Long userId, Long placeId);
+
+    int countByUserIdAndStatus(Long userId, Ticket.Status status);
 }
