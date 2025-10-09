@@ -96,12 +96,9 @@ public class PlaceReadService {
     public List<PlaceRankingResponseDto> getRanking(Campus campus, SortType sortType) {
         if (sortType == SortType.VIEWS) {
             return getDailyRankingByViews(campus);
-        } else if (sortType == SortType.LIKES) {
-            return getRankingByLikes(campus);
         }
-
-        // 기본값은 조회수 순
-        return getDailyRankingByViews(campus);
+        
+        return getRankingByLikes(campus);
     }
 
     private List<PlaceRankingResponseDto> getDailyRankingByViews(Campus campus) {
