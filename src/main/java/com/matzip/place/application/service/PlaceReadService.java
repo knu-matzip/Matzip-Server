@@ -19,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -160,13 +158,8 @@ public class PlaceReadService {
 
         return places.stream()
                 .map(place -> {
-                    List<Category> categories = place.getPlaceCategories().stream()
-                            .map(PlaceCategory::getCategory)
-                            .toList();
-
-                    List<Tag> tags = place.getPlaceTags().stream()
-                            .map(PlaceTag::getTag)
-                            .toList();
+                    List<Category> categories = place.getCategories();
+                    List<Tag> tags = place.getTags();
 
                     List<CategoryDto> categoryDtos = categories.stream().map(CategoryDto::from).collect(Collectors.toList());
                     List<TagDto> tagDtos = tags.stream().map(TagDto::from).collect(Collectors.toList());
