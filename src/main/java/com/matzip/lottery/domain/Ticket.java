@@ -52,6 +52,14 @@ public class Ticket extends BaseEntity {
         return this.getCreatedAt();
     }
 
+    public void use() {
+        if (this.status != Status.ACTIVE) {
+            throw new IllegalStateException("이미 사용된 티켓입니다.");
+        }
+
+        this.status = Status.USED;
+    }
+
     public enum Status {
         ACTIVE, USED
     }

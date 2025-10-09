@@ -31,7 +31,7 @@ public enum ErrorCode {
     PLACE_NOT_FOUND(3000, HttpStatus.NOT_FOUND, "맛집을 찾을 수 없습니다."),
     PLACE_ALREADY_EXISTS(3001, HttpStatus.CONFLICT, "이미 등록된 맛집입니다."),
     PLACE_PERMISSION_DENIED(3002, HttpStatus.FORBIDDEN, "해당 맛집을 수정 또는 삭제할 권한이 없습니다."),
-    
+
     // Place Like Errors (3100번대)
     LIKE_NOT_FOUND(3101, HttpStatus.NOT_FOUND, "찜한 기록을 찾을 수 없습니다."),
     ALREADY_LIKED_PLACE(3102, HttpStatus.CONFLICT, "이미 찜한 가게입니다."),
@@ -60,7 +60,10 @@ public enum ErrorCode {
     KAKAO_PANEL3_CALL_FAILED(7002, HttpStatus.SERVICE_UNAVAILABLE, "카카오 panel3 API 호출에 실패했습니다."),
     KAKAO_CONFIRM_ID_MISSING(7003, HttpStatus.BAD_REQUEST, "카카오 API 응답에 confirm_id가 없습니다."),
     KAKAO_CONFIRM_ID_MISMATCH(7004, HttpStatus.BAD_REQUEST, "요청 kakaoPlaceId와 응답 confirm_id가 일치하지 않습니다."),
-    KAKAO_PANEL3_FIELD_ERROR(7005, HttpStatus.BAD_REQUEST, "카카오 panel3 응답 필드에 오류가 있습니다.");
+    KAKAO_PANEL3_FIELD_ERROR(7005, HttpStatus.BAD_REQUEST, "카카오 panel3 응답 필드에 오류가 있습니다."),
+
+    EVENT_ENDED(10000, HttpStatus.BAD_REQUEST, "종료된 이벤트입니다."),
+    INSUFFICIENT_ENTRY_TICKETS(10001, HttpStatus.BAD_REQUEST, "응모권이 부족합니다.");
 
     private final int code;
     private final HttpStatus status;
