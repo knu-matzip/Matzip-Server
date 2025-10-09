@@ -3,12 +3,15 @@ package com.matzip.place.application.service;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.place.api.request.MapSearchRequestDto;
+import com.matzip.place.api.response.CategoryPlaceResponseDto;
 import com.matzip.place.api.response.MapSearchResponseDto;
 import com.matzip.place.api.response.PlaceDetailResponseDto;
 import com.matzip.place.domain.entity.*;
 import com.matzip.place.api.response.PlaceRankingResponseDto;
 import com.matzip.place.domain.*;
 import com.matzip.place.infra.repository.*;
+import com.matzip.place.dto.CategoryDto;
+import com.matzip.place.dto.TagDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +33,7 @@ public class PlaceReadService {
     private final PlaceCategoryRepository placeCategoryRepository;
     private final PlaceTagRepository placeTagRepository;
     private final DailyViewCountRepository dailyViewCountRepository;
+    private final CategoryRepository categoryRepository;
 
     private static final int RANKING_SIZE = 10;
 
@@ -143,6 +147,32 @@ public class PlaceReadService {
                 dailyViewCountRepository.save(newDailyViewCount);
             }
         }
+    }
+
+    public List<CategoryPlaceResponseDto> getPlacesByCategory(Long categoryId, Campus campus) {
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
+        }
+
+        List<Place> places = placeRepository.findByCategoryIdAndCampus(categoryId, campus);
+
+        return places.stream()
+                .map(place -> {
+                    List<Category> categories = place.getCategories();
+                    List<Tag> tags = place.getTags();
+
+                    List<CategoryDto> categoryDtos = categories.stream().map(CategoryDto::from).collect(Collectors.toList());
+                    List<TagDto> tagDtos = tags.stream().map(TagDto::from).collect(Collectors.toList());
+
+                    return CategoryPlaceResponseDto.of(
+                            place.getId(),
+                            place.getName(),
+                            place.getAddress(),
+                            categoryDtos,
+                            tagDtos
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     private record PlaceRelatedData(List<Photo> photos,

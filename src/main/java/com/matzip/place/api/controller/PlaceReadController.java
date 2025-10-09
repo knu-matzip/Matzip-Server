@@ -3,6 +3,8 @@ package com.matzip.place.api.controller;
 import com.matzip.common.response.ApiResponse;
 import com.matzip.common.security.UserPrincipal;
 import com.matzip.place.api.request.MapSearchRequestDto;
+import jakarta.validation.Valid;
+import com.matzip.place.api.response.CategoryPlaceResponseDto;
 import com.matzip.place.api.response.MapSearchResponseDto;
 import com.matzip.place.api.response.PlaceDetailResponseDto;
 import com.matzip.place.api.response.PlaceRankingResponseDto;
@@ -22,9 +24,6 @@ public class PlaceReadController {
 
     private final PlaceReadService placeReadService;
 
-    /**
-     * 맛집 상세 정보 조회
-     */
     @GetMapping("/{placeId}")
     public ResponseEntity<ApiResponse<PlaceDetailResponseDto>> getPlaceDetail(
             @PathVariable Long placeId,
@@ -36,14 +35,20 @@ public class PlaceReadController {
         return ResponseEntity.ok(ApiResponse.success(placeDetail));
     }
 
-    /**
-     * 지도 범위 내 맛집 조회
-     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<MapSearchResponseDto>>> getPlacesInMap(
-            @ModelAttribute MapSearchRequestDto requestDto) {
+            @Valid @ModelAttribute MapSearchRequestDto requestDto) {
 
         List<MapSearchResponseDto> places = placeReadService.findPlacesInMapBounds(requestDto);
+        return ResponseEntity.ok(ApiResponse.success(places));
+    }
+
+    @GetMapping("/category")
+    public ResponseEntity<ApiResponse<List<CategoryPlaceResponseDto>>> getPlacesByCategory(
+            @RequestParam Long categoryId,
+            @RequestParam Campus campus) {
+
+        List<CategoryPlaceResponseDto> places = placeReadService.getPlacesByCategory(categoryId, campus);
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 
