@@ -92,12 +92,14 @@ public class PlaceReadService {
                 .collect(Collectors.toList());
     }
 
-    public List<PlaceRankingResponseDto> getRanking(Campus campus, String sort) {
-        if ("views".equals(sort)) {
+    public List<PlaceRankingResponseDto> getRanking(Campus campus, SortType sortType) {
+        if (sortType == SortType.VIEWS) {
             return getDailyRankingByViews(campus);
+        } else if (sortType == SortType.LIKES) {
+            return getRankingByLikes(campus);
         }
 
-        // TODO: 찜 많은 맛집 기능 구현 후 추가하기
+        // 기본값은 조회수 순
         return getDailyRankingByViews(campus);
     }
 
@@ -110,6 +112,19 @@ public class PlaceReadService {
         return dailyRankings.stream()
                 .map(dailyViewCount -> {
                     Place place = dailyViewCount.getPlace();
+                    PlaceRelatedData relatedData = getPlaceRelatedData(place);
+                    return PlaceRankingResponseDto.from(place, relatedData.categories(), relatedData.tags());
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<PlaceRankingResponseDto> getRankingByLikes(Campus campus) {
+        Pageable topN = PageRequest.of(0, RANKING_SIZE);
+        
+        List<Place> places = placeRepository.findTopByCampusOrderByLikeCount(campus, topN);
+        
+        return places.stream()
+                .map(place -> {
                     PlaceRelatedData relatedData = getPlaceRelatedData(place);
                     return PlaceRankingResponseDto.from(place, relatedData.categories(), relatedData.tags());
                 })

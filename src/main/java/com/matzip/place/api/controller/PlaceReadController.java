@@ -10,6 +10,7 @@ import com.matzip.place.api.response.PlaceDetailResponseDto;
 import com.matzip.place.api.response.PlaceRankingResponseDto;
 import com.matzip.place.application.service.PlaceReadService;
 import com.matzip.place.domain.Campus;
+import com.matzip.place.domain.SortType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -54,7 +55,7 @@ public class PlaceReadController {
 
     @GetMapping("/ranking")
     public ResponseEntity<ApiResponse<List<PlaceRankingResponseDto>>> getRanking(
-            @RequestParam String sort,
+            @RequestParam SortType sort,
             @RequestParam Campus campus) {
 
         List<PlaceRankingResponseDto> ranking = placeReadService.getRanking(campus, sort);
