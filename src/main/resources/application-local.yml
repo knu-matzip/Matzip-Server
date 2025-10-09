@@ -46,6 +46,9 @@ auth:
     cookie-secure: false     # 로컬 HTTP 테스트면 false
     cookie-same-site: Lax
 
+image:
+  base-url: http://localhost:8080
+
 logging:
   level:
     org.hibernate.SQL: debug

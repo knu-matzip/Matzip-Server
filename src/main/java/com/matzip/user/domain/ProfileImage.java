@@ -27,4 +27,11 @@ public enum ProfileImage {
     UNICORN("/images/profiles/unicon.png");
 
     private final String imageUrl;
+
+    public String getFullUrl(String baseUrl) {
+        if (baseUrl == null || baseUrl.isEmpty()) {
+            return imageUrl;
+        }
+        return baseUrl + imageUrl;
+    }
 }
