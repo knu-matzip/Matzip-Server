@@ -13,6 +13,8 @@ import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.common.security.jwt.JwtProvider;
 import com.matzip.common.security.jwt.RefreshTokenRepository;
+import com.matzip.user.domain.ProfileBackground;
+import com.matzip.user.domain.ProfileImage;
 import com.matzip.user.domain.User;
 import com.matzip.user.infra.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ public class AuthService {
     private final JwtProperties jwtProps;
 
     private final NickNameGenerator nickNameGenerator;
-    private final ProfileImagePicker profileImagePicker;
+    private final ProfileAssignment profileAssignment;
 
     private long accessTokenTtlMs() {
         return jwtProps.getExpirationTime();
@@ -60,12 +62,14 @@ public class AuthService {
 
         if (user == null) {
             String nickname = nickNameGenerator.generate();
-//            String profileUrl = profileImagePicker.pick();
+            ProfileImage profileImage = profileAssignment.getRandomProfileImage();
+            ProfileBackground profileBackground = profileAssignment.getRandomProfileBackground();
 
             user = User.builder()
                     .kakaoId(kakaoUser.getId())
                     .nickname(nickname)
-//                    .profileImageUrl(profileUrl) // TODO: FK 전환 시 제거하고 ProfileImage 엔티티 참조로 변경
+                    .profileImage(profileImage)
+                    .profileBackground(profileBackground)
                     .build();
 
             user = userRepository.save(user);
@@ -96,7 +100,8 @@ public class AuthService {
                 .refreshTokenExpiresIn(refreshTokenTtlMs())
                 .userId(user.getId())
                 .nickname(user.getNickname())
-//                .profileImageUrl(user.getProfileImageUrl()) // TODO: FK 전환 시 DTO 매핑에서 user.getProfileImage().getImageUrl() 사용
+                .profileImageUrl(user.getProfileImage().getImageUrl())
+                .profileBackgroundHexCode(user.getProfileBackground().getColorHexCode())
                 .firstLogin(firstLogin)
                 .build();
     }
