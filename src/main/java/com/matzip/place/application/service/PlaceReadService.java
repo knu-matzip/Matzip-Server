@@ -6,11 +6,16 @@ import com.matzip.place.api.request.MapSearchRequestDto;
 import com.matzip.place.api.response.MapSearchResponseDto;
 import com.matzip.place.api.response.PlaceDetailResponseDto;
 import com.matzip.place.domain.entity.*;
+import com.matzip.place.api.response.PlaceRankingResponseDto;
+import com.matzip.place.domain.*;
 import com.matzip.place.infra.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,8 +29,16 @@ public class PlaceReadService {
     private final PhotoRepository photoRepository;
     private final PlaceCategoryRepository placeCategoryRepository;
     private final PlaceTagRepository placeTagRepository;
+    private final DailyViewCountRepository dailyViewCountRepository;
 
+    private static final int RANKING_SIZE = 10;
+
+    @Transactional
     public PlaceDetailResponseDto getPlaceDetail(Long placeId, Long userId) {
+
+        placeRepository.incrementViewCount(placeId);
+
+        incrementDailyViewCount(placeId);
 
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
@@ -75,6 +88,30 @@ public class PlaceReadService {
                 .collect(Collectors.toList());
     }
 
+    public List<PlaceRankingResponseDto> getRanking(Campus campus, String sort) {
+        if ("views".equals(sort)) {
+            return getDailyRankingByViews(campus);
+        }
+
+        // TODO: 찜 많은 맛집 기능 구현 후 추가하기
+        return getDailyRankingByViews(campus);
+    }
+
+    private List<PlaceRankingResponseDto> getDailyRankingByViews(Campus campus) {
+        LocalDate today = LocalDate.now();
+        Pageable topN = PageRequest.of(0, RANKING_SIZE);
+
+        List<DailyViewCount> dailyRankings = dailyViewCountRepository.findDailyRankingByCampus(campus, today, topN);
+
+        return dailyRankings.stream()
+                .map(dailyViewCount -> {
+                    Place place = dailyViewCount.getPlace();
+                    PlaceRelatedData relatedData = getPlaceRelatedData(place);
+                    return PlaceRankingResponseDto.from(place, relatedData.categories(), relatedData.tags());
+                })
+                .collect(Collectors.toList());
+    }
+
     /**
      * Place의 연관 데이터를 조회하는 공통 메서드
      */
@@ -92,6 +129,20 @@ public class PlaceReadService {
                 .collect(Collectors.toList());
 
         return new PlaceRelatedData(photos, categories, tags);
+    }
+
+    private void incrementDailyViewCount(Long placeId) {
+        LocalDate today = LocalDate.now();
+
+        int updatedRows = dailyViewCountRepository.incrementDailyViewCount(placeId, today);
+
+        if (updatedRows == 0) {
+            Place place = placeRepository.findById(placeId).orElse(null);
+            if (place != null) {
+                DailyViewCount newDailyViewCount = new DailyViewCount(place, today, 1);
+                dailyViewCountRepository.save(newDailyViewCount);
+            }
+        }
     }
 
     private record PlaceRelatedData(List<Photo> photos,

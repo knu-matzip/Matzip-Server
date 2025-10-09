@@ -4,6 +4,7 @@ import com.matzip.place.domain.entity.Place;
 import com.matzip.place.domain.PlaceStatus;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -55,4 +56,8 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     @EntityGraph(attributePaths = {"placeCategories", "placeCategories.category", "placeTags", "placeTags.tag"})
     @Query("SELECT DISTINCT place FROM Place place WHERE place.id = :id")
     Optional<Place> findByIdWithCategoriesAndTags(@Param("id") Long id);
+
+    @Modifying
+    @Query("UPDATE Place p SET p.viewCount = p.viewCount + 1 WHERE p.id = :placeId")
+    void incrementViewCount(@Param("placeId") Long placeId);
 }
