@@ -1,15 +1,15 @@
 package com.matzip.place.application;
 
-import com.matzip.common.dto.LocationDto;
-import com.matzip.common.dto.MenuDto;
-import com.matzip.common.dto.PhotoDto;
+import com.matzip.place.dto.LocationDto;
+import com.matzip.place.dto.MenuDto;
+import com.matzip.place.dto.PhotoDto;
 import com.matzip.place.application.service.PlaceService;
 import com.matzip.place.infra.kakao.KakaoApiClient;
 import com.matzip.place.api.request.PlaceCheckRequestDto;
 import com.matzip.place.api.request.PlaceRequestDto;
 import com.matzip.place.api.response.PlaceCheckResponseDto;
 import com.matzip.place.application.port.PlaceTempStore;
-import com.matzip.place.domain.Category;
+import com.matzip.place.domain.entity.Category;
 import com.matzip.place.domain.Campus;
 import com.matzip.place.infra.repository.*;
 import com.matzip.user.infra.UserRepository;

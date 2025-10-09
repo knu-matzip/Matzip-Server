@@ -1,11 +1,11 @@
 package com.matzip.admin.controller.response;
 
-import com.matzip.common.dto.CategoryDto;
-import com.matzip.common.dto.LocationDto;
-import com.matzip.common.dto.PhotoDto;
-import com.matzip.common.dto.TagDto;
-import com.matzip.place.domain.Menu;
-import com.matzip.place.domain.Place;
+import com.matzip.place.domain.entity.Menu;
+import com.matzip.place.domain.entity.Place;
+import com.matzip.place.dto.CategoryDto;
+import com.matzip.place.dto.LocationDto;
+import com.matzip.place.dto.PhotoDto;
+import com.matzip.place.dto.TagDto;
 import lombok.Builder;
 
 import java.time.LocalDate;

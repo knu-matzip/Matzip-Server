@@ -1,9 +1,9 @@
 package com.matzip.admin.controller.response;
 
-import com.matzip.common.dto.CategoryDto;
-import com.matzip.common.dto.TagDto;
 import com.matzip.place.domain.Campus;
-import com.matzip.place.domain.Place;
+import com.matzip.place.domain.entity.Place;
+import com.matzip.place.dto.CategoryDto;
+import com.matzip.place.dto.TagDto;
 import lombok.Builder;
 
 import java.time.LocalDate;

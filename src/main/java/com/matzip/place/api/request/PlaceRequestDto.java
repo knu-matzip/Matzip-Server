@@ -1,6 +1,6 @@
 package com.matzip.place.api.request;
 
-import com.matzip.common.dto.LocationDto;
+import com.matzip.place.dto.LocationDto;
 import com.matzip.place.domain.Campus;
 import jakarta.validation.constraints.*;
 import lombok.Getter;

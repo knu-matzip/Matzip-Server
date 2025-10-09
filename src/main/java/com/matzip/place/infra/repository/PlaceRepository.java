@@ -1,6 +1,6 @@
 package com.matzip.place.infra.repository;
 
-import com.matzip.place.domain.Place;
+import com.matzip.place.domain.entity.Place;
 import com.matzip.place.domain.PlaceStatus;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;

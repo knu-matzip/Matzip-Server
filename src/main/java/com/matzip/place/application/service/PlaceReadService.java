@@ -5,7 +5,7 @@ import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.place.api.request.MapSearchRequestDto;
 import com.matzip.place.api.response.MapSearchResponseDto;
 import com.matzip.place.api.response.PlaceDetailResponseDto;
-import com.matzip.place.domain.*;
+import com.matzip.place.domain.entity.*;
 import com.matzip.place.infra.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

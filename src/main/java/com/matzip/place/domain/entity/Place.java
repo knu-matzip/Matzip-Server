@@ -1,6 +1,8 @@
-package com.matzip.place.domain;
+package com.matzip.place.domain.entity;
 
 import com.matzip.common.entity.BaseEntity;
+import com.matzip.place.domain.Campus;
+import com.matzip.place.domain.PlaceStatus;
 import com.matzip.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -116,5 +118,15 @@ public class Place extends BaseEntity {
                 .map(PlaceTag::getTag)
                 .sorted(Comparator.comparing(Tag::getId))
                 .toList();
+    }
+
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decrementLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
     }
 }

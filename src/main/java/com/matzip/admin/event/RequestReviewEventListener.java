@@ -4,7 +4,7 @@ import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.lottery.domain.Ticket;
 import com.matzip.lottery.service.TicketIssuanceService;
-import com.matzip.place.domain.Place;
+import com.matzip.place.domain.entity.Place;
 import com.matzip.place.infra.repository.PlaceRepository;
 import com.matzip.user.domain.User;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
 package com.matzip.lottery.domain;
 
 import com.matzip.common.entity.BaseEntity;
-import com.matzip.place.domain.Place;
+import com.matzip.place.domain.entity.Place;
 import com.matzip.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

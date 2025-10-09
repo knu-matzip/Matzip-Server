@@ -2,8 +2,8 @@ package com.matzip.lottery.service;
 
 import com.matzip.lottery.domain.Ticket;
 import com.matzip.lottery.repository.TicketRepository;
-import com.matzip.place.domain.Place;
 import com.matzip.place.domain.PlaceStatus;
+import com.matzip.place.domain.entity.Place;
 import com.matzip.user.domain.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
