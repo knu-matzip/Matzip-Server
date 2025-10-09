@@ -1,6 +1,7 @@
 package com.matzip.place.infra.repository;
 
 import com.matzip.place.domain.entity.Place;
+import com.matzip.place.domain.Campus;
 import com.matzip.place.domain.PlaceStatus;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -60,4 +61,13 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     @Modifying
     @Query("UPDATE Place p SET p.viewCount = p.viewCount + 1 WHERE p.id = :placeId")
     void incrementViewCount(@Param("placeId") Long placeId);
+
+    @EntityGraph(attributePaths = {"placeCategories.category", "placeTags.tag"}) // <-- 이 부분 추가
+    @Query("SELECT DISTINCT p FROM Place p " +
+            "JOIN p.placeCategories pc " +
+            "WHERE pc.category.id = :categoryId " +
+            "AND p.campus = :campus " +
+            "AND p.status = 'APPROVED' " +
+            "ORDER BY p.id DESC")
+    List<Place> findByCategoryIdAndCampus(@Param("categoryId") Long categoryId, @Param("campus") Campus campus);
 }

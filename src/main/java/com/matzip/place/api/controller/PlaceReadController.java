@@ -3,6 +3,7 @@ package com.matzip.place.api.controller;
 import com.matzip.common.response.ApiResponse;
 import com.matzip.common.security.UserPrincipal;
 import com.matzip.place.api.request.MapSearchRequestDto;
+import com.matzip.place.api.response.CategoryPlaceResponseDto;
 import com.matzip.place.api.response.MapSearchResponseDto;
 import com.matzip.place.api.response.PlaceDetailResponseDto;
 import com.matzip.place.api.response.PlaceRankingResponseDto;
@@ -36,12 +37,16 @@ public class PlaceReadController {
         return ResponseEntity.ok(ApiResponse.success(placeDetail));
     }
 
-    /**
-     * 지도 범위 내 맛집 조회
-     */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<MapSearchResponseDto>>> getPlacesInMap(
-            @ModelAttribute MapSearchRequestDto requestDto) {
+    public ResponseEntity<ApiResponse<?>> getPlaces(
+            @ModelAttribute MapSearchRequestDto requestDto,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Campus campus) {
+
+        if (categoryId != null && campus != null) {
+            List<CategoryPlaceResponseDto> places = placeReadService.getPlacesByCategory(categoryId, campus);
+            return ResponseEntity.ok(ApiResponse.success(places));
+        }
 
         List<MapSearchResponseDto> places = placeReadService.findPlacesInMapBounds(requestDto);
         return ResponseEntity.ok(ApiResponse.success(places));
