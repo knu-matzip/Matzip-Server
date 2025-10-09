@@ -27,3 +27,6 @@ auth:
     success-uri: ${KAKAO_FRONT_REDIRECT_URI}
     cookie-secure: true
     cookie-same-site: Lax
+
+image:
+  base-url: ${IMAGE_BASE_URL}

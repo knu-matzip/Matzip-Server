@@ -8,6 +8,7 @@ import com.matzip.auth.domain.RefreshToken;
 import com.matzip.auth.infra.kakao.KakaoLoginApiClient;
 import com.matzip.auth.infra.kakao.dto.KakaoTokenResponse;
 import com.matzip.auth.infra.kakao.dto.KakaoUserResponse;
+import com.matzip.common.config.ImageProperties;
 import com.matzip.common.config.JwtProperties;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
@@ -31,6 +32,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
     private final JwtProperties jwtProps;
+    private final ImageProperties imageProperties;
 
     private final NickNameGenerator nickNameGenerator;
     private final ProfileAssignment profileAssignment;
@@ -100,7 +102,7 @@ public class AuthService {
                 .refreshTokenExpiresIn(refreshTokenTtlMs())
                 .userId(user.getId())
                 .nickname(user.getNickname())
-                .profileImageUrl(user.getProfileImage().getImageUrl())
+                .profileImageUrl(user.getProfileImage().getFullUrl(imageProperties.getBaseUrl()))
                 .profileBackgroundHexCode(user.getProfileBackground().getColorHexCode())
                 .firstLogin(firstLogin)
                 .build();
