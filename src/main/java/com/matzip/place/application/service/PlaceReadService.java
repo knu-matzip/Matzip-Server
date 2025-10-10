@@ -38,20 +38,18 @@ public class PlaceReadService {
     private final CategoryRepository categoryRepository;
     private final PlaceLikeRepository placeLikeRepository;
     private final UserRepository userRepository;
+    private final ViewCountService viewCountService;
 
     private static final int RANKING_SIZE = 10;
 
     @Transactional
     public PlaceDetailResponseDto getPlaceDetail(Long placeId, Long userId) {
 
-        placeRepository.incrementViewCount(placeId);
-
-        incrementDailyViewCount(placeId);
+        viewCountService.incrementAllCounts(placeId);
 
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
 
-        // 승인된 맛집만 조회 가능
         if (!place.isApproved()) {
             throw new BusinessException(ErrorCode.PLACE_NOT_FOUND);
         }
@@ -136,20 +134,6 @@ public class PlaceReadService {
                 .collect(Collectors.toList());
 
         return new PlaceRelatedData(photos, categories, tags);
-    }
-
-    private void incrementDailyViewCount(Long placeId) {
-        LocalDate today = LocalDate.now();
-
-        int updatedRows = dailyViewCountRepository.incrementDailyViewCount(placeId, today);
-
-        if (updatedRows == 0) {
-            Place place = placeRepository.findById(placeId).orElse(null);
-            if (place != null) {
-                DailyViewCount newDailyViewCount = new DailyViewCount(place, today, 1);
-                dailyViewCountRepository.save(newDailyViewCount);
-            }
-        }
     }
 
     private boolean checkIfUserLikedPlace(Long userId, Place place) {
