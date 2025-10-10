@@ -43,15 +43,6 @@ public class PlaceReadController {
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 
-    @GetMapping("/category")
-    public ResponseEntity<ApiResponse<List<CategoryPlaceResponseDto>>> getPlacesByCategory(
-            @RequestParam Long categoryId,
-            @RequestParam Campus campus) {
-
-        List<CategoryPlaceResponseDto> places = placeReadService.getPlacesByCategory(categoryId, campus);
-        return ResponseEntity.ok(ApiResponse.success(places));
-    }
-
     @GetMapping("/ranking")
     public ResponseEntity<ApiResponse<List<PlaceRankingResponseDto>>> getRanking(
             @RequestParam String sort,
