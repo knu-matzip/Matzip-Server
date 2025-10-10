@@ -12,6 +12,8 @@ import com.matzip.place.domain.*;
 import com.matzip.place.infra.repository.*;
 import com.matzip.place.dto.CategoryDto;
 import com.matzip.place.dto.TagDto;
+import com.matzip.user.domain.User;
+import com.matzip.user.infra.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +36,8 @@ public class PlaceReadService {
     private final PlaceTagRepository placeTagRepository;
     private final DailyViewCountRepository dailyViewCountRepository;
     private final CategoryRepository categoryRepository;
+    private final PlaceLikeRepository placeLikeRepository;
+    private final UserRepository userRepository;
 
     private static final int RANKING_SIZE = 10;
 
@@ -55,8 +59,7 @@ public class PlaceReadService {
         PlaceRelatedData relatedData = getPlaceRelatedData(place);
         List<Menu> menus = menuRepository.findByPlaceOrderByIsRecommendedDescNameAsc(place);
 
-        // 좋아요 여부 확인 (현재는 임시로 false 반환)
-        boolean isLiked = false; // TODO: 실제 좋아요 기능 구현 시 userId로 확인
+        boolean isLiked = checkIfUserLikedPlace(userId, place);
 
         return PlaceDetailResponseDto.from(place, relatedData.photos(), menus, relatedData.categories(), relatedData.tags(), isLiked);
     }
@@ -147,6 +150,19 @@ public class PlaceReadService {
                 dailyViewCountRepository.save(newDailyViewCount);
             }
         }
+    }
+
+    private boolean checkIfUserLikedPlace(Long userId, Place place) {
+        if (userId == null) {
+            return false;
+        }
+
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        return placeLikeRepository.existsByUserAndPlace(user, place);
     }
 
     public List<CategoryPlaceResponseDto> getPlacesByCategory(Long categoryId, Campus campus) {
