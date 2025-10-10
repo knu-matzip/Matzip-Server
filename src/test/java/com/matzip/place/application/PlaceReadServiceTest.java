@@ -4,6 +4,7 @@ import com.matzip.place.application.service.PlaceReadService;
 import com.matzip.place.domain.Campus;
 import com.matzip.place.domain.PlaceStatus;
 import com.matzip.place.domain.entity.Place;
+import com.matzip.place.infra.repository.DailyViewCountRepository;
 import com.matzip.place.infra.repository.PlaceRepository;
 import com.matzip.user.domain.User;
 import com.matzip.user.infra.UserRepository;
@@ -31,13 +32,17 @@ public class PlaceReadServiceTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private DailyViewCountRepository dailyViewCountRepository;
+
     private Place testPlace;
     private User testUser;
 
     @BeforeEach
     void setUp() {
         // 모든 테스트 전에 실행될 초기 데이터 설정
-        placeRepository.deleteAll(); // 테스트간 독립성을 위해 기존 데이터 삭제
+        dailyViewCountRepository.deleteAll();
+        placeRepository.deleteAll();
         userRepository.deleteAll();
 
         testUser = userRepository.save(User.builder().kakaoId(12345L).nickname("test_user").build());
