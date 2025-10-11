@@ -5,11 +5,9 @@ import com.matzip.place.api.response.CategoryPlaceResponseDto;
 import com.matzip.place.application.service.PlaceReadService;
 import com.matzip.place.domain.Campus;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.matzip.place.application.service.CategoryService;
 import com.matzip.place.dto.CategoryDto;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,13 +23,13 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping("/{categoryId}/places")
-    public ResponseEntity<ApiResponse<List<CategoryPlaceResponseDto>>> getPlacesByCategory(
+    public ApiResponse<List<CategoryPlaceResponseDto>> getPlacesByCategory(
             @PathVariable Long categoryId,
             @RequestParam Campus campus) {
 
         List<CategoryPlaceResponseDto> places = placeReadService.getPlacesByCategory(categoryId, campus);
-        return ResponseEntity.ok(ApiResponse.success(places));
-    
+        return ApiResponse.success(places);
+    }
 
     @GetMapping
     public ApiResponse<List<CategoryDto>> getAllCategories() {
