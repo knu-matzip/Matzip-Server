@@ -141,12 +141,9 @@ public class PlaceReadService {
             return false;
         }
 
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            return false;
-        }
-
-        return placeLikeRepository.existsByUserAndPlace(user, place);
+        return userRepository.findById(userId)
+                .map(user -> placeLikeRepository.existsByUserAndPlace(user, place))
+                .orElse(false);
     }
 
     public List<CategoryPlaceResponseDto> getPlacesByCategory(Long categoryId, Campus campus) {
