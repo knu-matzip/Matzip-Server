@@ -37,5 +37,16 @@ public class PlaceCommonResponseDto {
                 .tags(tagDtos)
                 .build();
     }
+
+    public static PlaceCommonResponseDto of(Long placeId, String placeName, String address,
+                                              List<CategoryDto> categories, List<TagDto> tags) {
+        return PlaceCommonResponseDto.builder()
+                .placeId(placeId)
+                .placeName(placeName)
+                .address(address)
+                .categories(categories)
+                .tags(tags)
+                .build();
+    }
 }
 

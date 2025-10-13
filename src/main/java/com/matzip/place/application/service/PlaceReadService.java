@@ -142,7 +142,7 @@ public class PlaceReadService {
                 .orElse(false);
     }
 
-    public List<CategoryPlaceResponseDto> getPlacesByCategory(Long categoryId, Campus campus) {
+    public List<PlaceCommonResponseDto> getPlacesByCategory(Long categoryId, Campus campus) {
         if (!categoryRepository.existsById(categoryId)) {
             throw new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
         }
@@ -157,7 +157,7 @@ public class PlaceReadService {
                     List<CategoryDto> categoryDtos = categories.stream().map(CategoryDto::from).collect(Collectors.toList());
                     List<TagDto> tagDtos = tags.stream().map(TagDto::from).collect(Collectors.toList());
 
-                    return CategoryPlaceResponseDto.of(
+                    return PlaceCommonResponseDto.of(
                             place.getId(),
                             place.getName(),
                             place.getAddress(),
