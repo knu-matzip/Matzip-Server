@@ -3,16 +3,12 @@ package com.matzip.place.application.service;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.place.api.request.MapSearchRequestDto;
-import com.matzip.place.api.response.CategoryPlaceResponseDto;
-import com.matzip.place.api.response.MapSearchResponseDto;
-import com.matzip.place.api.response.PlaceDetailResponseDto;
+import com.matzip.place.api.response.*;
 import com.matzip.place.domain.entity.*;
-import com.matzip.place.api.response.PlaceRankingResponseDto;
 import com.matzip.place.domain.*;
 import com.matzip.place.infra.repository.*;
 import com.matzip.place.dto.CategoryDto;
 import com.matzip.place.dto.TagDto;
-import com.matzip.user.domain.User;
 import com.matzip.user.infra.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -93,7 +89,7 @@ public class PlaceReadService {
                 .collect(Collectors.toList());
     }
 
-    public List<PlaceRankingResponseDto> getRanking(Campus campus, String sort) {
+    public List<PlaceCommonResponseDto> getRanking(Campus campus, String sort) {
         if ("views".equals(sort)) {
             return getDailyRankingByViews(campus);
         }
@@ -102,7 +98,7 @@ public class PlaceReadService {
         return getDailyRankingByViews(campus);
     }
 
-    private List<PlaceRankingResponseDto> getDailyRankingByViews(Campus campus) {
+    private List<PlaceCommonResponseDto> getDailyRankingByViews(Campus campus) {
         LocalDate today = LocalDate.now();
         Pageable topN = PageRequest.of(0, RANKING_SIZE);
 
@@ -112,7 +108,7 @@ public class PlaceReadService {
                 .map(dailyViewCount -> {
                     Place place = dailyViewCount.getPlace();
                     PlaceRelatedData relatedData = getPlaceRelatedData(place);
-                    return PlaceRankingResponseDto.from(place, relatedData.categories(), relatedData.tags());
+                    return PlaceCommonResponseDto.from(place, relatedData.categories(), relatedData.tags());
                 })
                 .collect(Collectors.toList());
     }
