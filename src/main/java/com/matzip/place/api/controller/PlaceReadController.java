@@ -4,14 +4,12 @@ import com.matzip.common.response.ApiResponse;
 import com.matzip.common.security.UserPrincipal;
 import com.matzip.place.api.request.MapSearchRequestDto;
 import jakarta.validation.Valid;
-import com.matzip.place.api.response.CategoryPlaceResponseDto;
 import com.matzip.place.api.response.MapSearchResponseDto;
 import com.matzip.place.api.response.PlaceDetailResponseDto;
 import com.matzip.place.api.response.PlaceRankingResponseDto;
 import com.matzip.place.application.service.PlaceReadService;
 import com.matzip.place.domain.Campus;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,30 +23,30 @@ public class PlaceReadController {
     private final PlaceReadService placeReadService;
 
     @GetMapping("/{placeId}")
-    public ResponseEntity<ApiResponse<PlaceDetailResponseDto>> getPlaceDetail(
+    public ApiResponse<PlaceDetailResponseDto> getPlaceDetail(
             @PathVariable Long placeId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         
         Long userId = userPrincipal != null ? userPrincipal.getUserId() : null;
         PlaceDetailResponseDto placeDetail = placeReadService.getPlaceDetail(placeId, userId);
         
-        return ResponseEntity.ok(ApiResponse.success(placeDetail));
+        return ApiResponse.success(placeDetail);
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<MapSearchResponseDto>>> getPlacesInMap(
+    public ApiResponse<List<MapSearchResponseDto>> getPlacesInMap(
             @Valid @ModelAttribute MapSearchRequestDto requestDto) {
 
         List<MapSearchResponseDto> places = placeReadService.findPlacesInMapBounds(requestDto);
-        return ResponseEntity.ok(ApiResponse.success(places));
+        return ApiResponse.success(places);
     }
 
     @GetMapping("/ranking")
-    public ResponseEntity<ApiResponse<List<PlaceRankingResponseDto>>> getRanking(
+    public ApiResponse<List<PlaceRankingResponseDto>> getRanking(
             @RequestParam String sort,
             @RequestParam Campus campus) {
 
         List<PlaceRankingResponseDto> ranking = placeReadService.getRanking(campus, sort);
-        return ResponseEntity.ok(ApiResponse.success(ranking));
+        return ApiResponse.success(ranking);
     }
 }
