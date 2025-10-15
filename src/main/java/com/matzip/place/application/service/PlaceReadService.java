@@ -6,13 +6,13 @@ import com.matzip.place.api.request.MapSearchRequestDto;
 import com.matzip.place.api.response.CategoryPlaceResponseDto;
 import com.matzip.place.api.response.MapSearchResponseDto;
 import com.matzip.place.api.response.PlaceDetailResponseDto;
+import com.matzip.place.application.port.RankingTempStore;
 import com.matzip.place.domain.entity.*;
 import com.matzip.place.api.response.PlaceRankingResponseDto;
 import com.matzip.place.domain.*;
 import com.matzip.place.infra.repository.*;
 import com.matzip.place.dto.CategoryDto;
 import com.matzip.place.dto.TagDto;
-import com.matzip.user.domain.User;
 import com.matzip.user.infra.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -39,8 +39,10 @@ public class PlaceReadService {
     private final PlaceLikeRepository placeLikeRepository;
     private final UserRepository userRepository;
     private final ViewCountService viewCountService;
+    private final RankingTempStore rankingTempStore;
 
     private static final int RANKING_SIZE = 10;
+    private static final int MINIMUM_RANKING_SIZE = 3;
 
     @Transactional
     public PlaceDetailResponseDto getPlaceDetail(Long placeId, Long userId) {
@@ -95,18 +97,17 @@ public class PlaceReadService {
 
     public List<PlaceRankingResponseDto> getRanking(Campus campus, String sort) {
         if ("views".equals(sort)) {
-            return getDailyRankingByViews(campus);
+            return getRankingByViewsWithFallback(campus);
         }
 
         // TODO: 찜 많은 맛집 기능 구현 후 추가하기
-        return getDailyRankingByViews(campus);
+        return getRankingByViewsWithFallback(campus);
     }
 
-    private List<PlaceRankingResponseDto> getDailyRankingByViews(Campus campus) {
-        LocalDate today = LocalDate.now();
+    public List<PlaceRankingResponseDto> getDailyRankingByViews(Campus campus, LocalDate date) {
         Pageable topN = PageRequest.of(0, RANKING_SIZE);
 
-        List<DailyViewCount> dailyRankings = dailyViewCountRepository.findDailyRankingByCampus(campus, today, topN);
+        List<DailyViewCount> dailyRankings = dailyViewCountRepository.findDailyRankingByCampus(campus, date, topN);
 
         return dailyRankings.stream()
                 .map(dailyViewCount -> {
@@ -115,6 +116,18 @@ public class PlaceReadService {
                     return PlaceRankingResponseDto.from(place, relatedData.categories(), relatedData.tags());
                 })
                 .collect(Collectors.toList());
+    }
+
+    private List<PlaceRankingResponseDto> getRankingByViewsWithFallback(Campus campus) {
+        LocalDate today = LocalDate.now();
+        List<PlaceRankingResponseDto> todaysRanking = getDailyRankingByViews(campus, today);
+
+        if (todaysRanking.size() < MINIMUM_RANKING_SIZE) {
+            LocalDate yesterday = today.minusDays(1);
+            return rankingTempStore.get(yesterday, campus)
+                    .orElseGet(() -> getDailyRankingByViews(campus, yesterday));
+        }
+        return todaysRanking;
     }
 
     /**
