@@ -51,3 +51,4 @@ jobs:
             chmod +x /home/${{ secrets.AWS_EC2_USERNAME }}/deploy.sh
             /home/${{ secrets.AWS_EC2_USERNAME }}/deploy.sh
 
+
