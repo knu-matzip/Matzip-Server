@@ -50,3 +50,4 @@ jobs:
             echo "${{ secrets.APPLICATION_ENV }}" > /home/${{ secrets.AWS_EC2_USERNAME }}/matzip.env
             chmod +x /home/${{ secrets.AWS_EC2_USERNAME }}/deploy.sh
             /home/${{ secrets.AWS_EC2_USERNAME }}/deploy.sh
+
