@@ -29,7 +29,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // 프론트엔드 서버 주소 허용
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://front"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://knu-matzip-dev.vercel.app", "https://knu-matzip.vercel.app"));
         // 허용할 HTTP 메서드
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         // 허용할 헤더
