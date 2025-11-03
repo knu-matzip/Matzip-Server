@@ -22,9 +22,12 @@ oauth2:
     client-id: ${KAKAO_CLIENT_ID}
     redirect-uri: ${KAKAO_PROD_REDIRECT_URI}
 
-auth:
-  redirect:
-    success-uri: ${KAKAO_FRONT_REDIRECT_URI}
+matzip:
+  auth:
+    allowed-origins: ${ALLOWED_ORIGINS}
+    success-path: /login/loding/success
+    failure-path: /login/loding/fail
+    state-secret: ${STATE_SIGNING_SECRET}
     cookie-secure: true
     cookie-same-site: Lax
 
