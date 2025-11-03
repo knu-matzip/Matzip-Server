@@ -129,7 +129,7 @@ public class AuthController {
                 .build();
 
         // 3) 프론트 성공 URL로 302 리다이렉트 (필요 시 state를 그대로 붙여 전달)
-        String location = redirectProperties.getSuccessUri();
+        String location = redirectProperties.getSuccessPath();
         if (state != null && !state.isBlank()) {
             location = location + (location.contains("?") ? "&" : "?") + "state=" + state;
         }
