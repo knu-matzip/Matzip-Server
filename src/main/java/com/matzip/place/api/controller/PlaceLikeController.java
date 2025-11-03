@@ -2,12 +2,11 @@ package com.matzip.place.api.controller;
 
 import com.matzip.common.response.ApiResponse;
 import com.matzip.common.security.UserPrincipal;
-import com.matzip.place.api.response.LikedPlaceResponseDto;
 import com.matzip.place.api.response.PlaceLikeResponseDto;
+import com.matzip.place.api.response.PlaceCommonResponseDto;
 import com.matzip.place.application.service.PlaceLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,28 +21,28 @@ public class PlaceLikeController {
 
 
     @PostMapping("/{placeId}/like")
-    public ResponseEntity<ApiResponse<PlaceLikeResponseDto>> addLike(
+    public ApiResponse<PlaceLikeResponseDto> addLike(
             @PathVariable Long placeId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         PlaceLikeResponseDto response = placeLikeService.addLike(userPrincipal.getUserId(), placeId);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ApiResponse.success(response);
     }
 
     @DeleteMapping("/{placeId}/like")
-    public ResponseEntity<ApiResponse<PlaceLikeResponseDto>> removeLike(
+    public ApiResponse<PlaceLikeResponseDto> removeLike(
             @PathVariable Long placeId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         PlaceLikeResponseDto response = placeLikeService.removeLike(userPrincipal.getUserId(), placeId);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ApiResponse.success(response);
     }
 
     @GetMapping("/like")
-    public ResponseEntity<ApiResponse<List<LikedPlaceResponseDto>>> getMyLikedPlaces(
+    public ApiResponse<List<PlaceCommonResponseDto>> getMyLikedPlaces(
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
-        List<LikedPlaceResponseDto> likedPlaces = placeLikeService.getLikedPlaces(userPrincipal.getUserId());
-        return ResponseEntity.ok(ApiResponse.success(likedPlaces));
+        List<PlaceCommonResponseDto> likedPlaces = placeLikeService.getLikedPlaces(userPrincipal.getUserId());
+        return ApiResponse.success(likedPlaces);
     }
 }
