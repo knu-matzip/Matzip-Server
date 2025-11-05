@@ -53,10 +53,9 @@ public class AuthController {
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "카카오 OAuth 설정(clientId/redirectUri)이 누락되었습니다.");
         }
 
-        // 1) state 생성 후 HttpOnly 쿠키로 저장
         String state = stateSigner.createSignedState(origin);
 
-        // 2) 카카오 authorize URL 구성
+        // 카카오 authorize URL 구성
         String authorizeUrl = kakaoAuthorizeUrlBuilder.build(state);
 
         return ResponseEntity.status(302)
