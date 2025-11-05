@@ -22,9 +22,15 @@ oauth2:
     client-id: ${KAKAO_CLIENT_ID}
     redirect-uri: ${KAKAO_PROD_REDIRECT_URI}
 
-auth:
-  redirect:
-    success-uri: ${KAKAO_FRONT_REDIRECT_URI}
+app:
+  auth:
+    allowed-origins:
+      - http://localhost:3000
+      - https://knu-matzip-dev.vercel.app
+      - https://knu-matzip.vercel.app
+    success-path: /login/loading/success
+    failure-path: /login/loading/fail
+    state-secret: ${STATE_SECRET_KEY}
     cookie-secure: true
     cookie-same-site: Lax
 
