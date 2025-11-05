@@ -1,6 +1,5 @@
 package com.matzip.place.api.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.matzip.place.api.RecommendedMenuDto;
 import com.matzip.place.domain.entity.*;
 import com.matzip.place.dto.CategoryDto;
@@ -22,13 +21,11 @@ public class PlaceDetailResponseDto {
     private String address;
     private LocationDto location;
     private List<PhotoDto> photos;
+    private boolean isLiked;
     private String description;
     private List<RecommendedMenuDto> menus;
     private List<TagDto> tags;
     private List<CategoryDto> categories;
-
-    @Getter(onMethod_ = @JsonProperty("isLiked"))
-    private boolean isLiked;
 
     // 서비스 계층에서 모든 정보를 조합하여 DTO로 변환하는 정적 팩토리 메서드
     public static PlaceDetailResponseDto from(
