@@ -1,24 +1,15 @@
 package com.matzip.common.config;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.List;
-
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "matzip.auth")
+@ConfigurationProperties(prefix = "auth.redirect")
 public class AuthRedirectProperties {
-
-    private List<String> allowedOrigins;
-
-    private String successPath;          // 예: /auth/callback/success
-
-    private String failurePath;
-
-    private String stateSecret;
+    // 콜백 성공 시 리다이렉트할 url
+    private String successUri;
 
     private boolean cookieSecure = true;
 
