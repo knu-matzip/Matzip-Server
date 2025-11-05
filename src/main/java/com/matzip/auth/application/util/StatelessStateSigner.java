@@ -37,11 +37,13 @@ public class StatelessStateSigner {
      * Origin을 서명하여 state 문자열 생성
      */
     public String createSignedState(String origin) {
-        String encodedOrigin = Base64.getUrlEncoder().encodeToString(origin.getBytes(StandardCharsets.UTF_8));
+        String encodedOrigin = Base64.getUrlEncoder().withoutPadding()
+                .encodeToString(origin.getBytes(StandardCharsets.UTF_8));
         String signature;
         synchronized (hmac) { // Mac은 thread-safe하지 않음
             byte[] signatureBytes = hmac.doFinal(encodedOrigin.getBytes(StandardCharsets.UTF_8));
-            signature = Base64.getUrlEncoder().encodeToString(signatureBytes);
+            signature = Base64.getUrlEncoder().withoutPadding()
+                    .encodeToString(signatureBytes);
         }
         return encodedOrigin + "." + signature;
     }
