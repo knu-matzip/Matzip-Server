@@ -1,6 +1,5 @@
 package com.matzip.common.config;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -9,18 +8,29 @@ import java.util.List;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "matzip.auth")
+@ConfigurationProperties(prefix = "app.auth")
 public class AuthRedirectProperties {
 
-    private List<String> allowedOrigins;
+    private final List<String> allowedOrigins;
 
-    private String successPath;          // 예: /auth/callback/success
+    private final String successPath;
 
-    private String failurePath;
+    private final String failurePath;
 
-    private String stateSecret;
+    private final String stateSecret;
 
-    private boolean cookieSecure = true;
+    private final boolean cookieSecure;
 
-    private String cookieSameSite = "Lax";
+    private final String cookieSameSite;
+
+    public AuthRedirectProperties(List<String> allowedOrigins, String successPath,
+                                  String failurePath, String stateSecret,
+                                  boolean cookieSecure, String cookieSameSite) {
+        this.allowedOrigins = allowedOrigins;
+        this.successPath = successPath;
+        this.failurePath = failurePath;
+        this.stateSecret = stateSecret;
+        this.cookieSecure = cookieSecure;
+        this.cookieSameSite = cookieSameSite;
+    }
 }
