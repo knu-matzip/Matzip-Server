@@ -104,7 +104,7 @@ public class PlaceReadServiceTest {
 
         latch.await();
         executorService.shutdown();
-        log.info("[동시] 10개 스레드 모두 호출 완료");
+//        log.info("[동시] 10개 스레드 모두 호출 완료");
 
         // then
         await().atMost(10, TimeUnit.SECONDS) // 10개 스레드이므로 넉넉하게 10초 대기
