@@ -72,8 +72,12 @@ public class PlaceReadServiceTest {
         placeReadService.getPlaceDetail(testPlace.getId(), testUser.getId());
 
         // then
-        Place updatedPlace = placeRepository.findById(testPlace.getId()).get();
-        assertThat(updatedPlace.getViewCount()).isEqualTo(initialViewCount + 1);
+        await().atMost(5, TimeUnit.SECONDS) // 최대 5초 대기
+                .untilAsserted(() -> { // 이 조건이 통과될 때까지 반복
+                    Place updatedPlace = placeRepository.findById(testPlace.getId()).get();
+//                    log.info("[단일] Awaitility 폴링 중... 현재 조회수: {}", updatedPlace.getViewCount());
+                    assertThat(updatedPlace.getViewCount()).isEqualTo(1);
+                });
     }
 
     @Test
@@ -83,12 +87,14 @@ public class PlaceReadServiceTest {
         int numberOfThreads = 10; // 10개의 동시 요청 시뮬레이션
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
+//        log.info("[동시] 테스트 시작. ({}개 스레드)", numberOfThreads);
 
         // when
         for (int i = 0; i < numberOfThreads; i++) {
             executorService.submit(() -> {
                 try {
                     // 각 스레드가 getPlaceDetail 메서드를 호출
+//                    log.info("[동시] 스레드 {} -> getPlaceDetail() 호출", Thread.currentThread().getId());
                     placeReadService.getPlaceDetail(testPlace.getId(), testUser.getId());
                 } finally {
                     latch.countDown();
@@ -98,9 +104,14 @@ public class PlaceReadServiceTest {
 
         latch.await();
         executorService.shutdown();
+        log.info("[동시] 10개 스레드 모두 호출 완료");
 
         // then
-        Place finalPlace = placeRepository.findById(testPlace.getId()).get();
-        assertThat(finalPlace.getViewCount()).isEqualTo(numberOfThreads);
+        await().atMost(10, TimeUnit.SECONDS) // 10개 스레드이므로 넉넉하게 10초 대기
+                .untilAsserted(() -> { // viewCount가 10이 될 때까지 반복
+                    Place finalPlace = placeRepository.findById(testPlace.getId()).get();
+//                    log.info("[동시] Awaitility 폴링 중... 최종 조회수: {}", finalPlace.getViewCount());
+                    assertThat(finalPlace.getViewCount()).isEqualTo(numberOfThreads);
+                });
     }
 }
