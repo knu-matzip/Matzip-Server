@@ -1,7 +1,7 @@
 package com.matzip.place.api.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.matzip.place.dto.LocationDto;
-import com.matzip.place.dto.MenuDto;
 import com.matzip.place.dto.PhotoDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class PlaceCheckResponseDto {
     // 미등록 프리뷰: 실제 사진/메뉴로 채움
     // 이미 등록: 빈 배열
     private List<PhotoDto> photos;
-    private List<MenuDto> menus;
+    private List<MenuItem> menus;
 
     @Getter
     @Builder
@@ -29,6 +29,8 @@ public class PlaceCheckResponseDto {
         private Long menuId;
         private String name;
         private int price;
+
+        @Getter(onMethod_ = @JsonProperty("isRecommended"))
         private boolean isRecommended; // 프리뷰 기본값: false
     }
 
