@@ -1,6 +1,5 @@
 package com.matzip.place.application;
 
-import com.matzip.place.dto.LocationDto;
 import com.matzip.place.dto.MenuDto;
 import com.matzip.place.dto.PhotoDto;
 import com.matzip.place.application.service.PlaceService;
@@ -108,9 +107,6 @@ class PlaceServiceCachingTest {
         PlaceRequestDto request = new PlaceRequestDto();
         request.setKakaoPlaceId(TEST_KAKAO_PLACE_ID);
         request.setCampus(Campus.SINGWAN);
-        request.setName("카페카키"); // 등록 시점의 이름
-        request.setAddress("테스트 주소"); // 등록 시점의 주소
-        request.setLocation(LocationDto.of(37.123456, 127.123456));
         request.setDescription("테스트 설명");
         request.setMenus(Collections.emptyList());
         request.setCategoryIds(List.of(1L));
@@ -137,7 +133,7 @@ class PlaceServiceCachingTest {
                 "충남 천안시 서북구 부성14길 46 지광빌딩 1층",
                 37.123456,
                 127.123456,
-                List.of(new SMenu("테스트 메뉴", 10000)),
+                List.of(new SMenu(1L, "테스트 메뉴", 10000)),
                 List.of(new SPhoto(null, "http://test.com/photo.jpg", 1))
         );
     }

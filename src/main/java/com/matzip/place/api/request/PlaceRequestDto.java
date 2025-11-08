@@ -37,8 +37,11 @@ public class PlaceRequestDto {
 
     // 메뉴 정보를 담는 내부 DTO
     @Getter
+    @Setter
     @NoArgsConstructor
     public static class MenuInfo {
+        private Long menuId;
+
         @NotEmpty(message = "메뉴 이름은 필수입니다.")
         private String name;
 

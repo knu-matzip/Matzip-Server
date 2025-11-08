@@ -174,13 +174,19 @@ public class PlaceService {
             }
         }
 
-        Map<String, Boolean> recommendedByName = new HashMap<String, Boolean>();
+        Map<Long, Boolean> recommendedById = new HashMap<>();
+        Map<String, Boolean> recommendedByName = new HashMap<>();
         List<MenuInfo> reqMenus = req.getMenus();
         if (reqMenus != null) {
             for (MenuInfo mi : reqMenus) {
-                if (mi != null && mi.getName() != null) {
-                    // 마지막 값 우선(중복 이름 방어)
-                    recommendedByName.put(mi.getName(), Boolean.TRUE.equals(mi.getIsRecommended()));
+                if (mi != null) {
+                    Boolean isRecommended = Boolean.TRUE.equals(mi.getIsRecommended());
+                    if (mi.getMenuId() != null) {
+                        recommendedById.put(mi.getMenuId(), isRecommended);
+                    } else if (mi.getName() != null) {
+                        // 마지막 값 우선(중복 이름 방어)
+                        recommendedByName.put(mi.getName(), isRecommended);
+                    }
                 }
             }
         }
@@ -191,7 +197,10 @@ public class PlaceService {
                 String name = sm.getName();
                 int price = sm.getPrice();
                 boolean isRec = false;
-                if (name != null && recommendedByName.containsKey(name)) {
+                if (sm.getMenuId() != null && recommendedById.containsKey(sm.getMenuId())) {
+                    Boolean v = recommendedById.get(sm.getMenuId());
+                    isRec = v != null && v.booleanValue();
+                } else if (name != null && recommendedByName.containsKey(name)) {
                     Boolean v = recommendedByName.get(name);
                     isRec = (v != null) && v.booleanValue();
                 }
@@ -217,7 +226,7 @@ public class PlaceService {
         List<SMenu> sMenus = new ArrayList<>();
         if (snap.menus() != null) {
             for (MenuDto md : snap.menus()) {
-                sMenus.add(new SMenu(md.getName(), md.getPrice()));
+                sMenus.add(new SMenu(md.getMenuId(), md.getName(), md.getPrice()));
             }
         }
 
