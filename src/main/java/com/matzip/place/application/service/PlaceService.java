@@ -81,6 +81,7 @@ public class PlaceService {
         if (srcMenus != null) {
             for (MenuDto m : srcMenus) {
                 MenuItem item = MenuItem.builder()
+                        .menuId(m.getMenuId())
                         .name(m.getName())
                         .price(m.getPrice())
                         .isRecommended(false) // 프리뷰 단계이므로 항상 false
@@ -95,7 +96,7 @@ public class PlaceService {
                 .address(snap.address())
                 .location(LocationDto.of(snap.latitude(), snap.longitude()))
                 .photos(snap.photos())
-                .menus(snap.menus())
+                .menus(menuItems)
                 .build();
     }
 
