@@ -63,18 +63,24 @@ public interface PlaceTempStore {
 
 
         public static final class SMenu {
+            private final Long menuId;
             private final String name;
             private final int price;
 
-            public SMenu(String name, int price) {
+            public SMenu(Long menuId, String name, int price) {
                 if (name == null || name.isBlank()) {
                     throw new IllegalArgumentException("메뉴 이름은 비어 있을 수 없습니다.");
                 }
                 if (price < 0) {
                     throw new IllegalArgumentException("메뉴 가격은 음수일 수 없습니다.");
                 }
+                this.menuId = menuId;
                 this.name = name;
                 this.price = price;
+            }
+
+            public Long getMenuId() {
+                return menuId;
             }
 
             public String getName() {
