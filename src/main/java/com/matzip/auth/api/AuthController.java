@@ -13,7 +13,6 @@ import com.matzip.common.config.KakaoProperties;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.common.response.ApiResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -31,7 +30,6 @@ import java.time.Duration;
 public class AuthController {
 
     private static final String RT_COOKIE_NAME = "RT";
-    private static final String STATE_COOKIE_NAME = "STATE";
     private static final String RT_COOKIE_PATH = "/api/v1/auth";
 
     private final AuthService authService;
@@ -42,10 +40,9 @@ public class AuthController {
     private final KakaoAuthorizeUrlBuilder kakaoAuthorizeUrlBuilder;
 
     @GetMapping("/authorize")
-    public ResponseEntity<Void> authorize(HttpServletRequest request) {
-        String origin = request.getHeader(HttpHeaders.ORIGIN);
+    public ResponseEntity<Void> authorize(@RequestParam("clientOrigin") String clientOrigin) {
 
-        if (origin == null || !redirectProperties.getAllowedOrigins().contains(origin)) {
+        if (clientOrigin == null || !redirectProperties.getAllowedOrigins().contains(clientOrigin)) {
             throw new BusinessException(ErrorCode.UNAUTHORIZED, "허용되지 않은 Origin입니다.");
         }
 
@@ -53,7 +50,7 @@ public class AuthController {
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "카카오 OAuth 설정(clientId/redirectUri)이 누락되었습니다.");
         }
 
-        String state = stateSigner.createSignedState(origin);
+        String state = stateSigner.createSignedState(clientOrigin);
 
         // 카카오 authorize URL 구성
         String authorizeUrl = kakaoAuthorizeUrlBuilder.build(state);
@@ -114,49 +111,46 @@ public class AuthController {
             @RequestParam("code") @NotBlank String code,
             @RequestParam(name = "state") String state
     ) {
-        String location;
-
+        String origin;
         try {
-            String origin = stateSigner.verifyAndGetOrigin(state);
+            // state부터 검증 후 origin 확보
+            origin = stateSigner.verifyAndGetOrigin(state);
 
             if (!redirectProperties.getAllowedOrigins().contains(origin)) {
                 throw new BusinessException(ErrorCode.UNAUTHORIZED, "검증 실패: 허용되지 않은 Origin");
             }
-
-            LoginResponse res = authService.login(new KakaoLoginRequest(code));
-
-            // Refresh Token을 HttpOnly 쿠키로 설정 (Acess Token은 바디/URL에 싣지 않음)
-            ResponseCookie rtCookie = ResponseCookie.from(RT_COOKIE_NAME, res.getRefreshToken())
-                    .httpOnly(true)
-                    .secure(redirectProperties.isCookieSecure())     // 로컬은 false, 운영은 true
-                    .sameSite(redirectProperties.getCookieSameSite())
-                    .path(RT_COOKIE_PATH)
-                    .maxAge(Duration.ofMillis(res.getRefreshTokenExpiresIn()))
-                    .build();
-
-            location = origin + redirectProperties.getSuccessPath();
-
-            return ResponseEntity.status(302)
-                    .header("Set-Cookie", rtCookie.toString())
-                    .header("Location", location)
-                    .build();
-        } catch (BusinessException e) {
-            String failOrigin = "https://knu-matzip.vercel.app";
-            try {
-                if (state != null) {
-                    failOrigin = stateSigner.verifyAndGetOrigin(state);
-                    if (!redirectProperties.getAllowedOrigins().contains(failOrigin)) {
-                        failOrigin = "https://knu-matzip.vercel.app";
-                    }
-                }
-            } catch (Exception ignore) {}
-
-            location = failOrigin + redirectProperties.getFailurePath() + "?error=" + e.getErrorCode().getCode();
+        } catch (Exception e) {
+            String defaultFailOrigin = "https://knu-matzip.vercel.app";
+            String location = defaultFailOrigin + redirectProperties.getFailurePath() + "?error=" + ErrorCode.UNAUTHORIZED.getCode();
 
             return ResponseEntity.status(302)
                     .header(HttpHeaders.LOCATION, location)
                     .build();
         }
 
+        try {
+            LoginResponse res = authService.login(new KakaoLoginRequest(code));
+
+            // 로그인 성공
+            ResponseCookie rtCookie = buildRtCookie(res.getRefreshToken(), res.getRefreshTokenExpiresIn());
+
+            String location = origin + redirectProperties.getSuccessPath();
+
+            return ResponseEntity.status(302)
+                    .header(HttpHeaders.SET_COOKIE, rtCookie.toString())
+                    .header(HttpHeaders.LOCATION, location)
+                    .build();
+
+        } catch (BusinessException e) {
+            // 로그인 실패 (State는 정상이었으나, code가 만료되었거나 등등)
+            // origin은 신뢰할 수 있으므로, 해당 origin의 실패 페이지로 보냄
+            String location = origin + redirectProperties.getFailurePath() + "?error=" + e.getErrorCode().getCode();
+
+            return ResponseEntity.status(302)
+                    .header(HttpHeaders.LOCATION, location)
+                    .build();
+        }
     }
+
 }
+
