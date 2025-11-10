@@ -53,7 +53,7 @@ public class SecurityConfig {
                 // HTTP 요청에 대한 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/events/**").authenticated()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+//                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 )
                 // 직접 구현한 JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 추가
