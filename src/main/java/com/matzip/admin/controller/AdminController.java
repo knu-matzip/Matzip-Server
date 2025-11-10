@@ -7,9 +7,9 @@ import com.matzip.admin.service.AdminPlaceRegisterRequestService;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.common.response.ApiResponse;
-import com.matzip.common.security.UserPrincipal;
+// import com.matzip.common.security.UserPrincipal;
 import com.matzip.place.infra.repository.PlaceRepository;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+// import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,11 +55,12 @@ public class AdminController {
     @PostMapping("/requests/places/{placeId}/review")
     public ApiResponse<?> reviewPlaceRegisterRequest(
             @PathVariable("placeId") Long placeId,
-            @RequestBody PlaceRegisterRequestReviewRequest request,
-            @AuthenticationPrincipal UserPrincipal admin
+            @RequestBody PlaceRegisterRequestReviewRequest request
+            // , @AuthenticationPrincipal UserPrincipal admin
     ) {
         adminPlaceRegisterRequestService.review(
-                placeId, request.status(), request.rejectedReason(), admin.getUserId()
+                placeId, request.status(), request.rejectedReason()
+                // , admin.getUserId()
         );
         return ApiResponse.successWithoutData();
     }
