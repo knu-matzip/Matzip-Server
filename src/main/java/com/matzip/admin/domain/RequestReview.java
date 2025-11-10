@@ -13,7 +13,7 @@ public class RequestReview extends BaseEntity {
 
     private Long placeId;
 
-//    private Long adminId;
+    private Long adminId;
 
     @Enumerated(EnumType.STRING)
     private RequestReviewStatus status;
@@ -24,25 +24,25 @@ public class RequestReview extends BaseEntity {
     }
 
     @Builder
-    public RequestReview(Long placeId, RequestReviewStatus status, String rejectedReason) {
+    public RequestReview(Long placeId, Long adminId, RequestReviewStatus status, String rejectedReason) {
         this.placeId = placeId;
-//        this.adminId = adminId;
+        this.adminId = adminId;
         this.status = status;
         this.rejectedReason = rejectedReason;
     }
 
-    public static RequestReview approved(Long placeId) {
+    public static RequestReview approved(Long placeId, Long adminId) {
         return RequestReview.builder()
                 .placeId(placeId)
-//                .adminId(adminId)
+                .adminId(adminId)
                 .status(RequestReviewStatus.APPROVED)
                 .build();
     }
 
-    public static RequestReview rejected(Long placeId, String rejectedReason) {
+    public static RequestReview rejected(Long placeId, Long adminId, String rejectedReason) {
         return RequestReview.builder()
                 .placeId(placeId)
-//                .adminId(adminId)
+                .adminId(adminId)
                 .status(RequestReviewStatus.REJECTED)
                 .rejectedReason(rejectedReason)
                 .build();
