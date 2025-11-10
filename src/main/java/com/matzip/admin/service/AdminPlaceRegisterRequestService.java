@@ -27,7 +27,7 @@ public class AdminPlaceRegisterRequestService {
     }
 
     @Transactional
-    public void review(Long placeId, RequestReviewStatus status, String rejectedReason, Long adminId) {
+    public void review(Long placeId, RequestReviewStatus status, String rejectedReason) {
         validateReviewRequest(status, rejectedReason);
 
         Place place = placeRepository.findById(placeId)
@@ -35,22 +35,22 @@ public class AdminPlaceRegisterRequestService {
         validatePlaceStatus(place);
 
         switch (status) {
-            case APPROVED -> approve(place, adminId);
-            case REJECTED -> reject(place, rejectedReason, adminId);
+            case APPROVED -> approve(place);
+            case REJECTED -> reject(place, rejectedReason);
         }
 
         applicationEventPublisher.publishEvent(new RequestReviewEvent(placeId, status));
     }
 
-    private void approve(Place place, Long adminId) {
+    private void approve(Place place) {
         place.approve();
-        RequestReview approved = RequestReview.approved(place.getId(), adminId);
+        RequestReview approved = RequestReview.approved(place.getId());
         requestReviewRepository.save(approved);
     }
 
-    private void reject(Place place, String rejectedReason, Long adminId) {
+    private void reject(Place place, String rejectedReason) {
         place.reject();
-        RequestReview rejected = RequestReview.rejected(place.getId(), adminId, rejectedReason);
+        RequestReview rejected = RequestReview.rejected(place.getId(), rejectedReason);
         requestReviewRepository.save(rejected);
     }
 
