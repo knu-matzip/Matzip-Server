@@ -62,7 +62,8 @@ public class StatelessStateSigner {
             String expectedSignature;
             synchronized (hmac) {
                 byte[] signatureBytes = hmac.doFinal(encodedOrigin.getBytes(StandardCharsets.UTF_8));
-                expectedSignature = Base64.getUrlEncoder().encodeToString(signatureBytes);
+                expectedSignature = Base64.getUrlEncoder().withoutPadding()
+                        .encodeToString(signatureBytes);
             }
 
             if (!Objects.equals(signature, expectedSignature)) {
