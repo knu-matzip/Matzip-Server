@@ -55,11 +55,11 @@ public class AdminController {
     @PostMapping("/requests/places/{placeId}/review")
     public ApiResponse<?> reviewPlaceRegisterRequest(
             @PathVariable("placeId") Long placeId,
-            @RequestBody PlaceRegisterRequestReviewRequest request
-//            @AuthenticationPrincipal UserPrincipal admin
+            @RequestBody PlaceRegisterRequestReviewRequest request,
+            @AuthenticationPrincipal UserPrincipal admin
     ) {
         adminPlaceRegisterRequestService.review(
-                placeId, request.status(), request.rejectedReason()
+                placeId, request.status(), request.rejectedReason(), admin.getUserId()
         );
         return ApiResponse.successWithoutData();
     }
