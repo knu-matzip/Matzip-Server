@@ -13,7 +13,6 @@ import com.matzip.common.config.KakaoProperties;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.common.response.ApiResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -31,7 +30,6 @@ import java.time.Duration;
 public class AuthController {
 
     private static final String RT_COOKIE_NAME = "RT";
-    private static final String STATE_COOKIE_NAME = "STATE";
     private static final String RT_COOKIE_PATH = "/api/v1/auth";
 
     private final AuthService authService;
@@ -42,10 +40,9 @@ public class AuthController {
     private final KakaoAuthorizeUrlBuilder kakaoAuthorizeUrlBuilder;
 
     @GetMapping("/authorize")
-    public ResponseEntity<Void> authorize(HttpServletRequest request) {
-        String origin = request.getHeader(HttpHeaders.ORIGIN);
+    public ResponseEntity<Void> authorize(@RequestParam("clientOrigin") String clientOrigin) {
 
-        if (origin == null || !redirectProperties.getAllowedOrigins().contains(origin)) {
+        if (clientOrigin == null || !redirectProperties.getAllowedOrigins().contains(clientOrigin)) {
             throw new BusinessException(ErrorCode.UNAUTHORIZED, "허용되지 않은 Origin입니다.");
         }
 
@@ -53,7 +50,7 @@ public class AuthController {
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "카카오 OAuth 설정(clientId/redirectUri)이 누락되었습니다.");
         }
 
-        String state = stateSigner.createSignedState(origin);
+        String state = stateSigner.createSignedState(clientOrigin);
 
         // 카카오 authorize URL 구성
         String authorizeUrl = kakaoAuthorizeUrlBuilder.build(state);
