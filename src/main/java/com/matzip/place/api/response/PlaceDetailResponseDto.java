@@ -1,7 +1,6 @@
 package com.matzip.place.api.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.matzip.place.api.RecommendedMenuDto;
 import com.matzip.place.domain.entity.*;
 import com.matzip.place.dto.CategoryDto;
 import com.matzip.place.dto.LocationDto;
@@ -23,7 +22,7 @@ public class PlaceDetailResponseDto {
     private LocationDto location;
     private List<PhotoDto> photos;
     private String description;
-    private List<RecommendedMenuDto> menus;
+    private List<MenuResponseDto> menus;
     private List<TagDto> tags;
     private List<CategoryDto> categories;
 
@@ -46,7 +45,7 @@ public class PlaceDetailResponseDto {
                 .description(place.getDescription())
                 .location(LocationDto.of(place.getLatitude(), place.getLongitude()))
                 .photos(photos.stream().map(PhotoDto::from).collect(Collectors.toList()))
-                .menus(menus.stream().map(RecommendedMenuDto::from).collect(Collectors.toList()))
+                .menus(menus.stream().map(MenuResponseDto::from).collect(Collectors.toList()))
                 .categories(categories.stream().map(CategoryDto::from).collect(Collectors.toList()))
                 .tags(tags.stream().map(TagDto::from).collect(Collectors.toList()))
                 .isLiked(isLiked)
