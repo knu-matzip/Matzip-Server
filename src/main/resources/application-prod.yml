@@ -31,7 +31,7 @@ app:
     success-path: /login/loading/success
     failure-path: /login/loading/fail
     state-secret: ${STATE_SECRET_KEY}
-    cookie-secure: true
+    cookie-secure: false
     cookie-same-site: Lax
 
 image:
