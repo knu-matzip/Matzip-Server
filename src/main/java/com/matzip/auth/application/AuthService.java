@@ -102,7 +102,7 @@ public class AuthService {
                 .refreshTokenExpiresIn(refreshTokenTtlMs())
                 .userId(user.getId())
                 .nickname(user.getNickname())
-                .profileImageUrl("asdf")
+                .profileImageUrl(user.getProfileImage().getFullUrl(imageProperties.getBaseUrl()))
                 .profileBackgroundHexCode(user.getProfileBackground().getColorHexCode())
                 .firstLogin(firstLogin)
                 .build();
