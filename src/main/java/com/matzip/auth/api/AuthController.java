@@ -100,6 +100,7 @@ public class AuthController {
         return ResponseCookie.from(RT_COOKIE_NAME, rt)
                 .httpOnly(true)      // JS 접근 차단
                 .secure(redirectProperties.isCookieSecure())        // HTTPS 전용
+                .sameSite(redirectProperties.getCookieSameSite())     // 도메인 구조에 따라 None/Strict로 조정
                 .path(RT_COOKIE_PATH)
                 .maxAge(Duration.ofMillis(maxAgeMs))
                 .build();
