@@ -32,7 +32,7 @@ app:
     failure-path: /login/loading/fail
     state-secret: ${STATE_SECRET_KEY}
     cookie-secure: false
-    cookie-same-site: None
+    cookie-same-site: Lax
 
 image:
   base-url: ${IMAGE_BASE_URL}
