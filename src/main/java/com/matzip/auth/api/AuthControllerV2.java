@@ -25,8 +25,9 @@ public class AuthControllerV2 {
     }
 
     @GetMapping("/oauth2")
-    public ResponseEntity<ApiResponse<String>> kakaoLogin(@RequestParam("code") String code) {
-        LoginResponse loginResponse = authService.login(new KakaoLoginRequest(code));
+    public ResponseEntity<ApiResponse<String>> kakaoLogin(@RequestParam("code") String code,
+                                                          @RequestParam("redirectUri") String redirectUri) {
+        LoginResponse loginResponse = authService.login(new KakaoLoginRequest(code, redirectUri));
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", loginResponse.getRefreshToken())
                 .httpOnly(true)

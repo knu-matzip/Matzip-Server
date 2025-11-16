@@ -129,7 +129,8 @@ public class AuthController {
         }
 
         try {
-            LoginResponse res = authService.login(new KakaoLoginRequest(code));
+            // KakaoLoginRequest의 redirectUri는 인가코드 받을 때 사용된 redirectUri
+            LoginResponse res = authService.login(new KakaoLoginRequest(code, "http://localhost:3000/login/loading/success"));
 
             // 로그인 성공
             ResponseCookie rtCookie = buildRtCookie(res.getRefreshToken(), res.getRefreshTokenExpiresIn());

@@ -47,13 +47,13 @@ public class AuthService {
     @Transactional
     public LoginResponse login(KakaoLoginRequest loginRequest) {
         // 1) 인가 코드 -> 카카오 액세스 토큰 교환
-        KakaoTokenResponse kakoToken = kakaoLoginApiClient.exchangeToken(loginRequest.getCode());
-        if (kakoToken == null || kakoToken.getAccessToken() == null) {
+        KakaoTokenResponse kakaoToken = kakaoLoginApiClient.exchangeToken(loginRequest.getCode(), loginRequest.getRedirectUri());
+        if (kakaoToken == null || kakaoToken.getAccessToken() == null) {
             throw new BusinessException(ErrorCode.KAKAO_LOGIN_FAILED, "카카오 토큰 응답이 비어 있습니다.");
         }
 
         // 2) 카카오 사용자 정보 조회
-        KakaoUserResponse kakaoUser = kakaoLoginApiClient.getUser(kakoToken.getAccessToken());
+        KakaoUserResponse kakaoUser = kakaoLoginApiClient.getUser(kakaoToken.getAccessToken());
         if (kakaoUser == null || kakaoUser.getId() == null) {
             throw new BusinessException(ErrorCode.KAKAO_LOGIN_FAILED, "카카오 사용자 정보 조회 실패");
         }
