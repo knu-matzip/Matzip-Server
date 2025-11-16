@@ -29,14 +29,22 @@ public class AuthControllerV2 {
                                                           @RequestParam("redirectUri") String redirectUri) {
         LoginResponse loginResponse = authService.login(new KakaoLoginRequest(code, redirectUri));
 
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", loginResponse.getRefreshToken())
-                .httpOnly(true)
-                .path("/")
-                .maxAge(Duration.ofDays(14))
-                .build();
+        ResponseCookie accessTokenCookie =
+                generateCookie("accessToken", loginResponse.getAccessToken(), Duration.ofHours(1));
+        ResponseCookie refreshTokenCookie =
+                generateCookie("refreshToken", loginResponse.getRefreshToken(), Duration.ofDays(14));
 
         return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
                 .body(ApiResponse.success(loginResponse.getAccessToken()));
+    }
+
+    private ResponseCookie generateCookie(String name, String value, Duration expires) {
+        return ResponseCookie.from(name, value)
+                .httpOnly(true)
+                .path("/")
+                .maxAge(expires)
+                .build();
     }
 }
