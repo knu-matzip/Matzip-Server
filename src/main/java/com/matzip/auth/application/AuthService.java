@@ -116,8 +116,15 @@ public class AuthService {
         }
 
         // 1) RT 유효성 검증(만료/서명 등)
-        if (!jwtProvider.validateToken(requestRt)) {
-            throw new BusinessException(ErrorCode.INVALID_TOKEN, "유효하지 않은 리프레시 토큰입니다.");
+        JwtProvider.TokenValidationResult validationResult = jwtProvider.validateTokenWithResult(requestRt);
+        if (validationResult != JwtProvider.TokenValidationResult.VALID) {
+            ErrorCode errorCode = validationResult == JwtProvider.TokenValidationResult.EXPIRED 
+                    ? ErrorCode.TOKEN_EXPIRED 
+                    : ErrorCode.INVALID_TOKEN;
+            throw new BusinessException(errorCode, 
+                    validationResult == JwtProvider.TokenValidationResult.EXPIRED 
+                            ? "리프레시 토큰이 만료되었습니다." 
+                            : "유효하지 않은 리프레시 토큰입니다.");
         }
 
         // 2) subject(userId) 파싱
