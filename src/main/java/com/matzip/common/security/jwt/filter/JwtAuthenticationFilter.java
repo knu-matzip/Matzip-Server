@@ -20,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -27,6 +28,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String TOKEN_HEADER = "Authorization";
     private static final String TOKEN_PREFIX = "Bearer ";
+
+    private static final List<String> PUBLIC_PATHS = List.of(
+            "/api/v1/auth",
+            "/api/v1/places",
+            "/api/v1/categories",
+            "/api/v1/events"
+    );
 
     private final JwtProvider jwtProvider;
     private final ObjectMapper objectMapper;
@@ -37,6 +45,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 1. 요청 헤더에서 토큰 추출
         String token = resolveToken(request);
+        String requestPath = request.getRequestURI();
+        String requestMethod = request.getMethod();
 
         // 2. 토큰이 있는 경우 유효성 검증
         if (token != null) {
@@ -50,18 +60,47 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     Authentication authentication = new UsernamePasswordAuthenticationToken(userPrincipal, null, Collections.emptyList());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } catch (JwtException e) {
-                    // 토큰 파싱 중 예외 발생 시 401 반환
-                    handleJwtException(response, JwtProvider.TokenValidationResult.INVALID);
-                    return;
+                    if (isAuthenticationRequired(requestPath, requestMethod)) {
+                        handleJwtException(response, JwtProvider.TokenValidationResult.INVALID);
+                        return;
+                    }
                 }
             } else {
-                // 토큰이 만료되었거나 유효하지 않은 경우 401 반환
-                handleJwtException(response, validationResult);
-                return;
+                if (isAuthenticationRequired(requestPath, requestMethod)) {
+                    handleJwtException(response, validationResult);
+                    return;
+                }
             }
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isAuthenticationRequired(String requestPath, String requestMethod) {
+        // 인증이 필요 없는 공개 경로인지 확인
+        for (String publicPath : PUBLIC_PATHS) {
+            if (requestPath.startsWith(publicPath)) {
+                // /api/v1/events/entries 인증 필요
+                if (requestPath.equals("/api/v1/events/entries") && "POST".equals(requestMethod)) {
+                    return true;
+                }
+                
+                // /api/v1/places 경로 중 인증이 필요한 경로들
+                if (publicPath.equals("/api/v1/places")) {
+                    if (requestPath.equals("/api/v1/places/like") && "GET".equals(requestMethod)) {
+                        return true;
+                    }
+                    if (requestPath.matches("/api/v1/places/\\d+/like") &&
+                        ("POST".equals(requestMethod) || "DELETE".equals(requestMethod))) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
