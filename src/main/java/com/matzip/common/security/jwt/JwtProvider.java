@@ -73,22 +73,32 @@ public class JwtProvider {
     }
 
     /**
-     * 토큰 유효성 검증
+     * 토큰 검증 및 예외 타입 반환
+     * @return TokenValidationResult 토큰 검증 결과 (VALID, EXPIRED, INVALID)
      */
-    public boolean validateToken(String token) {
+    public TokenValidationResult validateTokenWithResult(String token) {
         try {
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
-            return true;
+            return TokenValidationResult.VALID;
         } catch (ExpiredJwtException e) {
             log.warn("JWT expired at {}", e.getClaims().getExpiration());
+            return TokenValidationResult.EXPIRED;
         } catch (SecurityException | MalformedJwtException e) {
             log.warn("JWT signature invalid or malformed: {}", e.getMessage());
+            return TokenValidationResult.INVALID;
         } catch (IllegalArgumentException e) {
             log.warn("JWT illegal argument (null/empty?): {}", e.getMessage());
+            return TokenValidationResult.INVALID;
         } catch (Exception e) {
             log.warn("JWT validate failed: {}", e.getMessage());
+            return TokenValidationResult.INVALID;
         }
-        return false;
+    }
+
+    public enum TokenValidationResult {
+        VALID,
+        EXPIRED,
+        INVALID
     }
 
 }
