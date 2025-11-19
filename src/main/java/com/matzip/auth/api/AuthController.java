@@ -30,7 +30,7 @@ import java.time.Duration;
 public class AuthController {
 
     private static final String RT_COOKIE_NAME = "refreshToken";
-    private static final String RT_COOKIE_PATH = "/api/v1/auth/";
+    private static final String RT_COOKIE_PATH = "/";
 
     private final AuthService authService;
     private final AuthRedirectProperties redirectProperties;
