@@ -56,4 +56,11 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
             "AND p.status = 'APPROVED' " +
             "ORDER BY p.id DESC")
     List<Place> findByCategoryIdAndCampus(@Param("categoryId") Long categoryId, @Param("campus") Campus campus);
+
+    @EntityGraph(attributePaths = {"placeCategories.category", "placeTags.tag"})
+    @Query("SELECT p FROM Place p " +
+            "WHERE p.name LIKE CONCAT('%', :keyword, '%') " +
+            "AND p.status = 'APPROVED' " +
+            "ORDER BY p.id DESC")
+    List<Place> searchByNameContaining(@Param("keyword") String keyword);
 }
