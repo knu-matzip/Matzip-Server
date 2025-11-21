@@ -168,6 +168,15 @@ public class PlaceReadService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public List<PlaceDetailResponseDto> searchPlaceDetails(String keyword, Long userId) {
+        List<Place> places = placeRepository.searchByNameContaining(keyword);
+
+        return places.stream()
+                .map(place -> getPlaceDetail(place.getId(), userId))
+                .collect(Collectors.toList());
+    }
+
     private record PlaceRelatedData(List<Photo> photos,
                                     List<Category> categories,
                                     List<Tag> tags) {
