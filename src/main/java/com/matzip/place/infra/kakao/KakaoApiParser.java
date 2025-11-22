@@ -59,7 +59,7 @@ public class KakaoApiParser {
     }
 
     /**
-     * panel3 응답에서 사진 정보를 추출
+     * panel3 응답에서 사진 정보를 추출 (최대 15장까지)
      * 세 가지 출처에서 사진을 수집
      * 1) /menu/menus/photos[*]
      * 2) /photos/photos[*]
@@ -68,6 +68,7 @@ public class KakaoApiParser {
     public static List<PhotoDto> extractPhotos(JsonNode root) {
         List<PhotoDto> list = new ArrayList<>();
         int order = 0;
+        final int MAX_PHOTOS = 15;
 
         // URL 중복 제거용
         Set<String> dedup = new HashSet<String>();
@@ -76,14 +77,20 @@ public class KakaoApiParser {
         JsonNode menus = root.at("/menu/menus");
         if (menus != null && menus.isArray()) {
             for (JsonNode group : menus) {
+                if (list.size() >= MAX_PHOTOS) break;
                 JsonNode menuPhotos = group.path("photos");
                 if (menuPhotos != null && menuPhotos.isArray()) {
                     for (JsonNode p : menuPhotos) {
+                        if (list.size() >= MAX_PHOTOS) break;
                         String url = text(p, "photo_url"); // 일부는 url, 일부는 photo_url일 수 있어 둘 다 시도
                         if (url == null) url = text(p, "url");
+                        
+                        // photoUrl이 null이거나 공백인 경우 제외
+                        if (url == null || url.isBlank()) continue;
+                        
                         Long pid = numberToLongOrNull(p.get("photo_id"));
 
-                        if (isNotBlank(url) && !dedup.contains(url)) {
+                        if (!dedup.contains(url)) {
                             list.add(PhotoDto.builder()
                                     .photoId(pid)             // 있으면 세팅, 없으면 null
                                     .photoUrl(url)
@@ -97,42 +104,57 @@ public class KakaoApiParser {
         }
 
         // 2) /photos/photos[*]
-        JsonNode globalPhotos = root.at("/photos/photos");
-        if (globalPhotos != null && globalPhotos.isArray()) {
-            for (JsonNode p : globalPhotos) {
-                String url = text(p, "photo_url");
-                if (url == null) url = text(p, "url");
-                Long pid = numberToLongOrNull(p.get("photo_id"));
+        if (list.size() < MAX_PHOTOS) {
+            JsonNode globalPhotos = root.at("/photos/photos");
+            if (globalPhotos != null && globalPhotos.isArray()) {
+                for (JsonNode p : globalPhotos) {
+                    if (list.size() >= MAX_PHOTOS) break;
+                    String url = text(p, "photo_url");
+                    if (url == null) url = text(p, "url");
+                    
+                    // photoUrl이 null이거나 공백인 경우 제외
+                    if (url == null || url.isBlank()) continue;
+                    
+                    Long pid = numberToLongOrNull(p.get("photo_id"));
 
-                if (isNotBlank(url) && !dedup.contains(url)) {
-                    list.add(PhotoDto.builder()
-                            .photoId(pid)
-                            .photoUrl(url)
-                            .displayOrder(order++)
-                            .build());
-                    dedup.add(url);
+                    if (!dedup.contains(url)) {
+                        list.add(PhotoDto.builder()
+                                .photoId(pid)
+                                .photoUrl(url)
+                                .displayOrder(order++)
+                                .build());
+                        dedup.add(url);
+                    }
                 }
             }
         }
 
         // 3) /blog_review/reviews[*].photos[*]
-        JsonNode reviews = root.at("/blog_review/reviews");
-        if (reviews != null && reviews.isArray()) {
-            for (JsonNode r : reviews) {
-                JsonNode reviewPhotos = r.path("photos");
-                if (reviewPhotos != null && reviewPhotos.isArray()) {
-                    for (JsonNode p : reviewPhotos) {
-                        String url = text(p, "photo_url");
-                        if (url == null) url = text(p, "url");
-                        Long pid = numberToLongOrNull(p.get("photo_id"));
+        if (list.size() < MAX_PHOTOS) {
+            JsonNode reviews = root.at("/blog_review/reviews");
+            if (reviews != null && reviews.isArray()) {
+                for (JsonNode r : reviews) {
+                    if (list.size() >= MAX_PHOTOS) break;
+                    JsonNode reviewPhotos = r.path("photos");
+                    if (reviewPhotos != null && reviewPhotos.isArray()) {
+                        for (JsonNode p : reviewPhotos) {
+                            if (list.size() >= MAX_PHOTOS) break;
+                            String url = text(p, "photo_url");
+                            if (url == null) url = text(p, "url");
+                            
+                            // photoUrl이 null이거나 공백인 경우 제외
+                            if (url == null || url.isBlank()) continue;
+                            
+                            Long pid = numberToLongOrNull(p.get("photo_id"));
 
-                        if (isNotBlank(url) && !dedup.contains(url)) {
-                            list.add(PhotoDto.builder()
-                                    .photoId(pid)
-                                    .photoUrl(url)
-                                    .displayOrder(order++)
-                                    .build());
-                            dedup.add(url);
+                            if (!dedup.contains(url)) {
+                                list.add(PhotoDto.builder()
+                                        .photoId(pid)
+                                        .photoUrl(url)
+                                        .displayOrder(order++)
+                                        .build());
+                                dedup.add(url);
+                            }
                         }
                     }
                 }
