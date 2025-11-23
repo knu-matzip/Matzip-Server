@@ -5,8 +5,8 @@ import com.matzip.common.security.UserPrincipal;
 import com.matzip.place.api.request.PlaceCheckRequestDto;
 import com.matzip.place.api.request.PlaceRequestDto;
 import com.matzip.place.api.response.PlaceCheckResponseDto;
-import com.matzip.place.api.response.PlaceDetailResponseDto;
 import com.matzip.place.api.response.PlaceRegisterResponseDto;
+import com.matzip.place.api.response.PlaceSearchResponseDto;
 import com.matzip.place.application.service.PlaceReadService;
 import com.matzip.place.application.service.PlaceService;
 import jakarta.validation.Valid;
@@ -40,10 +40,8 @@ public class PlaceController {
 
     // 검색
     @GetMapping("/search")
-    public ApiResponse<List<PlaceDetailResponseDto>> search(@RequestParam String keyword,
-                                                            @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        Long userId = userPrincipal != null ? userPrincipal.getUserId() : null;
-        List<PlaceDetailResponseDto> places = placeReadService.searchPlaceDetails(keyword, userId);
+    public ApiResponse<List<PlaceSearchResponseDto>> search(@RequestParam String keyword) {
+        List<PlaceSearchResponseDto> places = placeReadService.searchPlaceDetails(keyword);
         return ApiResponse.success(places);
     }
 }

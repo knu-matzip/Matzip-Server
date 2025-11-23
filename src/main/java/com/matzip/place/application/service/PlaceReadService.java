@@ -168,12 +168,11 @@ public class PlaceReadService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public List<PlaceDetailResponseDto> searchPlaceDetails(String keyword, Long userId) {
+    public List<PlaceSearchResponseDto> searchPlaceDetails(String keyword) {
         List<Place> places = placeRepository.searchByNameContaining(keyword);
 
         return places.stream()
-                .map(place -> getPlaceDetail(place.getId(), userId))
+                .map(PlaceSearchResponseDto::from)
                 .collect(Collectors.toList());
     }
 
