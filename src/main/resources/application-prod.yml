@@ -28,6 +28,7 @@ app:
       - http://localhost:3000
       - https://knu-matzip-dev.vercel.app
       - https://knu-matzip.vercel.app
+      - ${ADMIN_ORIGIN:}
     success-path: /login/loading/success
     failure-path: /login/loading/fail
     state-secret: ${STATE_SECRET_KEY}
