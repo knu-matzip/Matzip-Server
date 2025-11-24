@@ -17,7 +17,7 @@ public interface DailyViewCountRepository extends JpaRepository<DailyViewCount, 
 
     Optional<DailyViewCount> findByPlaceAndViewDate(Place place, LocalDate date);
 
-    @Query("SELECT d FROM DailyViewCount d JOIN FETCH d.place p WHERE p.campus = :campus AND d.viewDate = :date ORDER BY d.count DESC")
+    @Query("SELECT d FROM DailyViewCount d JOIN d.place p WHERE p.campus = :campus AND d.viewDate = :date ORDER BY d.count DESC")
     List<DailyViewCount> findDailyRankingByCampus(
             @Param("campus") Campus campus,
             @Param("date") LocalDate date,
