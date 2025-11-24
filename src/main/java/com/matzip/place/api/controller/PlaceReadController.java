@@ -43,7 +43,7 @@ public class PlaceReadController {
     }
 
     @GetMapping("/ranking")
-    public ResponseEntity<ApiResponse<List<PlaceRankingResponseDto>>> getRanking(
+    public ApiResponse<List<PlaceCommonResponseDto>> getRanking(
             @RequestParam SortType sort,
             @RequestParam Campus campus) {
 

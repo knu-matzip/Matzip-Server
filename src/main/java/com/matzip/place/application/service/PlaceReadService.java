@@ -90,10 +90,8 @@ public class PlaceReadService {
                 .collect(Collectors.toList());
     }
 
-    public List<PlaceRankingResponseDto> getRanking(Campus campus, SortType sortType) {
+    public List<PlaceCommonResponseDto> getRanking(Campus campus, SortType sortType) {
         if (sortType == SortType.VIEWS) {
-
-
             return getDailyRankingByViews(campus);
         }
         
@@ -116,12 +114,12 @@ public class PlaceReadService {
                     Place place = dailyViewCount.getPlace();
 
                     PlaceRelatedData relatedData = relatedDataMap.get(place.getId());
-                    return PlaceRankingResponseDto.from(place, relatedData.categories(), relatedData.tags());
+                    return PlaceCommonResponseDto.from(place, relatedData.categories(), relatedData.tags());
                 })
                 .collect(Collectors.toList());
     }
 
-    private List<PlaceRankingResponseDto> getRankingByLikes(Campus campus) {
+    private List<PlaceCommonResponseDto> getRankingByLikes(Campus campus) {
         Pageable topN = PageRequest.of(0, RANKING_SIZE);
         
         List<Place> places = placeRepository.findTopByCampusOrderByLikeCount(campus, topN);
@@ -131,7 +129,7 @@ public class PlaceReadService {
         return places.stream()
                 .map(place -> {
                     PlaceRelatedData relatedData = relatedDataMap.get(place.getId());
-                    return PlaceRankingResponseDto.from(place, relatedData.categories(), relatedData.tags());
+                    return PlaceCommonResponseDto.from(place, relatedData.categories(), relatedData.tags());
                 })
                 .collect(Collectors.toList());
     }
