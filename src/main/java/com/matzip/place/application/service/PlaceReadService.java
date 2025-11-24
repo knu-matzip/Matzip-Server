@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,14 +89,13 @@ public class PlaceReadService {
                 .collect(Collectors.toList());
     }
 
-    public List<PlaceRankingResponseDto> getRanking(Campus campus, SortType sortType) {
-        if (sortType == SortType.VIEWS) {
-
-
+    public List<PlaceCommonResponseDto> getRanking(Campus campus, String sort) {
+        if ("views".equals(sort)) {
             return getDailyRankingByViews(campus);
         }
-        
-        return getRankingByLikes(campus);
+
+        // TODO: 찜 많은 맛집 기능 구현 후 추가하기
+        return getDailyRankingByViews(campus);
     }
 
     private List<PlaceCommonResponseDto> getDailyRankingByViews(Campus campus) {
@@ -105,33 +103,12 @@ public class PlaceReadService {
         Pageable topN = PageRequest.of(0, RANKING_SIZE);
 
         List<DailyViewCount> dailyRankings = dailyViewCountRepository.findDailyRankingByCampus(campus, today, topN);
-        List<Place> places = dailyRankings.stream()
-                .map(DailyViewCount::getPlace)
-                .collect(Collectors.toList());
-
-        Map<Long, PlaceRelatedData> relatedDataMap = getPlaceRelatedDataInBatch(places);
 
         return dailyRankings.stream()
                 .map(dailyViewCount -> {
                     Place place = dailyViewCount.getPlace();
-
-                    PlaceRelatedData relatedData = relatedDataMap.get(place.getId());
-                    return PlaceRankingResponseDto.from(place, relatedData.categories(), relatedData.tags());
-                })
-                .collect(Collectors.toList());
-    }
-
-    private List<PlaceRankingResponseDto> getRankingByLikes(Campus campus) {
-        Pageable topN = PageRequest.of(0, RANKING_SIZE);
-        
-        List<Place> places = placeRepository.findTopByCampusOrderByLikeCount(campus, topN);
-
-        Map<Long, PlaceRelatedData> relatedDataMap = getPlaceRelatedDataInBatch(places);
-        
-        return places.stream()
-                .map(place -> {
-                    PlaceRelatedData relatedData = relatedDataMap.get(place.getId());
-                    return PlaceRankingResponseDto.from(place, relatedData.categories(), relatedData.tags());
+                    PlaceRelatedData relatedData = getPlaceRelatedData(place);
+                    return PlaceCommonResponseDto.from(place, relatedData.categories(), relatedData.tags());
                 })
                 .collect(Collectors.toList());
     }
@@ -189,42 +166,6 @@ public class PlaceReadService {
                     );
                 })
                 .collect(Collectors.toList());
-    }
-
-
-    private Map<Long, PlaceRelatedData> getPlaceRelatedDataInBatch(List<Place> places) {
-        if (places.isEmpty()) {
-            return Map.of();
-        }
-
-        List<Photo> allPhotos = photoRepository.findByPlaceInOrderByDisplayOrderAsc(places);
-        List<PlaceCategory> allPlaceCategories = placeCategoryRepository.findAllByPlaceIn(places);
-        List<PlaceTag> allPlaceTags = placeTagRepository.findAllByPlaceIn(places);
-
-        Map<Long, List<Photo>> photosByPlaceId = allPhotos.stream()
-                .collect(Collectors.groupingBy(photo -> photo.getPlace().getId()));
-
-        Map<Long, List<Category>> categoriesByPlaceId = allPlaceCategories.stream()
-                .collect(Collectors.groupingBy(
-                        pc -> pc.getPlace().getId(),
-                        Collectors.mapping(PlaceCategory::getCategory, Collectors.toList())
-                ));
-
-        Map<Long, List<Tag>> tagsByPlaceId = allPlaceTags.stream()
-                .collect(Collectors.groupingBy(
-                        pt -> pt.getPlace().getId(),
-                        Collectors.mapping(PlaceTag::getTag, Collectors.toList())
-                ));
-
-        return places.stream()
-                .collect(Collectors.toMap(
-                        Place::getId,
-                        place -> new PlaceRelatedData(
-                                photosByPlaceId.getOrDefault(place.getId(), List.of()),
-                                categoriesByPlaceId.getOrDefault(place.getId(), List.of()),
-                                tagsByPlaceId.getOrDefault(place.getId(), List.of())
-                        )
-                ));
     }
 
     public List<PlaceSearchResponseDto> searchPlaceDetails(String keyword) {

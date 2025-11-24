@@ -3,7 +3,6 @@ package com.matzip.place.infra.repository;
 import com.matzip.place.domain.entity.Place;
 import com.matzip.place.domain.Campus;
 import com.matzip.place.domain.PlaceStatus;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -57,9 +56,6 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
             "AND p.status = 'APPROVED' " +
             "ORDER BY p.id DESC")
     List<Place> findByCategoryIdAndCampus(@Param("categoryId") Long categoryId, @Param("campus") Campus campus);
-
-    @Query("SELECT p FROM Place p WHERE p.campus = :campus AND p.status = 'APPROVED' ORDER BY p.likeCount DESC")
-    List<Place> findTopByCampusOrderByLikeCount(@Param("campus") Campus campus, Pageable pageable);
 
     @EntityGraph(attributePaths = {"placeCategories.category", "placeTags.tag"})
     @Query("SELECT p FROM Place p " +
