@@ -55,7 +55,7 @@ public class Place extends BaseEntity {
     @Column(name = "view_count")
     private int viewCount = 0;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "registered_by")
     private User registeredBy; // 등록자 (nullable - 비회원도 등록 가능)
 
