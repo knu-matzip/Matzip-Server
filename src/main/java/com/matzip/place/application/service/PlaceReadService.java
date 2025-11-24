@@ -37,7 +37,7 @@ public class PlaceReadService {
     private final UserRepository userRepository;
     private final ViewCountService viewCountService;
 
-    private static final int RANKING_SIZE = 10;
+    private static final int RANKING_SIZE = 3;
 
     @Transactional
     public PlaceDetailResponseDto getPlaceDetail(Long placeId, Long userId) {
