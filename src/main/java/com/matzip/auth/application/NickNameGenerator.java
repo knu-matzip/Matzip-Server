@@ -28,17 +28,12 @@ public class NickNameGenerator {
 
     private final SecureRandom random = new SecureRandom();
 
-    /**
-     * 예: "활기찬수달_0427"
-     * - 형식: {형용사}{명사}_{4자리}
-     * - 길이 제한(30자)을 초과하지 않도록 보수적으로 구성.
-     */
     public String generate() {
         String adj = ADJECTIVES[random.nextInt(ADJECTIVES.length)];
         String noun = NOUNS[random.nextInt(NOUNS.length)];
         String suffix = String.format("%04d", random.nextInt(SUFFIX_BOUND));
 
-        String candidate = adj + noun + "_" + suffix;
+        String candidate = adj + " " + noun + "_" + suffix;
 
         if (candidate.length() > MAX_NICKNAME_LENGTH) {
             candidate = candidate.substring(0, MAX_NICKNAME_LENGTH);
