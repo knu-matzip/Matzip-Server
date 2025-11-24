@@ -38,5 +38,3 @@ secrets/
 ### VS Code ###
 .vscode/
 
-### Admin Package ###
-src/main/java/com/matzip/admin/
