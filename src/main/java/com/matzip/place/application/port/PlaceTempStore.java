@@ -3,26 +3,16 @@ package com.matzip.place.application.port;
 import java.util.List;
 
 /**
- * 임시 스냅샷 저장소 Port(추상화)
- * 애플리케이션 계층은 구현체(메모리/Redis 등)에 의존하지 않고 이 인터페이스에만 의존
+ * 임시 스냅샷 저장소 Port
  */
 public interface PlaceTempStore {
 
     void put(PlaceSnapshot snapshot);
 
-    /**
-     * 등록 시점에 사용할 스냅샷을 조회한다.
-     * 존재하지 않거나 만료되었으면 null을 반환한다.
-     */
     PlaceSnapshot findById(String kakaoPlaceId);
 
     void remove(String kakaoPlaceId);
 
-    /**
-     * 프리뷰 단계에서 확보한 값을 등록 시까지 보존하기 위한 스냅샷 모델
-     * 서버가 신뢰하는 값(이름/주소/좌표)을 보존하여, 등록 시 클라이언트 입력을 신뢰하지 않기 위함
-     * 사진/메뉴는 정책상 URL/원본 메뉴 기준으로 보존한다(추천 여부는 등록 요청에서 사용자 선택 반영)
-     */
     final class PlaceSnapshot {
 
         private final String kakaoPlaceId;
@@ -71,23 +61,26 @@ public interface PlaceTempStore {
         public List<SMenu> getMenus() { return menus; }
         public List<SPhoto> getPhotos() { return photos; }
 
-        /**
-         * 프리뷰 시점의 메뉴 스냅샷(추천 여부는 포함하지 않음)
-         * 등록 단계에서 요청의 isRecommended를 이름 매칭으로 반영하기 위함
-         */
+
         public static final class SMenu {
+            private final Long menuId;
             private final String name;
             private final int price;
 
-            public SMenu(String name, int price) {
+            public SMenu(Long menuId, String name, int price) {
                 if (name == null || name.isBlank()) {
                     throw new IllegalArgumentException("메뉴 이름은 비어 있을 수 없습니다.");
                 }
                 if (price < 0) {
                     throw new IllegalArgumentException("메뉴 가격은 음수일 수 없습니다.");
                 }
+                this.menuId = menuId;
                 this.name = name;
                 this.price = price;
+            }
+
+            public Long getMenuId() {
+                return menuId;
             }
 
             public String getName() {
@@ -99,10 +92,7 @@ public interface PlaceTempStore {
             }
         }
 
-        /**
-         * 프리뷰 시점의 사진 스냅샷
-         * 정책상 서버는 파일을 저장하지 않고 외부 URL만 보관한다.
-         */
+
         public static final class SPhoto {
             private final Long photoId;      // 외부에서 식별용으로 제공되면 사용(없으면 null)
             private final String photoUrl;   // 필수

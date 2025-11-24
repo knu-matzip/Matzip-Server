@@ -3,7 +3,7 @@ package com.matzip.lottery.controller;
 import com.matzip.common.response.ApiResponse;
 import com.matzip.common.security.UserPrincipal;
 import com.matzip.lottery.controller.request.ParticipateEventRequest;
-import com.matzip.lottery.controller.response.LotteryEventResponse;
+import com.matzip.lottery.controller.response.LotteryEventView;
 import com.matzip.lottery.service.LotteryEventService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -24,8 +24,9 @@ public class LotteryEventController {
     }
 
     @GetMapping
-    public ApiResponse<LotteryEventResponse> findEvent(@AuthenticationPrincipal UserPrincipal user) {
-        LotteryEventResponse data = lotteryEventService.getCurrentEvent(user.getUserId());
+    public ApiResponse<LotteryEventView> findEvent(@AuthenticationPrincipal UserPrincipal user) {
+        Long userId = (user != null) ? user.getUserId() : null;
+        LotteryEventView data = lotteryEventService.getCurrentEvent(userId);
         return ApiResponse.success(data);
     }
 

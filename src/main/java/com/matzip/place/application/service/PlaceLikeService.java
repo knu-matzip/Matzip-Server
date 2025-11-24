@@ -2,8 +2,8 @@ package com.matzip.place.application.service;
 
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
-import com.matzip.place.api.response.LikedPlaceResponseDto;
 import com.matzip.place.api.response.PlaceLikeResponseDto;
+import com.matzip.place.api.response.PlaceCommonResponseDto;
 import com.matzip.place.domain.entity.*;
 import com.matzip.place.infra.repository.PlaceCategoryRepository;
 import com.matzip.place.infra.repository.PlaceLikeRepository;
@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,7 +59,7 @@ public class PlaceLikeService {
     }
 
     @Transactional(readOnly = true)
-    public List<LikedPlaceResponseDto> getLikedPlaces(Long userId) {
+    public List<PlaceCommonResponseDto> getLikedPlaces(Long userId) {
         User user = findUserById(userId);
 
         List<PlaceLike> likes = placeLikeRepository.findAllByUserWithPlace(user);
@@ -86,7 +85,7 @@ public class PlaceLikeService {
                 .map(place -> {
                     List<Category> categories = placeIdToCategories.getOrDefault(place.getId(), Collections.emptyList());
                     List<Tag> tags = placeIdToTags.getOrDefault(place.getId(), Collections.emptyList());
-                    return LikedPlaceResponseDto.from(place, categories, tags);
+                    return PlaceCommonResponseDto.from(place, categories, tags);
                 })
                 .collect(Collectors.toList());
     }

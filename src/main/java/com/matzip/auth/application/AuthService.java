@@ -8,6 +8,7 @@ import com.matzip.auth.domain.RefreshToken;
 import com.matzip.auth.infra.kakao.KakaoLoginApiClient;
 import com.matzip.auth.infra.kakao.dto.KakaoTokenResponse;
 import com.matzip.auth.infra.kakao.dto.KakaoUserResponse;
+import com.matzip.common.config.ImageProperties;
 import com.matzip.common.config.JwtProperties;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
@@ -31,6 +32,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
     private final JwtProperties jwtProps;
+    private final ImageProperties imageProperties;
 
     private final NickNameGenerator nickNameGenerator;
     private final ProfileAssignment profileAssignment;
@@ -45,13 +47,13 @@ public class AuthService {
     @Transactional
     public LoginResponse login(KakaoLoginRequest loginRequest) {
         // 1) 인가 코드 -> 카카오 액세스 토큰 교환
-        KakaoTokenResponse kakoToken = kakaoLoginApiClient.exchangeToken(loginRequest.getCode());
-        if (kakoToken == null || kakoToken.getAccessToken() == null) {
+        KakaoTokenResponse kakaoToken = kakaoLoginApiClient.exchangeToken(loginRequest.getCode(), loginRequest.getRedirectUri());
+        if (kakaoToken == null || kakaoToken.getAccessToken() == null) {
             throw new BusinessException(ErrorCode.KAKAO_LOGIN_FAILED, "카카오 토큰 응답이 비어 있습니다.");
         }
 
         // 2) 카카오 사용자 정보 조회
-        KakaoUserResponse kakaoUser = kakaoLoginApiClient.getUser(kakoToken.getAccessToken());
+        KakaoUserResponse kakaoUser = kakaoLoginApiClient.getUser(kakaoToken.getAccessToken());
         if (kakaoUser == null || kakaoUser.getId() == null) {
             throw new BusinessException(ErrorCode.KAKAO_LOGIN_FAILED, "카카오 사용자 정보 조회 실패");
         }
@@ -100,7 +102,7 @@ public class AuthService {
                 .refreshTokenExpiresIn(refreshTokenTtlMs())
                 .userId(user.getId())
                 .nickname(user.getNickname())
-                .profileImageUrl(user.getProfileImage().getImageUrl())
+                .profileImageUrl(user.getProfileImage().getFullUrl(imageProperties.getBaseUrl()))
                 .profileBackgroundHexCode(user.getProfileBackground().getColorHexCode())
                 .firstLogin(firstLogin)
                 .build();
@@ -114,8 +116,15 @@ public class AuthService {
         }
 
         // 1) RT 유효성 검증(만료/서명 등)
-        if (!jwtProvider.validateToken(requestRt)) {
-            throw new BusinessException(ErrorCode.INVALID_TOKEN, "유효하지 않은 리프레시 토큰입니다.");
+        JwtProvider.TokenValidationResult validationResult = jwtProvider.validateTokenWithResult(requestRt);
+        if (validationResult != JwtProvider.TokenValidationResult.VALID) {
+            ErrorCode errorCode = validationResult == JwtProvider.TokenValidationResult.EXPIRED 
+                    ? ErrorCode.TOKEN_EXPIRED 
+                    : ErrorCode.INVALID_TOKEN;
+            throw new BusinessException(errorCode, 
+                    validationResult == JwtProvider.TokenValidationResult.EXPIRED 
+                            ? "리프레시 토큰이 만료되었습니다." 
+                            : "유효하지 않은 리프레시 토큰입니다.");
         }
 
         // 2) subject(userId) 파싱

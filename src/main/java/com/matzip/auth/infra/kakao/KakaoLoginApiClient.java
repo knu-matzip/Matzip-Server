@@ -29,11 +29,11 @@ public class KakaoLoginApiClient {
     /**
      * 인가코드 - 카카오 액세스 토큰 교환
      */
-    public KakaoTokenResponse exchangeToken(String authorizationCode) {
+    public KakaoTokenResponse exchangeToken(String authorizationCode, String redirectUri) {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
         form.add("grant_type", "authorization_code");
         form.add("client_id", kakaoProperties.getClientId());
-        form.add("redirect_uri", kakaoProperties.getRedirectUri());
+        form.add("redirect_uri", redirectUri);
         form.add("code", authorizationCode);
 
 

@@ -3,15 +3,13 @@ package com.matzip.place.application.service;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.place.api.request.MapSearchRequestDto;
-import com.matzip.place.api.response.CategoryPlaceResponseDto;
-import com.matzip.place.api.response.MapSearchResponseDto;
-import com.matzip.place.api.response.PlaceDetailResponseDto;
+import com.matzip.place.api.response.*;
 import com.matzip.place.domain.entity.*;
-import com.matzip.place.api.response.PlaceRankingResponseDto;
 import com.matzip.place.domain.*;
 import com.matzip.place.infra.repository.*;
 import com.matzip.place.dto.CategoryDto;
 import com.matzip.place.dto.TagDto;
+import com.matzip.user.infra.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,20 +33,20 @@ public class PlaceReadService {
     private final PlaceTagRepository placeTagRepository;
     private final DailyViewCountRepository dailyViewCountRepository;
     private final CategoryRepository categoryRepository;
+    private final PlaceLikeRepository placeLikeRepository;
+    private final UserRepository userRepository;
+    private final ViewCountService viewCountService;
 
     private static final int RANKING_SIZE = 10;
 
     @Transactional
     public PlaceDetailResponseDto getPlaceDetail(Long placeId, Long userId) {
 
-        placeRepository.incrementViewCount(placeId);
-
-        incrementDailyViewCount(placeId);
+        viewCountService.incrementAllCounts(placeId);
 
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
 
-        // 승인된 맛집만 조회 가능
         if (!place.isApproved()) {
             throw new BusinessException(ErrorCode.PLACE_NOT_FOUND);
         }
@@ -56,8 +54,7 @@ public class PlaceReadService {
         PlaceRelatedData relatedData = getPlaceRelatedData(place);
         List<Menu> menus = menuRepository.findByPlaceOrderByIsRecommendedDescNameAsc(place);
 
-        // 좋아요 여부 확인 (현재는 임시로 false 반환)
-        boolean isLiked = false; // TODO: 실제 좋아요 기능 구현 시 userId로 확인
+        boolean isLiked = checkIfUserLikedPlace(userId, place);
 
         return PlaceDetailResponseDto.from(place, relatedData.photos(), menus, relatedData.categories(), relatedData.tags(), isLiked);
     }
@@ -95,13 +92,15 @@ public class PlaceReadService {
 
     public List<PlaceRankingResponseDto> getRanking(Campus campus, SortType sortType) {
         if (sortType == SortType.VIEWS) {
+
+
             return getDailyRankingByViews(campus);
         }
         
         return getRankingByLikes(campus);
     }
 
-    private List<PlaceRankingResponseDto> getDailyRankingByViews(Campus campus) {
+    private List<PlaceCommonResponseDto> getDailyRankingByViews(Campus campus) {
         LocalDate today = LocalDate.now();
         Pageable topN = PageRequest.of(0, RANKING_SIZE);
 
@@ -115,6 +114,7 @@ public class PlaceReadService {
         return dailyRankings.stream()
                 .map(dailyViewCount -> {
                     Place place = dailyViewCount.getPlace();
+
                     PlaceRelatedData relatedData = relatedDataMap.get(place.getId());
                     return PlaceRankingResponseDto.from(place, relatedData.categories(), relatedData.tags());
                 })
@@ -155,21 +155,17 @@ public class PlaceReadService {
         return new PlaceRelatedData(photos, categories, tags);
     }
 
-    private void incrementDailyViewCount(Long placeId) {
-        LocalDate today = LocalDate.now();
-
-        int updatedRows = dailyViewCountRepository.incrementDailyViewCount(placeId, today);
-
-        if (updatedRows == 0) {
-            Place place = placeRepository.findById(placeId).orElse(null);
-            if (place != null) {
-                DailyViewCount newDailyViewCount = new DailyViewCount(place, today, 1);
-                dailyViewCountRepository.save(newDailyViewCount);
-            }
+    private boolean checkIfUserLikedPlace(Long userId, Place place) {
+        if (userId == null) {
+            return false;
         }
+
+        return userRepository.findById(userId)
+                .map(user -> placeLikeRepository.existsByUserAndPlace(user, place))
+                .orElse(false);
     }
 
-    public List<CategoryPlaceResponseDto> getPlacesByCategory(Long categoryId, Campus campus) {
+    public List<PlaceCommonResponseDto> getPlacesByCategory(Long categoryId, Campus campus) {
         if (!categoryRepository.existsById(categoryId)) {
             throw new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
         }
@@ -184,7 +180,7 @@ public class PlaceReadService {
                     List<CategoryDto> categoryDtos = categories.stream().map(CategoryDto::from).collect(Collectors.toList());
                     List<TagDto> tagDtos = tags.stream().map(TagDto::from).collect(Collectors.toList());
 
-                    return CategoryPlaceResponseDto.of(
+                    return PlaceCommonResponseDto.of(
                             place.getId(),
                             place.getName(),
                             place.getAddress(),
@@ -194,6 +190,7 @@ public class PlaceReadService {
                 })
                 .collect(Collectors.toList());
     }
+
 
     private Map<Long, PlaceRelatedData> getPlaceRelatedDataInBatch(List<Place> places) {
         if (places.isEmpty()) {
@@ -228,6 +225,14 @@ public class PlaceReadService {
                                 tagsByPlaceId.getOrDefault(place.getId(), List.of())
                         )
                 ));
+    }
+
+    public List<PlaceSearchResponseDto> searchPlaceDetails(String keyword) {
+        List<Place> places = placeRepository.searchByNameContaining(keyword);
+
+        return places.stream()
+                .map(PlaceSearchResponseDto::from)
+                .collect(Collectors.toList());
     }
 
     private record PlaceRelatedData(List<Photo> photos,

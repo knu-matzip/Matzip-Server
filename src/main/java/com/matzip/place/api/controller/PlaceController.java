@@ -1,14 +1,20 @@
 package com.matzip.place.api.controller;
 
 import com.matzip.common.response.ApiResponse;
+import com.matzip.common.security.UserPrincipal;
 import com.matzip.place.api.request.PlaceCheckRequestDto;
 import com.matzip.place.api.request.PlaceRequestDto;
 import com.matzip.place.api.response.PlaceCheckResponseDto;
 import com.matzip.place.api.response.PlaceRegisterResponseDto;
+import com.matzip.place.api.response.PlaceSearchResponseDto;
+import com.matzip.place.application.service.PlaceReadService;
 import com.matzip.place.application.service.PlaceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,12 +22,13 @@ import org.springframework.web.bind.annotation.*;
 public class PlaceController {
 
     private final PlaceService placeService;
+    private final PlaceReadService placeReadService;
 
     // 프리뷰
     @GetMapping("/preview")
     public ApiResponse<PlaceCheckResponseDto> preview(@Valid @ModelAttribute PlaceCheckRequestDto req) {
-        PlaceCheckResponseDto data = placeService.preview(req); // 서비스 결과 DTO
-        return ApiResponse.success(data);                       // 공통 응답 형태로 래핑
+        PlaceCheckResponseDto data = placeService.preview(req);
+        return ApiResponse.success(data);
     }
 
     // 등록
@@ -31,11 +38,10 @@ public class PlaceController {
         return ApiResponse.success(data);
     }
 
-    // ===== 관리자 기능 (TODO: Admin 페이지 개발 시 구현) =====
-    
-    /**
-     * TODO: 관리자가 Place 등록 요청을 승인하는 API
-     * TODO: 관리자가 Place 등록 요청을 거부하는 API
-     * TODO: 관리자가 승인 대기 중인 Place 목록을 조회하는 API
-     */
+    // 검색
+    @GetMapping("/search")
+    public ApiResponse<List<PlaceSearchResponseDto>> search(@RequestParam String keyword) {
+        List<PlaceSearchResponseDto> places = placeReadService.searchPlaceDetails(keyword);
+        return ApiResponse.success(places);
+    }
 }

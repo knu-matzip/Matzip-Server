@@ -2,7 +2,9 @@ package com.matzip.lottery.service;
 
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
+import com.matzip.lottery.controller.response.LotteryEventAnonymousResponse;
 import com.matzip.lottery.controller.response.LotteryEventResponse;
+import com.matzip.lottery.controller.response.LotteryEventView;
 import com.matzip.lottery.domain.LotteryEntries;
 import com.matzip.lottery.domain.LotteryEntry;
 import com.matzip.lottery.domain.LotteryEvent;
@@ -31,9 +33,13 @@ public class LotteryEventService {
     }
 
     @Transactional(readOnly = true)
-    public LotteryEventResponse getCurrentEvent(Long userId) {
+    public LotteryEventView getCurrentEvent(Long userId) {
         return lotteryEventRepository.findCurrentEvent(LocalDateTime.now())
                 .map(currentEvent -> {
+                    if (userId == null) {
+                        return LotteryEventAnonymousResponse.of(currentEvent);
+                    }
+
                     List<LotteryEntry> entries = lotteryEntryRepository.findByLotteryEvent(currentEvent);
                     LotteryEntries lotteryEntries = new LotteryEntries(entries);
 
@@ -43,7 +49,7 @@ public class LotteryEventService {
 
                     return LotteryEventResponse.of(currentEvent, participantsCount, usedTicketsCount, remainingTicketsCount);
                 })
-                .orElseGet(LotteryEventResponse::empty);
+                .orElseGet(() -> userId == null ? LotteryEventAnonymousResponse.empty() : LotteryEventResponse.empty());
     }
 
     @Transactional
