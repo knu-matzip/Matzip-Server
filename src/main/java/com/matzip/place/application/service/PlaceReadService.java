@@ -1,14 +1,18 @@
 package com.matzip.place.application.service;
 
+import com.matzip.admin.domain.RequestReview;
+import com.matzip.admin.domain.RequestReviewStatus;
+import com.matzip.admin.repository.RequestReviewRepository;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.place.api.request.MapSearchRequestDto;
 import com.matzip.place.api.response.*;
-import com.matzip.place.domain.entity.*;
 import com.matzip.place.domain.*;
-import com.matzip.place.infra.repository.*;
+import com.matzip.place.domain.entity.*;
 import com.matzip.place.dto.CategoryDto;
 import com.matzip.place.dto.TagDto;
+import com.matzip.place.infra.repository.*;
+import com.matzip.user.domain.User;
 import com.matzip.user.infra.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +40,7 @@ public class PlaceReadService {
     private final PlaceLikeRepository placeLikeRepository;
     private final UserRepository userRepository;
     private final ViewCountService viewCountService;
+    private final RequestReviewRepository requestReviewRepository;
 
     private static final int RANKING_SIZE = 3;
 
@@ -232,6 +237,48 @@ public class PlaceReadService {
                 .map(PlaceSearchResponseDto::from)
                 .collect(Collectors.toList());
     }
+
+    public List<PlaceRegisterStatusResponseDto> getMyPlaceRequests(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        List<Place> myPlaces = placeRepository.findAllByRegisteredByOrderByCreatedAtDesc(user);
+
+        return myPlaces.stream()
+                .map(PlaceRegisterStatusResponseDto::from)
+                .collect(Collectors.toList());
+    }
+
+    public PlaceRegisterStatusDetailResponseDto getMyPlaceRequestDetail(Long placeId, Long userId) {
+        Place place = placeRepository.findByIdWithCategoriesAndTags(placeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
+
+        if (place.getRegisteredBy() == null || !place.getRegisteredBy().getId().equals(userId)) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "로그인이 필요합니다.");
+        }
+
+        List<Photo> photos = photoRepository.findByPlaceOrderByDisplayOrderAsc(place);
+        List<Menu> menus = menuRepository.findByPlaceOrderByIsRecommendedDescNameAsc(place);
+        List<Category> categories = place.getCategories();
+        List<Tag> tags = place.getTags();
+        String rejectedReason = resolveRejectedReason(place);
+
+        return PlaceRegisterStatusDetailResponseDto.from(place, photos, menus, categories, tags, rejectedReason);
+    }
+
+    private String resolveRejectedReason(Place place) {
+        if (place.getStatus() != PlaceStatus.REJECTED) {
+            return null;
+        }
+
+        return requestReviewRepository.findTopByPlaceIdAndStatusOrderByCreatedAtDesc(
+                        place.getId(),
+                        RequestReviewStatus.REJECTED
+                )
+                .map(RequestReview::getRejectedReason)
+                .orElse(null);
+    }
+
 
     private record PlaceRelatedData(List<Photo> photos,
                                     List<Category> categories,

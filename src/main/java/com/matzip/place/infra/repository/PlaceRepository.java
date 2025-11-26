@@ -1,8 +1,8 @@
 package com.matzip.place.infra.repository;
 
-import com.matzip.place.domain.entity.Place;
 import com.matzip.place.domain.Campus;
-import com.matzip.place.domain.PlaceStatus;
+import com.matzip.place.domain.entity.Place;
+import com.matzip.user.domain.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -67,4 +67,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
             "AND p.status = 'APPROVED' " +
             "ORDER BY p.id DESC")
     List<Place> searchByNameContaining(@Param("keyword") String keyword);
+
+    @EntityGraph(attributePaths = {"placeCategories", "placeCategories.category", "placeTags", "placeTags.tag"})
+    List<Place> findAllByRegisteredByOrderByCreatedAtDesc(User registeredBy);
 }
