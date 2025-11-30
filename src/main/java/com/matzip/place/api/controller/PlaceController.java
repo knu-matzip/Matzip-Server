@@ -33,7 +33,14 @@ public class PlaceController {
 
     // 등록
     @PostMapping
-    public ApiResponse<PlaceRegisterResponseDto> register(@Valid @RequestBody PlaceRequestDto req) {
+    public ApiResponse<PlaceRegisterResponseDto> register(
+            @Valid @RequestBody PlaceRequestDto req,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        if (userPrincipal != null) {
+            req.setRegisteredBy(userPrincipal.getUserId());
+        }
+
         PlaceRegisterResponseDto data = placeService.register(req);
         return ApiResponse.success(data);
     }
