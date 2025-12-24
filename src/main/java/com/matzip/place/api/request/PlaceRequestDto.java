@@ -26,7 +26,7 @@ public class PlaceRequestDto {
     @NotEmpty(message = "메뉴 정보는 최소 1개 이상이어야 합니다.")
     private List<MenuInfo> menus;
 
-    @Size(max = 4, message = "태그는 최대 4개까지 선택할 수 있습니다.")
+    @Size(max = 6, message = "태그는 최대 6개까지 선택할 수 있습니다.")
     private List<Long> tagIds;
 
     @NotEmpty(message = "카테고리는 최소 1개 이상 선택해야 합니다.")
