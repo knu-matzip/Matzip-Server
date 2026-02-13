@@ -23,7 +23,6 @@ public class PlaceRequestDto {
     @Size(min = 1, max = 1000, message = "설명은 1자 이상 1000자 이하로 작성되어야 합니다.")
     private String description;
 
-    @NotEmpty(message = "메뉴 정보는 최소 1개 이상이어야 합니다.")
     private List<MenuInfo> menus;
 
     @Size(max = 6, message = "태그는 최대 6개까지 선택할 수 있습니다.")
