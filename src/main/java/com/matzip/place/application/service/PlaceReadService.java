@@ -238,6 +238,14 @@ public class PlaceReadService {
                 .collect(Collectors.toList());
     }
 
+    public List<PlaceMenuSearchResponseDto> searchPlaceByMenuName(String keyword) {
+        List<Menu> menus = menuRepository.findByNameContainingAndPlaceApproved(keyword);
+
+        return menus.stream()
+                .map(PlaceMenuSearchResponseDto::from)
+                .collect(Collectors.toList());
+    }
+
     public List<PlaceRegisterStatusResponseDto> getMyPlaceRequests(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));

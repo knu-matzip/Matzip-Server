@@ -6,6 +6,7 @@ import com.matzip.place.api.request.PlaceCheckRequestDto;
 import com.matzip.place.api.request.PlaceRequestDto;
 import com.matzip.place.api.response.PlaceCheckResponseDto;
 import com.matzip.place.api.response.PlaceRegisterResponseDto;
+import com.matzip.place.api.response.PlaceMenuSearchResponseDto;
 import com.matzip.place.api.response.PlaceSearchResponseDto;
 import com.matzip.place.application.service.PlaceReadService;
 import com.matzip.place.application.service.PlaceService;
@@ -45,10 +46,17 @@ public class PlaceController {
         return ApiResponse.success(data);
     }
 
-    // 검색
+    // 가게 이름으로 검색
     @GetMapping("/search")
     public ApiResponse<List<PlaceSearchResponseDto>> search(@RequestParam String keyword) {
         List<PlaceSearchResponseDto> places = placeReadService.searchPlaceDetails(keyword);
         return ApiResponse.success(places);
+    }
+
+    // 메뉴 이름으로 가게 검색
+    @GetMapping("/search/menu")
+    public ApiResponse<List<PlaceMenuSearchResponseDto>> searchByMenu(@RequestParam String keyword) {
+        List<PlaceMenuSearchResponseDto> results = placeReadService.searchPlaceByMenuName(keyword);
+        return ApiResponse.success(results);
     }
 }
