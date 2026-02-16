@@ -12,6 +12,9 @@ import java.util.Optional;
 @Repository
 public interface LotteryEventRepository extends JpaRepository<LotteryEvent, Long> {
 
-    @Query("SELECT le FROM LotteryEvent le WHERE le.endDateTime > :currentDateTime ORDER BY le.endDateTime LIMIT 1")
+    @Query("SELECT le FROM LotteryEvent le WHERE le.isDrawn = false AND le.endDateTime > :currentDateTime ORDER BY le.endDateTime LIMIT 1")
     Optional<LotteryEvent> findCurrentEvent(@Param("currentDateTime") LocalDateTime currentDateTime);
+
+    @Query("SELECT le FROM LotteryEvent le WHERE le.isDrawn = false AND le.endDateTime <= :currentDateTime ORDER BY le.endDateTime DESC LIMIT 1")
+    Optional<LotteryEvent> findRecentlyEndedEvent(@Param("currentDateTime") LocalDateTime currentDateTime);
 }
