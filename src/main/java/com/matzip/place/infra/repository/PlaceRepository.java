@@ -65,8 +65,9 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     @Query("SELECT p FROM Place p " +
             "WHERE p.name LIKE CONCAT('%', :keyword, '%') " +
             "AND p.status = 'APPROVED' " +
+            "AND p.campus = :campus " +
             "ORDER BY p.id DESC")
-    List<Place> searchByNameContaining(@Param("keyword") String keyword);
+    List<Place> searchByNameContainingAndCampus(@Param("keyword") String keyword, @Param("campus") Campus campus);
 
     @EntityGraph(attributePaths = {"placeCategories", "placeCategories.category", "placeTags", "placeTags.tag"})
     List<Place> findAllByRegisteredByOrderByCreatedAtDesc(User registeredBy);

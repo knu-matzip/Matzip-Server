@@ -72,9 +72,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     protected ResponseEntity<ApiResponse<Void>> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
         log.error("MissingServletRequestParameterException: {}", e.getMessage());
+        String message = getMissingParameterMessage(e.getParameterName());
         return ResponseEntity
                 .status(ErrorCode.INVALID_INPUT_VALUE.getStatus())
-                .body(ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE, e.getMessage()));
+                .body(ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE, message));
+    }
+
+    private String getMissingParameterMessage(String parameterName) {
+        if ("campus".equals(parameterName)) {
+            return "캠퍼스 정보를 입력해주세요.";
+        }
+        if ("keyword".equals(parameterName)) {
+            return "검색어를 입력해주세요.";
+        }
+        return "필수 요청 파라미터가 누락되었습니다. (" + parameterName + ")";
     }
     
     /**

@@ -230,16 +230,16 @@ public class PlaceReadService {
                 ));
     }
 
-    public List<PlaceSearchResponseDto> searchPlaceDetails(String keyword) {
-        List<Place> places = placeRepository.searchByNameContaining(keyword);
+    public List<PlaceSearchResponseDto> searchPlaceDetails(String keyword, Campus campus) {
+        List<Place> places = placeRepository.searchByNameContainingAndCampus(keyword, campus);
 
         return places.stream()
                 .map(PlaceSearchResponseDto::from)
                 .collect(Collectors.toList());
     }
 
-    public List<PlaceMenuSearchResponseDto> searchPlaceByMenuName(String keyword) {
-        List<Menu> menus = menuRepository.findByNameContainingAndPlaceApproved(keyword);
+    public List<PlaceMenuSearchResponseDto> searchPlaceByMenuName(String keyword, Campus campus) {
+        List<Menu> menus = menuRepository.findByNameContainingAndPlaceApprovedAndCampus(keyword, campus);
 
         return menus.stream()
                 .map(PlaceMenuSearchResponseDto::from)

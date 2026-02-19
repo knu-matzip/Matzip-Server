@@ -10,6 +10,7 @@ import com.matzip.place.api.response.PlaceMenuSearchResponseDto;
 import com.matzip.place.api.response.PlaceSearchResponseDto;
 import com.matzip.place.application.service.PlaceReadService;
 import com.matzip.place.application.service.PlaceService;
+import com.matzip.place.domain.Campus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,15 +49,19 @@ public class PlaceController {
 
     // 가게 이름으로 검색
     @GetMapping("/search")
-    public ApiResponse<List<PlaceSearchResponseDto>> search(@RequestParam String keyword) {
-        List<PlaceSearchResponseDto> places = placeReadService.searchPlaceDetails(keyword);
+    public ApiResponse<List<PlaceSearchResponseDto>> search(
+            @RequestParam String keyword,
+            @RequestParam Campus campus) {
+        List<PlaceSearchResponseDto> places = placeReadService.searchPlaceDetails(keyword, campus);
         return ApiResponse.success(places);
     }
 
     // 메뉴 이름으로 가게 검색
     @GetMapping("/search/menu")
-    public ApiResponse<List<PlaceMenuSearchResponseDto>> searchByMenu(@RequestParam String keyword) {
-        List<PlaceMenuSearchResponseDto> results = placeReadService.searchPlaceByMenuName(keyword);
+    public ApiResponse<List<PlaceMenuSearchResponseDto>> searchByMenu(
+            @RequestParam String keyword,
+            @RequestParam Campus campus) {
+        List<PlaceMenuSearchResponseDto> results = placeReadService.searchPlaceByMenuName(keyword, campus);
         return ApiResponse.success(results);
     }
 }
