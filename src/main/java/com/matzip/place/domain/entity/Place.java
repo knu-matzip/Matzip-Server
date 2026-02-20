@@ -111,8 +111,10 @@ public class Place extends BaseEntity {
 
     public List<Category> getCategories() {
         return this.placeCategories.stream()
+                .sorted(Comparator
+                        .comparing(PlaceCategory::getDisplayOrder)
+                        .thenComparing(pc -> pc.getCategory().getId()))
                 .map(PlaceCategory::getCategory)
-                .sorted(Comparator.comparing(Category::getId))
                 .toList();
     }
 

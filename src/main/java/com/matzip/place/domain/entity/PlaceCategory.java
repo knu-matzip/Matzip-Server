@@ -22,8 +22,16 @@ public class PlaceCategory {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    public PlaceCategory(Place place, Category category) {
+    @Column(name = "display_order", nullable = false)
+    private int displayOrder;
+
+    public PlaceCategory(Place place, Category category, int displayOrder) {
         this.place = place;
         this.category = category;
+        this.displayOrder = displayOrder;
+    }
+
+    public PlaceCategory(Place place, Category category) {
+        this(place, category, 0);
     }
 }

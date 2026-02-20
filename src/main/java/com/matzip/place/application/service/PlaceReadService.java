@@ -145,7 +145,7 @@ public class PlaceReadService {
     private PlaceRelatedData getPlaceRelatedData(Place place) {
         List<Photo> photos = photoRepository.findByPlaceOrderByDisplayOrderAsc(place);
 
-        List<PlaceCategory> placeCategories = placeCategoryRepository.findAllByPlace(place);
+        List<PlaceCategory> placeCategories = placeCategoryRepository.findAllByPlaceOrderByDisplayOrderAsc(place);
         List<Category> categories = placeCategories.stream()
                 .map(PlaceCategory::getCategory)
                 .collect(Collectors.toList());
