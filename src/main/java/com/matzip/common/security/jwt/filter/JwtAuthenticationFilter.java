@@ -47,6 +47,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
         String requestPath = request.getRequestURI();
         String requestMethod = request.getMethod();
+        boolean authenticationRequired = isAuthenticationRequired(requestPath, requestMethod);
+
+        if (token == null && authenticationRequired) {
+            handleUnauthorized(response);
+            return;
+        }
 
         // 2. 토큰이 있는 경우 유효성 검증
         if (token != null) {
@@ -60,13 +66,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     Authentication authentication = new UsernamePasswordAuthenticationToken(userPrincipal, null, Collections.emptyList());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } catch (JwtException e) {
-                    if (isAuthenticationRequired(requestPath, requestMethod)) {
+                    if (authenticationRequired) {
                         handleJwtException(response, JwtProvider.TokenValidationResult.INVALID);
                         return;
                     }
                 }
             } else {
-                if (isAuthenticationRequired(requestPath, requestMethod)) {
+                if (authenticationRequired) {
                     handleJwtException(response, validationResult);
                     return;
                 }
@@ -119,6 +125,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType("application/json;charset=UTF-8");
         
         ApiResponse<Void> apiResponse = ApiResponse.error(errorCode);
+        String jsonResponse = objectMapper.writeValueAsString(apiResponse);
+        response.getWriter().write(jsonResponse);
+    }
+
+    private void handleUnauthorized(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+
+        ApiResponse<Void> apiResponse = ApiResponse.error(ErrorCode.UNAUTHORIZED);
         String jsonResponse = objectMapper.writeValueAsString(apiResponse);
         response.getWriter().write(jsonResponse);
     }
