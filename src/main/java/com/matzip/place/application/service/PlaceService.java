@@ -50,15 +50,15 @@ public class PlaceService {
     public PlaceCheckResponseDto preview(PlaceCheckRequestDto req) {
         final String kakaoPlaceId = req.getKakaoPlaceId();
 
-        boolean already = placeRepository.existsByKakaoPlaceId(kakaoPlaceId);
+        boolean already = placeRepository.existsByKakaoPlaceIdAndStatus(kakaoPlaceId, PlaceStatus.APPROVED);
         if (already) {
 
-            Optional<Place> maybe = placeRepository.findByKakaoPlaceId(kakaoPlaceId);
-            if (maybe.isEmpty()) {
+            Optional<Place> approvedPlaceOpt = placeRepository.findByKakaoPlaceIdAndStatus(kakaoPlaceId, PlaceStatus.APPROVED);
+            if (approvedPlaceOpt.isEmpty()) {
                 // 경합 상황 방어(존재 체크 직후 삭제 등)
                 throw new IllegalStateException("등록된 맛집 조회에 실패했습니다. kakaoPlaceId=" + kakaoPlaceId);
             }
-            Place p = maybe.get();
+            Place p = approvedPlaceOpt.get();
 
             return builder()
                     .alreadyRegistered(true)
@@ -105,9 +105,17 @@ public class PlaceService {
     public PlaceRegisterResponseDto register(PlaceRequestDto req) {
         final String kakaoPlaceId = req.getKakaoPlaceId();
 
-        Optional<Place> maybe = placeRepository.findByKakaoPlaceId(kakaoPlaceId);
-        if (maybe.isPresent()) {
-            Place exists = maybe.get();
+        Optional<Place> approvedPlaceOpt = placeRepository.findByKakaoPlaceIdAndStatus(kakaoPlaceId, PlaceStatus.APPROVED);
+        if (approvedPlaceOpt.isPresent()) {
+            Place exists = approvedPlaceOpt.get();
+            List<Category> existsCategories = extractCategoriesByPlace(exists);
+            List<Tag> existsTags = extractTagsByPlace(exists);
+            return PlaceRegisterResponseDto.from(exists, existsCategories, existsTags);
+        }
+
+        Optional<Place> existingPlaceOpt = placeRepository.findByKakaoPlaceId(kakaoPlaceId);
+        if (existingPlaceOpt.isPresent()) {
+            Place exists = existingPlaceOpt.get();
             List<Category> existsCategories = extractCategoriesByPlace(exists);
             List<Tag> existsTags = extractTagsByPlace(exists);
             return PlaceRegisterResponseDto.from(exists, existsCategories, existsTags);
