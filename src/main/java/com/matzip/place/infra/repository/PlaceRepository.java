@@ -1,6 +1,7 @@
 package com.matzip.place.infra.repository;
 
 import com.matzip.place.domain.Campus;
+import com.matzip.place.domain.PlaceStatus;
 import com.matzip.place.domain.entity.Place;
 import com.matzip.user.domain.User;
 import org.springframework.data.domain.Pageable;
@@ -16,8 +17,10 @@ import java.util.Optional;
 public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     boolean existsByKakaoPlaceId(String kakaoPlaceId);
+    boolean existsByKakaoPlaceIdAndStatus(String kakaoPlaceId, PlaceStatus status);
 
     Optional<Place> findByKakaoPlaceId(String kakaoPlaceId);
+    Optional<Place> findByKakaoPlaceIdAndStatus(String kakaoPlaceId, PlaceStatus status);
 
     @Query("SELECT p FROM Place p WHERE p.latitude BETWEEN :minLat AND :maxLat AND p.longitude BETWEEN :minLng AND :maxLng AND p.status = 'APPROVED'")
     List<Place> findWithinBounds(
