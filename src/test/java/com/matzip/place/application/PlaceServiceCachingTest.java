@@ -56,7 +56,7 @@ class PlaceServiceCachingTest {
         PlaceCheckRequestDto request = createPlaceCheckRequest();
         KakaoApiClient.PanelSnapshot mockSnapshot = createMockPanelSnapshot();
 
-        when(placeRepository.existsByKakaoPlaceId(TEST_KAKAO_PLACE_ID)).thenReturn(false);
+        when(placeRepository.existsByKakaoPlaceIdAndStatus(anyString(), any())).thenReturn(false);
         when(kakaoApiClient.getPanelSnapshot(TEST_KAKAO_PLACE_ID)).thenReturn(mockSnapshot);
 
         // when
@@ -79,9 +79,10 @@ class PlaceServiceCachingTest {
         PlaceRequestDto request = createPlaceRequest();
         PlaceTempStore.PlaceSnapshot cachedSnapshot = createMockPlaceSnapshot();
 
+        Category category = createMockCategory(1L);
         when(placeRepository.findByKakaoPlaceId(TEST_KAKAO_PLACE_ID)).thenReturn(Optional.empty());
         when(placeTempStore.findById(TEST_KAKAO_PLACE_ID)).thenReturn(cachedSnapshot);
-        when(categoryRepository.findAllById(List.of(1L))).thenReturn(List.of(createMockCategory()));
+        when(categoryRepository.findAllById(List.of(1L))).thenReturn(List.of(category));
 
         // when
         placeService.register(request);
@@ -94,8 +95,6 @@ class PlaceServiceCachingTest {
         verify(placeTempStore, times(1)).findById(TEST_KAKAO_PLACE_ID);
         verify(placeTempStore, times(1)).remove(TEST_KAKAO_PLACE_ID);
     }
-
-
 
     private PlaceCheckRequestDto createPlaceCheckRequest() {
         PlaceCheckRequestDto request = new PlaceCheckRequestDto();
@@ -138,8 +137,10 @@ class PlaceServiceCachingTest {
         );
     }
 
-    private Category createMockCategory() {
-        return new Category();
+    private Category createMockCategory(Long id) {
+        Category category = mock(Category.class);
+        when(category.getId()).thenReturn(id);
+        return category;
     }
 
 }

@@ -146,12 +146,23 @@ public class PlaceService {
         placeRepository.save(place);
 
         List<Long> categoryIds = req.getCategoryIds();
-        List<Category> categories = categoryRepository.findAllById(categoryIds);
-        if (categories.size() != categoryIds.size()) {
-            throw new IllegalArgumentException("유효하지 않은 categoryId가 포함되어 있습니다.");
+        if (categoryIds.size() != new LinkedHashSet<>(categoryIds).size()) {
+            throw new IllegalArgumentException("categoryId는 중복될 수 없습니다.");
         }
-        for (Category c : categories) {
-            placeCategoryRepository.save(new PlaceCategory(place, c));
+
+        List<Category> foundCategories = categoryRepository.findAllById(categoryIds);
+        Map<Long, Category> categoryById = foundCategories.stream()
+                .collect(Collectors.toMap(Category::getId, category -> category));
+
+        List<Category> categories = new ArrayList<>();
+        for (int i = 0; i < categoryIds.size(); i++) {
+            Long categoryId = categoryIds.get(i);
+            Category category = categoryById.get(categoryId);
+            if (category == null) {
+                throw new IllegalArgumentException("유효하지 않은 categoryId가 포함되어 있습니다.");
+            }
+            categories.add(category);
+            placeCategoryRepository.save(new PlaceCategory(place, category, i));
         }
 
         List<Tag> tags = new ArrayList<Tag>();
@@ -263,7 +274,7 @@ public class PlaceService {
 
     // Place 기준으로 연결된 Category 목록을 조회
     private List<Category> extractCategoriesByPlace(Place place) {
-        List<PlaceCategory> pcs = placeCategoryRepository.findAllByPlace(place);
+        List<PlaceCategory> pcs = placeCategoryRepository.findAllByPlaceOrderByDisplayOrderAsc(place);
         return pcs.stream().map(PlaceCategory::getCategory).collect(Collectors.toList());
     }
 

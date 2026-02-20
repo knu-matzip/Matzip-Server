@@ -11,9 +11,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface PlaceCategoryRepository extends JpaRepository<PlaceCategory, PlaceCategoryId> {
-    List<PlaceCategory> findAllByPlace(Place place);
+    List<PlaceCategory> findAllByPlaceOrderByDisplayOrderAsc(Place place);
 
     @EntityGraph(attributePaths = {"category"})
-    @Query("SELECT pc FROM PlaceCategory pc WHERE pc.place IN :places")
+    @Query("SELECT pc FROM PlaceCategory pc WHERE pc.place IN :places ORDER BY pc.place.id ASC, pc.displayOrder ASC")
     List<PlaceCategory> findAllByPlaceIn(@Param("places") List<Place> places);
 }
