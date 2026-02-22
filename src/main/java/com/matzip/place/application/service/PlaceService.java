@@ -113,14 +113,6 @@ public class PlaceService {
             return PlaceRegisterResponseDto.from(exists, existsCategories, existsTags);
         }
 
-        Optional<Place> existingPlaceOpt = placeRepository.findByKakaoPlaceId(kakaoPlaceId);
-        if (existingPlaceOpt.isPresent()) {
-            Place exists = existingPlaceOpt.get();
-            List<Category> existsCategories = extractCategoriesByPlace(exists);
-            List<Tag> existsTags = extractTagsByPlace(exists);
-            return PlaceRegisterResponseDto.from(exists, existsCategories, existsTags);
-        }
-
         PlaceSnapshot cachedSnapshot = placeTempStore.findById(kakaoPlaceId);
         if (cachedSnapshot == null) {
             throw new ValidationException(ErrorCode.VALIDATION_ERROR, "맛집 프리뷰 정보가 만료되었거나 존재하지 않습니다. 프리뷰를 다시 진행해주세요.");

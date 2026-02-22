@@ -4,6 +4,7 @@ import com.matzip.place.api.request.PlaceRequestDto;
 import com.matzip.place.application.port.PlaceTempStore;
 import com.matzip.place.application.service.PlaceService;
 import com.matzip.place.domain.Campus;
+import com.matzip.place.domain.PlaceStatus;
 import com.matzip.place.domain.entity.Category;
 import com.matzip.place.domain.entity.PlaceCategory;
 import com.matzip.place.infra.kakao.KakaoApiClient;
@@ -24,6 +25,7 @@ import java.util.Optional;
 import static com.matzip.place.application.port.PlaceTempStore.PlaceSnapshot.SMenu;
 import static com.matzip.place.application.port.PlaceTempStore.PlaceSnapshot.SPhoto;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,7 +56,8 @@ class PlaceServiceTest {
         Category category1 = createMockCategory(1L);
         Category category2 = createMockCategory(2L);
 
-        when(placeRepository.findByKakaoPlaceId(TEST_KAKAO_PLACE_ID)).thenReturn(Optional.empty());
+        when(placeRepository.findByKakaoPlaceIdAndStatus(eq(TEST_KAKAO_PLACE_ID), eq(PlaceStatus.APPROVED)))
+                .thenReturn(Optional.empty());
         when(placeTempStore.findById(TEST_KAKAO_PLACE_ID)).thenReturn(createMockPlaceSnapshot());
         when(categoryRepository.findAllById(List.of(2L, 1L))).thenReturn(List.of(category1, category2));
 

@@ -31,7 +31,7 @@ public class Place extends BaseEntity {
     @Column(name = "campus", nullable = false)
     private Campus campus;
 
-    @Column(name = "kakao_place_id", unique = true, nullable = false)
+    @Column(name = "kakao_place_id", nullable = false)
     private String kakaoPlaceId;
 
     @Column(name = "place_name", nullable = false, length = 100)
