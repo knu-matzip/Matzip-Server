@@ -20,6 +20,8 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     Optional<Place> findByKakaoPlaceIdAndStatus(String kakaoPlaceId, PlaceStatus status);
 
+    List<Place> findByKakaoPlaceIdAndStatusAndIdNot(String kakaoPlaceId, PlaceStatus status, Long id);
+
     @Query("SELECT p FROM Place p WHERE p.latitude BETWEEN :minLat AND :maxLat AND p.longitude BETWEEN :minLng AND :maxLng AND p.status = 'APPROVED'")
     List<Place> findWithinBounds(
             @Param("minLat") double minLat, @Param("maxLat") double maxLat,

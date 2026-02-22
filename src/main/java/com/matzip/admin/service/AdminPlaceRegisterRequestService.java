@@ -13,8 +13,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class AdminPlaceRegisterRequestService {
+
+    private static final String REJECTED_REASON_OTHER_APPROVED = "동일한 장소가 먼저 등록되어 이번 신청은 반려되었습니다\uD83D\uDE2D";
 
     private final PlaceRepository placeRepository;
     private final RequestReviewRepository requestReviewRepository;
@@ -46,6 +50,13 @@ public class AdminPlaceRegisterRequestService {
         place.approve();
         RequestReview approved = RequestReview.approved(place.getId(), null/*adminId*/);
         requestReviewRepository.save(approved);
+
+        List<Place> otherPendingPlaces = placeRepository.findByKakaoPlaceIdAndStatusAndIdNot(
+                place.getKakaoPlaceId(), PlaceStatus.PENDING, place.getId());
+
+        for (Place other : otherPendingPlaces) {
+            reject(other, REJECTED_REASON_OTHER_APPROVED/*, adminId*/);
+        }
     }
 
     private void reject(Place place, String rejectedReason/*, Long adminId*/) {
