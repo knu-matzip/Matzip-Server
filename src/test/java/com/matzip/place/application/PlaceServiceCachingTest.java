@@ -10,6 +10,7 @@ import com.matzip.place.api.response.PlaceCheckResponseDto;
 import com.matzip.place.application.port.PlaceTempStore;
 import com.matzip.place.domain.entity.Category;
 import com.matzip.place.domain.Campus;
+import com.matzip.place.domain.PlaceStatus;
 import com.matzip.place.infra.repository.*;
 import com.matzip.user.infra.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +28,7 @@ import static com.matzip.place.application.port.PlaceTempStore.PlaceSnapshot.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,7 +82,8 @@ class PlaceServiceCachingTest {
         PlaceTempStore.PlaceSnapshot cachedSnapshot = createMockPlaceSnapshot();
 
         Category category = createMockCategory(1L);
-        when(placeRepository.findByKakaoPlaceId(TEST_KAKAO_PLACE_ID)).thenReturn(Optional.empty());
+        when(placeRepository.findByKakaoPlaceIdAndStatus(eq(TEST_KAKAO_PLACE_ID), eq(PlaceStatus.APPROVED)))
+                .thenReturn(Optional.empty());
         when(placeTempStore.findById(TEST_KAKAO_PLACE_ID)).thenReturn(cachedSnapshot);
         when(categoryRepository.findAllById(List.of(1L))).thenReturn(List.of(category));
 

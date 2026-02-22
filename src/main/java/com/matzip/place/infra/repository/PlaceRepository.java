@@ -16,10 +16,8 @@ import java.util.Optional;
 
 public interface PlaceRepository extends JpaRepository<Place, Long> {
 
-    boolean existsByKakaoPlaceId(String kakaoPlaceId);
     boolean existsByKakaoPlaceIdAndStatus(String kakaoPlaceId, PlaceStatus status);
 
-    Optional<Place> findByKakaoPlaceId(String kakaoPlaceId);
     Optional<Place> findByKakaoPlaceIdAndStatus(String kakaoPlaceId, PlaceStatus status);
 
     @Query("SELECT p FROM Place p WHERE p.latitude BETWEEN :minLat AND :maxLat AND p.longitude BETWEEN :minLng AND :maxLng AND p.status = 'APPROVED'")
