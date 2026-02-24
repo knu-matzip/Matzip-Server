@@ -1,7 +1,5 @@
 package com.matzip.place.application.service;
 
-import com.matzip.common.exception.ValidationException;
-import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.place.dto.LocationDto;
 import com.matzip.place.dto.MenuDto;
 import com.matzip.place.dto.PhotoDto;
@@ -113,9 +111,10 @@ public class PlaceService {
             return PlaceRegisterResponseDto.from(exists, existsCategories, existsTags);
         }
 
-        PlaceSnapshot cachedSnapshot = placeTempStore.findById(kakaoPlaceId);
-        if (cachedSnapshot == null) {
-            throw new ValidationException(ErrorCode.VALIDATION_ERROR, "맛집 프리뷰 정보가 만료되었거나 존재하지 않습니다. 프리뷰를 다시 진행해주세요.");
+        PlaceSnapshot snapshot = placeTempStore.findById(kakaoPlaceId);
+        if (snapshot == null) {
+            PanelSnapshot panelSnapshot = kakaoApiClient.getPanelSnapshot(kakaoPlaceId);
+            snapshot = createPlaceSnapshot(panelSnapshot);
         }
 
         User registeredBy = null;
@@ -127,10 +126,10 @@ public class PlaceService {
         Place place = Place.builder()
                 .campus(req.getCampus())
                 .kakaoPlaceId(kakaoPlaceId)
-                .name(cachedSnapshot.getPlaceName())
-                .address(cachedSnapshot.getAddress())
-                .latitude(cachedSnapshot.getLatitude())
-                .longitude(cachedSnapshot.getLongitude())
+                .name(snapshot.getPlaceName())
+                .address(snapshot.getAddress())
+                .latitude(snapshot.getLatitude())
+                .longitude(snapshot.getLongitude())
                 .description(req.getDescription())
                 .registeredBy(registeredBy)
                 .status(PlaceStatus.PENDING) // 승인 대기 상태로 저장
@@ -171,7 +170,7 @@ public class PlaceService {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        List<SPhoto> photos = cachedSnapshot.getPhotos();
+        List<SPhoto> photos = snapshot.getPhotos();
         if (photos != null) {
             for (SPhoto sp : photos) {
                 int order = sp.getDisplayOrder();
@@ -203,7 +202,7 @@ public class PlaceService {
             }
         }
 
-        List<SMenu> menus = cachedSnapshot.getMenus();
+        List<SMenu> menus = snapshot.getMenus();
         if (menus != null) {
             for (SMenu sm : menus) {
                 String name = sm.getName();
