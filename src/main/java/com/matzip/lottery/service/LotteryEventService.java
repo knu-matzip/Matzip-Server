@@ -5,6 +5,7 @@ import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.lottery.controller.response.LotteryEventAnonymousResponse;
 import com.matzip.lottery.controller.response.LotteryEventResponse;
 import com.matzip.lottery.controller.response.LotteryEventView;
+import com.matzip.lottery.controller.response.ParticipatedEventResponse;
 import com.matzip.lottery.domain.LotteryEntries;
 import com.matzip.lottery.domain.LotteryEntry;
 import com.matzip.lottery.domain.LotteryEvent;
@@ -50,6 +51,18 @@ public class LotteryEventService {
                     return LotteryEventResponse.of(currentEvent, participantsCount, usedTicketsCount, remainingTicketsCount);
                 })
                 .orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ParticipatedEventResponse> getParticipatedEvents(Long userId) {
+        List<LotteryEvent> events = lotteryEntryRepository.findDistinctLotteryEventsByUserId(userId);
+
+        return events.stream()
+                .map(event -> {
+                    int participantsCount = lotteryEntryRepository.countParticipantsByLotteryEvent(event);
+                    return ParticipatedEventResponse.of(event, participantsCount);
+                })
+                .toList();
     }
 
     @Transactional

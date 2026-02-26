@@ -4,7 +4,10 @@ import com.matzip.common.response.ApiResponse;
 import com.matzip.common.security.UserPrincipal;
 import com.matzip.lottery.controller.request.ParticipateEventRequest;
 import com.matzip.lottery.controller.response.LotteryEventView;
+import com.matzip.lottery.controller.response.ParticipatedEventResponse;
 import com.matzip.lottery.service.LotteryEventService;
+
+import java.util.List;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +30,12 @@ public class LotteryEventController {
     public ApiResponse<LotteryEventView> findEvent(@AuthenticationPrincipal UserPrincipal user) {
         Long userId = (user != null) ? user.getUserId() : null;
         LotteryEventView data = lotteryEventService.getCurrentEvent(userId);
+        return ApiResponse.success(data);
+    }
+
+    @GetMapping("/entries")
+    public ApiResponse<List<ParticipatedEventResponse>> getParticipatedEvents(@AuthenticationPrincipal UserPrincipal user) {
+        List<ParticipatedEventResponse> data = lotteryEventService.getParticipatedEvents(user.getUserId());
         return ApiResponse.success(data);
     }
 
