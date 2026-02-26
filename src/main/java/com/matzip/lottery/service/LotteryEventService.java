@@ -49,7 +49,7 @@ public class LotteryEventService {
 
                     return LotteryEventResponse.of(currentEvent, participantsCount, usedTicketsCount, remainingTicketsCount);
                 })
-                .orElseGet(() -> userId == null ? LotteryEventAnonymousResponse.empty() : LotteryEventResponse.empty());
+                .orElse(null);
     }
 
     @Transactional

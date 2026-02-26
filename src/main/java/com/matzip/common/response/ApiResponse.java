@@ -20,7 +20,7 @@ public class ApiResponse<T> {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime timestamp;
     
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private final T data;
     
     @JsonInclude(JsonInclude.Include.NON_NULL)
