@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -18,6 +19,9 @@ public interface LotteryEntryRepository extends JpaRepository<LotteryEntry, Long
 
     @Query("SELECT DISTINCT le.lotteryEvent FROM LotteryEntry le WHERE le.ticket.userId = :userId ORDER BY le.lotteryEvent.endDateTime DESC")
     List<LotteryEvent> findDistinctLotteryEventsByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT DISTINCT le.lotteryEvent FROM LotteryEntry le WHERE le.ticket.userId = :userId AND le.lotteryEvent.endDateTime < :currentDateTime ORDER BY le.lotteryEvent.endDateTime DESC")
+    List<LotteryEvent> findDistinctEndedLotteryEventsByUserId(@Param("userId") Long userId, @Param("currentDateTime") LocalDateTime currentDateTime);
 
     @Query("SELECT COUNT(DISTINCT e.ticket.userId) FROM LotteryEntry e WHERE e.lotteryEvent = :event")
     int countParticipantsByLotteryEvent(@Param("event") LotteryEvent event);
