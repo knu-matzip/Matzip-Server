@@ -48,4 +48,3 @@ public class AuthControllerV2 {
                 .build();
     }
 }
-
