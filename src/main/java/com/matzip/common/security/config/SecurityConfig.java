@@ -57,6 +57,7 @@ public class SecurityConfig {
                 // HTTP 요청에 대한 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/events/entries").authenticated()
+                        .requestMatchers("/api/v1/events/*/entries").authenticated()
 //                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 )

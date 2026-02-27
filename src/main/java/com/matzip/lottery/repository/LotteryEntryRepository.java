@@ -21,4 +21,7 @@ public interface LotteryEntryRepository extends JpaRepository<LotteryEntry, Long
 
     @Query("SELECT COUNT(DISTINCT e.ticket.userId) FROM LotteryEntry e WHERE e.lotteryEvent = :event")
     int countParticipantsByLotteryEvent(@Param("event") LotteryEvent event);
+
+    @Query("SELECT COUNT(le) FROM LotteryEntry le WHERE le.lotteryEvent.id = :eventId AND le.ticket.userId = :userId")
+    int countByLotteryEventIdAndUserId(@Param("eventId") Long eventId, @Param("userId") Long userId);
 }
