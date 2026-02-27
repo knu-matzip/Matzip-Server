@@ -2,6 +2,7 @@ package com.matzip.lottery.service;
 
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
+import com.matzip.lottery.controller.response.EventEntryResultResponse;
 import com.matzip.lottery.controller.response.LotteryEventAnonymousResponse;
 import com.matzip.lottery.controller.response.LotteryEventResponse;
 import com.matzip.lottery.controller.response.LotteryEventView;
@@ -13,6 +14,7 @@ import com.matzip.lottery.domain.Ticket;
 import com.matzip.lottery.repository.LotteryEntryRepository;
 import com.matzip.lottery.repository.LotteryEventRepository;
 import com.matzip.lottery.repository.TicketRepository;
+import com.matzip.lottery.repository.WinnerRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,11 +28,14 @@ public class LotteryEventService {
     private final LotteryEventRepository lotteryEventRepository;
     private final TicketRepository ticketRepository;
     private final LotteryEntryRepository lotteryEntryRepository;
+    private final WinnerRepository winnerRepository;
 
-    public LotteryEventService(LotteryEventRepository lotteryEventRepository, TicketRepository ticketRepository, LotteryEntryRepository lotteryEntryRepository) {
+    public LotteryEventService(LotteryEventRepository lotteryEventRepository, TicketRepository ticketRepository,
+                               LotteryEntryRepository lotteryEntryRepository, WinnerRepository winnerRepository) {
         this.lotteryEventRepository = lotteryEventRepository;
         this.ticketRepository = ticketRepository;
         this.lotteryEntryRepository = lotteryEntryRepository;
+        this.winnerRepository = winnerRepository;
     }
 
     @Transactional(readOnly = true)
@@ -63,6 +68,23 @@ public class LotteryEventService {
                     return ParticipatedEventResponse.of(event, participantsCount);
                 })
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public EventEntryResultResponse getEntryResult(Long eventId, Long userId) {
+        LotteryEvent event = lotteryEventRepository.findById(eventId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "이벤트가 존재하지 않습니다. eventId: " + eventId));
+
+        int usedTicketsCount = lotteryEntryRepository.countByLotteryEventIdAndUserId(eventId, userId);
+        if (usedTicketsCount == 0) {
+            throw new BusinessException(ErrorCode.EVENT_NOT_PARTICIPATED);
+        }
+
+        int participantsCount = lotteryEntryRepository.countParticipantsByLotteryEvent(event);
+        boolean isWinner = winnerRepository.findByUserIdAndEventId(userId, eventId).isPresent();
+        boolean isPhoneSubmitted = false; // TODO: 핸드폰 번호 제출 기능 연동 시 구현
+
+        return EventEntryResultResponse.of(event, participantsCount, usedTicketsCount, isWinner, isPhoneSubmitted);
     }
 
     @Transactional

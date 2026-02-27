@@ -64,7 +64,8 @@ public enum ErrorCode {
     KAKAO_PANEL3_FIELD_ERROR(7005, HttpStatus.BAD_REQUEST, "카카오 panel3 응답 필드에 오류가 있습니다."),
 
     EVENT_ENDED(10000, HttpStatus.BAD_REQUEST, "종료된 이벤트입니다."),
-    INSUFFICIENT_ENTRY_TICKETS(10001, HttpStatus.BAD_REQUEST, "응모권이 부족합니다.");
+    INSUFFICIENT_ENTRY_TICKETS(10001, HttpStatus.BAD_REQUEST, "응모권이 부족합니다."),
+    EVENT_NOT_PARTICIPATED(10002, HttpStatus.FORBIDDEN, "참여한 이벤트가 아닙니다.");
 
     private final int code;
     private final HttpStatus status;
