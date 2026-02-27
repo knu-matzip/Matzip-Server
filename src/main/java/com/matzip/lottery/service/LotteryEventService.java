@@ -67,7 +67,7 @@ public class LotteryEventService {
 
     @Transactional(readOnly = true)
     public List<ParticipatedEventResponse> getParticipatedEvents(Long userId) {
-        List<LotteryEvent> events = lotteryEntryRepository.findDistinctLotteryEventsByUserId(userId);
+        List<LotteryEvent> events = lotteryEntryRepository.findDistinctEndedLotteryEventsByUserId(userId, LocalDateTime.now());
 
         return events.stream()
                 .map(event -> {
