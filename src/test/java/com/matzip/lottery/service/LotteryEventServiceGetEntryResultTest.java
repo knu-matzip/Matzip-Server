@@ -9,6 +9,7 @@ import com.matzip.lottery.domain.Winner;
 import com.matzip.lottery.repository.LotteryEntryRepository;
 import com.matzip.lottery.repository.LotteryEventRepository;
 import com.matzip.lottery.repository.TicketRepository;
+import com.matzip.lottery.repository.WinnerContactRepository;
 import com.matzip.lottery.repository.WinnerRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,6 +24,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -43,6 +45,8 @@ class LotteryEventServiceGetEntryResultTest {
     private LotteryEntryRepository lotteryEntryRepository;
     @Mock
     private WinnerRepository winnerRepository;
+    @Mock
+    private WinnerContactRepository winnerContactRepository;
 
     private static LotteryEvent createEvent(Long eventId) {
         LotteryEvent event = LotteryEvent.builder()
@@ -74,6 +78,7 @@ class LotteryEventServiceGetEntryResultTest {
             BDDMockito.given(lotteryEntryRepository.countParticipantsByLotteryEvent(event)).willReturn(127);
             BDDMockito.given(winnerRepository.findByUserIdAndEventId(USER_ID, EVENT_ID))
                     .willReturn(Optional.of(Winner.builder().userId(USER_ID).eventId(EVENT_ID).build()));
+            BDDMockito.given(winnerContactRepository.findByUserIdAndEventId(anyLong(), anyLong())).willReturn(Optional.empty());
 
             // when
             EventEntryResultResponse result = lotteryEventService.getEntryResult(EVENT_ID, USER_ID);
@@ -98,6 +103,7 @@ class LotteryEventServiceGetEntryResultTest {
             BDDMockito.given(lotteryEntryRepository.countByLotteryEventIdAndUserId(EVENT_ID, USER_ID)).willReturn(1);
             BDDMockito.given(lotteryEntryRepository.countParticipantsByLotteryEvent(event)).willReturn(50);
             BDDMockito.given(winnerRepository.findByUserIdAndEventId(USER_ID, EVENT_ID)).willReturn(Optional.empty());
+            BDDMockito.given(winnerContactRepository.findByUserIdAndEventId(anyLong(), anyLong())).willReturn(Optional.empty());
 
             // when
             EventEntryResultResponse result = lotteryEventService.getEntryResult(EVENT_ID, USER_ID);

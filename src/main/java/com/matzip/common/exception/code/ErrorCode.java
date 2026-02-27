@@ -65,7 +65,10 @@ public enum ErrorCode {
 
     EVENT_ENDED(10000, HttpStatus.BAD_REQUEST, "종료된 이벤트입니다."),
     INSUFFICIENT_ENTRY_TICKETS(10001, HttpStatus.BAD_REQUEST, "응모권이 부족합니다."),
-    EVENT_NOT_PARTICIPATED(10002, HttpStatus.FORBIDDEN, "참여한 이벤트가 아닙니다.");
+    EVENT_NOT_PARTICIPATED(10002, HttpStatus.FORBIDDEN, "참여한 이벤트가 아닙니다."),
+    EVENT_NOT_WINNER(10003, HttpStatus.FORBIDDEN, "당첨자가 아닙니다."),
+    AGREEMENT_REQUIRED(10004, HttpStatus.BAD_REQUEST, "약관 및 개인정보 수집에 동의해 주세요."),
+    DRAW_NOT_COMPLETED(10005, HttpStatus.BAD_REQUEST, "이벤트 추첨이 완료된 후 상품 수령 신청이 가능합니다.");
 
     private final int code;
     private final HttpStatus status;
