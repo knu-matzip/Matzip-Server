@@ -2,6 +2,8 @@ package com.matzip.lottery.service;
 
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
+import com.matzip.lottery.controller.request.ApplyEventRequest;
+import com.matzip.lottery.controller.response.ApplyEventResponse;
 import com.matzip.lottery.controller.response.EventEntryResultResponse;
 import com.matzip.lottery.controller.response.LotteryEventAnonymousResponse;
 import com.matzip.lottery.controller.response.LotteryEventResponse;
@@ -11,9 +13,11 @@ import com.matzip.lottery.domain.LotteryEntries;
 import com.matzip.lottery.domain.LotteryEntry;
 import com.matzip.lottery.domain.LotteryEvent;
 import com.matzip.lottery.domain.Ticket;
+import com.matzip.lottery.domain.WinnerContact;
 import com.matzip.lottery.repository.LotteryEntryRepository;
 import com.matzip.lottery.repository.LotteryEventRepository;
 import com.matzip.lottery.repository.TicketRepository;
+import com.matzip.lottery.repository.WinnerContactRepository;
 import com.matzip.lottery.repository.WinnerRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -29,13 +33,16 @@ public class LotteryEventService {
     private final TicketRepository ticketRepository;
     private final LotteryEntryRepository lotteryEntryRepository;
     private final WinnerRepository winnerRepository;
+    private final WinnerContactRepository winnerContactRepository;
 
     public LotteryEventService(LotteryEventRepository lotteryEventRepository, TicketRepository ticketRepository,
-                               LotteryEntryRepository lotteryEntryRepository, WinnerRepository winnerRepository) {
+                               LotteryEntryRepository lotteryEntryRepository, WinnerRepository winnerRepository,
+                               WinnerContactRepository winnerContactRepository) {
         this.lotteryEventRepository = lotteryEventRepository;
         this.ticketRepository = ticketRepository;
         this.lotteryEntryRepository = lotteryEntryRepository;
         this.winnerRepository = winnerRepository;
+        this.winnerContactRepository = winnerContactRepository;
     }
 
     @Transactional(readOnly = true)
@@ -82,9 +89,42 @@ public class LotteryEventService {
 
         int participantsCount = lotteryEntryRepository.countParticipantsByLotteryEvent(event);
         boolean isWinner = winnerRepository.findByUserIdAndEventId(userId, eventId).isPresent();
-        boolean isPhoneSubmitted = false; // TODO: 핸드폰 번호 제출 기능 연동 시 구현
+        boolean isPhoneSubmitted = winnerContactRepository.findByUserIdAndEventId(userId, eventId).isPresent();
 
         return EventEntryResultResponse.of(event, participantsCount, usedTicketsCount, isWinner, isPhoneSubmitted);
+    }
+
+    @Transactional
+    public ApplyEventResponse applyForPrize(Long eventId, Long userId, ApplyEventRequest request) {
+        LotteryEvent event = lotteryEventRepository.findById(eventId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "이벤트가 존재하지 않습니다. eventId: " + eventId));
+
+        LocalDateTime now = LocalDateTime.now();
+        if (!event.getEndDateTime().isBefore(now) || !event.isDrawn()) {
+            throw new BusinessException(ErrorCode.DRAW_NOT_COMPLETED);
+        }
+        if (winnerRepository.findByUserIdAndEventId(userId, eventId).isEmpty()) {
+            throw new BusinessException(ErrorCode.EVENT_NOT_WINNER);
+        }
+
+        if (!request.isAllAgreed()) {
+            throw new BusinessException(ErrorCode.AGREEMENT_REQUIRED);
+        }
+
+        WinnerContact contact = winnerContactRepository.findByUserIdAndEventId(userId, eventId)
+                .map(existing -> {
+                    existing.update(request.phoneNumber(), request.agreements().termsAgreed(), request.agreements().privacyAgreed());
+                    return winnerContactRepository.save(existing);
+                })
+                .orElseGet(() -> winnerContactRepository.save(WinnerContact.builder()
+                        .userId(userId)
+                        .eventId(eventId)
+                        .phoneNumber(request.phoneNumber())
+                        .termsAgreed(request.agreements().termsAgreed())
+                        .privacyAgreed(request.agreements().privacyAgreed())
+                        .build()));
+
+        return ApplyEventResponse.from(contact);
     }
 
     @Transactional
