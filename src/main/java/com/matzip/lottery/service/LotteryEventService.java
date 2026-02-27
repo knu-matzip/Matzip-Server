@@ -87,6 +87,11 @@ public class LotteryEventService {
             throw new BusinessException(ErrorCode.EVENT_NOT_PARTICIPATED);
         }
 
+        LocalDateTime now = LocalDateTime.now();
+        if (!event.getEndDateTime().isBefore(now) || !event.isDrawn()) {
+            throw new BusinessException(ErrorCode.DRAW_NOT_COMPLETED, "아직 이벤트 추첨이 진행되지 않았습니다.");
+        }
+
         int participantsCount = lotteryEntryRepository.countParticipantsByLotteryEvent(event);
         boolean isWinner = winnerRepository.findByUserIdAndEventId(userId, eventId).isPresent();
         boolean isPhoneSubmitted = winnerContactRepository.findByUserIdAndEventId(userId, eventId).isPresent();
