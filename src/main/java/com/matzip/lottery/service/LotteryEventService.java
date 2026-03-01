@@ -17,6 +17,7 @@ import com.matzip.lottery.domain.WinnerContact;
 import com.matzip.lottery.repository.LotteryEntryRepository;
 import com.matzip.lottery.repository.LotteryEventRepository;
 import com.matzip.lottery.repository.TicketRepository;
+import com.matzip.lottery.infra.discord.DiscordWinnerNotificationService;
 import com.matzip.lottery.repository.WinnerContactRepository;
 import com.matzip.lottery.repository.WinnerRepository;
 import org.springframework.data.domain.Sort;
@@ -34,15 +35,18 @@ public class LotteryEventService {
     private final LotteryEntryRepository lotteryEntryRepository;
     private final WinnerRepository winnerRepository;
     private final WinnerContactRepository winnerContactRepository;
+    private final DiscordWinnerNotificationService discordWinnerNotificationService;
 
     public LotteryEventService(LotteryEventRepository lotteryEventRepository, TicketRepository ticketRepository,
                                LotteryEntryRepository lotteryEntryRepository, WinnerRepository winnerRepository,
-                               WinnerContactRepository winnerContactRepository) {
+                               WinnerContactRepository winnerContactRepository,
+                               DiscordWinnerNotificationService discordWinnerNotificationService) {
         this.lotteryEventRepository = lotteryEventRepository;
         this.ticketRepository = ticketRepository;
         this.lotteryEntryRepository = lotteryEntryRepository;
         this.winnerRepository = winnerRepository;
         this.winnerContactRepository = winnerContactRepository;
+        this.discordWinnerNotificationService = discordWinnerNotificationService;
     }
 
     @Transactional(readOnly = true)
@@ -128,6 +132,8 @@ public class LotteryEventService {
                         .termsAgreed(request.agreements().termsAgreed())
                         .privacyAgreed(request.agreements().privacyAgreed())
                         .build()));
+
+        discordWinnerNotificationService.notifyWinnerContactSubmitted(event, userId, request.phoneNumber());
 
         return ApplyEventResponse.from(contact);
     }

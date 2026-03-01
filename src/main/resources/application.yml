@@ -14,3 +14,7 @@ spring:
 
 server:
   port: 8080
+
+app:
+  discord:
+    webhook-url: ${DISCORD_WEBHOOK_URL:}
