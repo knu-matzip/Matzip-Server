@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/events/*/entries").authenticated()
                         .requestMatchers("/api/v1/events/*/apply").authenticated()
 //                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/actuator/prometheus").permitAll()
                         .anyRequest().permitAll()
                 )
                 // 직접 구현한 JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 추가

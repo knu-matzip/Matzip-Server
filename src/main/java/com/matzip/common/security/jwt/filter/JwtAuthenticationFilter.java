@@ -35,7 +35,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/v1/places",
             "/api/v1/categories",
             "/api/v1/events",
-            "/admin/api"
+            "/admin/api",
+            "/actuator/prometheus"
     );
 
     private final JwtProvider jwtProvider;
