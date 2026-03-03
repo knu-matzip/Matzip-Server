@@ -53,14 +53,14 @@ public class LotteryEventService {
     public LotteryEventView getCurrentEvent(Long userId) {
         return lotteryEventRepository.findCurrentEvent(LocalDateTime.now())
                 .map(currentEvent -> {
-                    if (userId == null) {
-                        return LotteryEventAnonymousResponse.of(currentEvent);
-                    }
-
                     List<LotteryEntry> entries = lotteryEntryRepository.findByLotteryEvent(currentEvent);
                     LotteryEntries lotteryEntries = new LotteryEntries(entries);
-
                     int participantsCount = lotteryEntries.getParticipantsCount();
+
+                    if (userId == null) {
+                        return LotteryEventAnonymousResponse.of(currentEvent, participantsCount);
+                    }
+
                     int usedTicketsCount = lotteryEntries.countTicketsByUser(userId);
                     int remainingTicketsCount = ticketRepository.countByUserIdAndStatus(userId, Ticket.Status.ACTIVE);
 
