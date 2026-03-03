@@ -20,18 +20,13 @@ import java.util.Set;
 @Table(name = "place")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AttributeOverrides({
-    @AttributeOverride(name = "id", column = @Column(name = "place_id")),
-    @AttributeOverride(name = "createdAt", column = @Column(name = "created_at")),
-    @AttributeOverride(name = "updatedAt", column = @Column(name = "updated_at"))
-})
 public class Place extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "campus", nullable = false)
+    @Column(nullable = false)
     private Campus campus;
 
-    @Column(name = "kakao_place_id", nullable = false)
+    @Column(nullable = false)
     private String kakaoPlaceId;
 
     @Column(name = "place_name", nullable = false, length = 100)
@@ -49,18 +44,18 @@ public class Place extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "like_count", nullable = false)
+    @Column(nullable = false)
     private int likeCount = 0; // 기본값을 0으로 초기화
 
-    @Column(name = "view_count")
+    @Column
     private int viewCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "registered_by")
+    @JoinColumn
     private User registeredBy; // 등록자 (nullable - 비회원도 등록 가능)
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(nullable = false)
     private PlaceStatus status = PlaceStatus.PENDING; // 기본값은 승인 대기
 
     @OneToMany(mappedBy = "place")

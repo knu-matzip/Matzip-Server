@@ -14,12 +14,12 @@ public class PlaceTag {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "place_id")
+    @JoinColumn
     private Place place;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_id")
+    @JoinColumn
     private Tag tag;
 
     public PlaceTag(Place place, Tag tag) {

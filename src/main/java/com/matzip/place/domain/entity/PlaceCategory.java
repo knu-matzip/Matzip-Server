@@ -14,15 +14,15 @@ public class PlaceCategory {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "place_id")
+    @JoinColumn
     private Place place;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @JoinColumn
     private Category category;
 
-    @Column(name = "display_order", nullable = false)
+    @Column(nullable = false)
     private int displayOrder;
 
     public PlaceCategory(Place place, Category category, int displayOrder) {

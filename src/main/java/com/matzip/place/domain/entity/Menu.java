@@ -1,5 +1,6 @@
 package com.matzip.place.domain.entity;
 
+import com.matzip.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,15 +11,10 @@ import lombok.NoArgsConstructor;
 @Table(name = "menu")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Menu {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "menu_id")
-    private Long id;
+public class Menu extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "place_id", nullable = false) // 연관관계의 주인
+    @JoinColumn(nullable = false) // 연관관계의 주인
     private Place place;
 
     @Column(nullable = false, length = 100)
@@ -27,7 +23,7 @@ public class Menu {
     @Column(nullable = false)
     private int price;
 
-    @Column(name = "is_recommended", nullable = false)
+    @Column(nullable = false)
     private boolean isRecommended = false;
 
     @Builder

@@ -22,11 +22,11 @@ import lombok.NoArgsConstructor;
 public class PlaceLike extends BaseEntity {
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "place_id", nullable = false)
+    @JoinColumn(nullable = false)
     private Place place;
 
     private PlaceLike(User user, Place place) {
