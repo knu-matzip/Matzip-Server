@@ -15,6 +15,7 @@ import com.matzip.place.application.port.PlaceTempStore;
 import com.matzip.place.infra.repository.*;
 import com.matzip.user.domain.User;
 import com.matzip.user.infra.UserRepository;
+import com.matzip.common.infra.discord.DiscordWebhookSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +45,7 @@ public class PlaceService {
     private final PlaceTagRepository placeTagRepository;
     private final UserRepository userRepository;
     private final PlaceTempStore placeTempStore;
+    private final DiscordWebhookSender discordWebhookSender;
 
     public PlaceCheckResponseDto preview(PlaceCheckRequestDto req) {
         final String kakaoPlaceId = req.getKakaoPlaceId();
@@ -229,7 +231,22 @@ public class PlaceService {
 
         placeTempStore.remove(kakaoPlaceId);
 
+        notifyPlaceRegistrationRequest(place);
+
         return PlaceRegisterResponseDto.from(place, categories, tags);
+    }
+
+    private void notifyPlaceRegistrationRequest(Place place) {
+        Long userId = place.getRegisteredBy() != null ? place.getRegisteredBy().getId() : null;
+        String userIdStr = userId != null ? String.valueOf(userId) : "비회원";
+        String content = """
+                **맛집 등록 신청**
+                - 유저 ID: %s
+                - 캠퍼스: %s
+                - 가게명: %s
+                """
+                .formatted(userIdStr, place.getCampus(), place.getName());
+        discordWebhookSender.sendAsync(content);
     }
 
 
