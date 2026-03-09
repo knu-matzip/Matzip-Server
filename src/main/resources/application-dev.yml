@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+
+logging:
+  level:
+    com.matzip: DEBUG
+    org.hibernate.SQL: debug
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  expiration-time: 3600000
+  refresh-expiration-time: 1209600000 # 14일
+
+oauth2:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID}
+    redirect-uri: ${KAKAO_DEV_REDIRECT_URI}
+
+app:
+  auth:
+    allowed-origins:
+      - http://localhost:3000
+      - http://localhost:3001
+      - https://knu-matzip-dev.vercel.app
+      - ${ADMIN_ORIGIN:}
+    success-path: /login/loading
+    state-secret: ${STATE_SECRET_KEY}
+    cookie-secure: false
+    cookie-same-site: Lax
+
+image:
+  base-url: ${IMAGE_BASE_URL}
