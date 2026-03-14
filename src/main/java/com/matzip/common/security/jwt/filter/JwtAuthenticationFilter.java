@@ -89,11 +89,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 인증이 필요 없는 공개 경로인지 확인
         for (String publicPath : PUBLIC_PATHS) {
             if (requestPath.startsWith(publicPath)) {
-                // /api/v1/events/entries 인증 필요
-                if (requestPath.equals("/api/v1/events/entries") && "POST".equals(requestMethod)) {
-                    return true;
-                }
-                
                 // /api/v1/places 경로 중 인증이 필요한 경로들
                 if (publicPath.equals("/api/v1/places")) {
                     if (requestPath.equals("/api/v1/places/like") && "GET".equals(requestMethod)) {

@@ -8,7 +8,6 @@ import com.matzip.lottery.domain.Prize;
 import com.matzip.lottery.domain.Winner;
 import com.matzip.lottery.repository.LotteryEntryRepository;
 import com.matzip.lottery.repository.LotteryEventRepository;
-import com.matzip.lottery.repository.TicketRepository;
 import com.matzip.lottery.repository.WinnerContactRepository;
 import com.matzip.lottery.repository.WinnerRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -39,8 +38,6 @@ class LotteryEventServiceGetEntryResultTest {
 
     @Mock
     private LotteryEventRepository lotteryEventRepository;
-    @Mock
-    private TicketRepository ticketRepository;
     @Mock
     private LotteryEntryRepository lotteryEntryRepository;
     @Mock

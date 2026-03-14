@@ -3,7 +3,6 @@ package com.matzip.lottery.controller;
 import com.matzip.common.response.ApiResponse;
 import com.matzip.common.security.UserPrincipal;
 import com.matzip.lottery.controller.request.ApplyEventRequest;
-import com.matzip.lottery.controller.request.ParticipateEventRequest;
 import com.matzip.lottery.controller.response.ApplyEventResponse;
 import com.matzip.lottery.controller.response.EventEntryResultResponse;
 import com.matzip.lottery.controller.response.LotteryEventView;
@@ -56,12 +55,5 @@ public class LotteryEventController {
                                                          @AuthenticationPrincipal UserPrincipal user) {
         ApplyEventResponse data = lotteryEventService.applyForPrize(eventId, user.getUserId(), request);
         return ApiResponse.success(data);
-    }
-
-    @PostMapping("/entries")
-    public ApiResponse<String> participate(@Validated @RequestBody ParticipateEventRequest request,
-                                           @AuthenticationPrincipal UserPrincipal user) {
-        lotteryEventService.enterLottery(request.eventId(), request.ticketsCount(), user.getUserId());
-        return ApiResponse.successWithoutData();
     }
 }

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record LotteryEventResponse(Long eventId, PrizeResponse prize, int totalWinnersCount, int participantsCount,
-                                   int usedTicketsCount, int remainingTicketsCount, LocalDateTime eventEndDate)
+                                   int usedTicketsCount, LocalDateTime eventEndDate)
         implements LotteryEventView {
 
     public static LotteryEventResponse empty() {
@@ -16,14 +16,13 @@ public record LotteryEventResponse(Long eventId, PrizeResponse prize, int totalW
                 .build();
     }
 
-    public static LotteryEventResponse of(LotteryEvent lotteryEvent, int participantsCount, int usedTicketsCount, int remainingTicketsCount) {
+    public static LotteryEventResponse of(LotteryEvent lotteryEvent, int participantsCount, int usedTicketsCount) {
         return LotteryEventResponse.builder()
                 .eventId(lotteryEvent.getId())
                 .prize(PrizeResponse.from(lotteryEvent.getPrize()))
                 .totalWinnersCount(lotteryEvent.getWinnersCount())
                 .participantsCount(participantsCount)
                 .usedTicketsCount(usedTicketsCount)
-                .remainingTicketsCount(remainingTicketsCount)
                 .eventEndDate(lotteryEvent.getEndDateTime())
                 .build();
     }
