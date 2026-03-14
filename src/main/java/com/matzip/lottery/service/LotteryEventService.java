@@ -12,37 +12,35 @@ import com.matzip.lottery.controller.response.ParticipatedEventResponse;
 import com.matzip.lottery.domain.LotteryEntries;
 import com.matzip.lottery.domain.LotteryEntry;
 import com.matzip.lottery.domain.LotteryEvent;
-import com.matzip.lottery.domain.Ticket;
 import com.matzip.lottery.domain.WinnerContact;
+import com.matzip.lottery.infra.discord.DiscordWinnerNotificationService;
 import com.matzip.lottery.repository.LotteryEntryRepository;
 import com.matzip.lottery.repository.LotteryEventRepository;
-import com.matzip.lottery.repository.TicketRepository;
-import com.matzip.lottery.infra.discord.DiscordWinnerNotificationService;
 import com.matzip.lottery.repository.WinnerContactRepository;
 import com.matzip.lottery.repository.WinnerRepository;
-import org.springframework.data.domain.Sort;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class LotteryEventService {
 
     private final LotteryEventRepository lotteryEventRepository;
-    private final TicketRepository ticketRepository;
     private final LotteryEntryRepository lotteryEntryRepository;
     private final WinnerRepository winnerRepository;
     private final WinnerContactRepository winnerContactRepository;
     private final DiscordWinnerNotificationService discordWinnerNotificationService;
 
-    public LotteryEventService(LotteryEventRepository lotteryEventRepository, TicketRepository ticketRepository,
-                               LotteryEntryRepository lotteryEntryRepository, WinnerRepository winnerRepository,
+    public LotteryEventService(LotteryEventRepository lotteryEventRepository, LotteryEntryRepository lotteryEntryRepository,
+                               WinnerRepository winnerRepository,
                                WinnerContactRepository winnerContactRepository,
                                DiscordWinnerNotificationService discordWinnerNotificationService) {
         this.lotteryEventRepository = lotteryEventRepository;
-        this.ticketRepository = ticketRepository;
         this.lotteryEntryRepository = lotteryEntryRepository;
         this.winnerRepository = winnerRepository;
         this.winnerContactRepository = winnerContactRepository;
@@ -61,10 +59,9 @@ public class LotteryEventService {
                         return LotteryEventAnonymousResponse.of(currentEvent, participantsCount);
                     }
 
-                    int usedTicketsCount = lotteryEntries.countTicketsByUser(userId);
-                    int remainingTicketsCount = ticketRepository.countByUserIdAndStatus(userId, Ticket.Status.ACTIVE);
+                    int usedTicketsCount = lotteryEntries.countEntriesByUser(userId);
 
-                    return LotteryEventResponse.of(currentEvent, participantsCount, usedTicketsCount, remainingTicketsCount);
+                    return LotteryEventResponse.of(currentEvent, participantsCount, usedTicketsCount);
                 })
                 .orElse(null);
     }
@@ -139,37 +136,24 @@ public class LotteryEventService {
     }
 
     @Transactional
-    public void enterLottery(Long eventId, int ticketsCount, Long userId) {
-        LotteryEvent lotteryEvent = lotteryEventRepository.findById(eventId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "이벤트가 존재하지 않습니다. eventId: " + eventId));
-        validateLotteryEvent(lotteryEvent);
-
-        Sort sort = Sort.by("createdAt");
-        List<Ticket> remainingTickets = ticketRepository.findByUserIdAndStatus(userId, Ticket.Status.ACTIVE, sort);
-        validateTickets(remainingTickets, ticketsCount);
-
-        remainingTickets.stream()
-                .limit(ticketsCount)
-                .forEach(ticket -> doEnter(lotteryEvent, ticket));
+    public boolean enterCurrentEventOnPlaceApproval(Long userId, Long placeId) {
+        return lotteryEventRepository.findCurrentEvent(LocalDateTime.now())
+                .map(currentEvent -> enterOnPlaceApproval(currentEvent, userId, placeId))
+                .orElse(false);
     }
 
-    private void doEnter(LotteryEvent lotteryEvent, Ticket ticket) {
-        LotteryEntry lotteryEntry = LotteryEntry.fromTicket(lotteryEvent, ticket);
-        lotteryEntryRepository.save(lotteryEntry);
-        ticket.use();
-    }
-
-    private void validateLotteryEvent(LotteryEvent lotteryEvent) {
-        if (lotteryEvent.getEndDateTime().isBefore(LocalDateTime.now())) {
-            throw new BusinessException(ErrorCode.EVENT_ENDED);
+    private boolean enterOnPlaceApproval(LotteryEvent lotteryEvent, Long userId, Long placeId) {
+        if (lotteryEntryRepository.existsByLotteryEvent_IdAndPlaceId(lotteryEvent.getId(), placeId)) {
+            log.info("[자동 응모 스킵] 이미 응모 처리된 placeId: {}, eventId: {}", placeId, lotteryEvent.getId());
+            return false;
         }
-    }
 
-    private void validateTickets(List<Ticket> remainingTickets, int ticketsCount) {
-        int remainingTicketsCount = remainingTickets.size();
-        if (remainingTicketsCount < ticketsCount) {
-            throw new BusinessException(ErrorCode.INSUFFICIENT_ENTRY_TICKETS,
-                    String.format("응모권이 부족합니다. 현재 남은 응모권: %d", remainingTicketsCount));
+        try {
+            lotteryEntryRepository.save(LotteryEntry.of(lotteryEvent, userId, placeId));
+            return true;
+        } catch (DataIntegrityViolationException exception) {
+            log.warn("[자동 응모 중복 감지] placeId: {}, eventId: {}", placeId, lotteryEvent.getId());
+            return false;
         }
     }
 }

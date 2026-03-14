@@ -7,12 +7,19 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Entity
-@Table(name = "lottery_event_ticket")
+@Table(
+        name = "lottery_event_ticket",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_lottery_event_ticket_event_place",
+                columnNames = {"lottery_event_id", "place_id"}
+        )
+)
 public class LotteryEntry extends BaseEntity {
 
     @JoinColumn(name = "lottery_event_id")

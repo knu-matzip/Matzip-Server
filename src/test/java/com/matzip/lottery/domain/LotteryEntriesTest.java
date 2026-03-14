@@ -23,8 +23,8 @@ class LotteryEntriesTest {
         LotteryEntries lotteryEntries = new LotteryEntries(entries);
 
         assertThat(lotteryEntries.getParticipantsCount()).isEqualTo(2);
-        assertThat(lotteryEntries.countTicketsByUser(1L)).isEqualTo(2);
-        assertThat(lotteryEntries.countTicketsByUser(2L)).isEqualTo(1);
+        assertThat(lotteryEntries.countEntriesByUser(1L)).isEqualTo(2);
+        assertThat(lotteryEntries.countEntriesByUser(2L)).isEqualTo(1);
     }
 
     @Test

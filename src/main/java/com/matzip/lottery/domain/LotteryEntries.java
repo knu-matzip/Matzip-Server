@@ -31,7 +31,7 @@ public class LotteryEntries {
         return ticketsCountByUser.size();
     }
 
-    public int countTicketsByUser(Long userId) {
+    public int countEntriesByUser(Long userId) {
         return ticketsCountByUser.getOrDefault(userId, 0);
     }
 

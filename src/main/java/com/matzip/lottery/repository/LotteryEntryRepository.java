@@ -28,4 +28,6 @@ public interface LotteryEntryRepository extends JpaRepository<LotteryEntry, Long
 
     @Query("SELECT COUNT(le) FROM LotteryEntry le WHERE le.lotteryEvent.id = :eventId AND COALESCE(le.userId, le.ticket.userId) = :userId")
     int countByLotteryEventIdAndUserId(@Param("eventId") Long eventId, @Param("userId") Long userId);
+
+    boolean existsByLotteryEvent_IdAndPlaceId(Long lotteryEventId, Long placeId);
 }
