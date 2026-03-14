@@ -121,7 +121,7 @@ public class AuthController {
             }
         } catch (Exception e) {
             String defaultFailOrigin = "https://knu-matzip.vercel.app";
-            String location = defaultFailOrigin + redirectProperties.getFailurePath() + "?error=" + ErrorCode.UNAUTHORIZED.getCode();
+            String location = defaultFailOrigin + redirectProperties.getFailurePath();
 
             return ResponseEntity.status(302)
                     .header(HttpHeaders.LOCATION, location)
@@ -145,7 +145,7 @@ public class AuthController {
         } catch (BusinessException e) {
             // 로그인 실패 (State는 정상이었으나, code가 만료되었거나 등등)
             // origin은 신뢰할 수 있으므로, 해당 origin의 실패 페이지로 보냄
-            String location = origin + redirectProperties.getFailurePath() + "?error=" + e.getErrorCode().getCode();
+            String location = origin + redirectProperties.getFailurePath();
 
             return ResponseEntity.status(302)
                     .header(HttpHeaders.LOCATION, location)
@@ -154,4 +154,3 @@ public class AuthController {
     }
 
 }
-

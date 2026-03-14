@@ -68,7 +68,6 @@ public class ApiResponse<T> {
                 .status("ERROR")
                 .timestamp(LocalDateTime.now())
                 .error(ErrorInfo.builder()
-                        .code(code)
                         .message(message)
                         .build())
                 .build();
@@ -82,7 +81,6 @@ public class ApiResponse<T> {
                 .status("ERROR")
                 .timestamp(LocalDateTime.now())
                 .error(ErrorInfo.builder()
-                        .code(String.valueOf(errorCode.getCode()))
                         .message(errorCode.getMessage())
                         .build())
                 .build();
@@ -96,7 +94,6 @@ public class ApiResponse<T> {
                 .status("ERROR")
                 .timestamp(LocalDateTime.now())
                 .error(ErrorInfo.builder()
-                        .code(String.valueOf(errorCode.getCode()))
                         .message(detailMessage)
                         .build())
                 .build();
@@ -105,7 +102,6 @@ public class ApiResponse<T> {
     @Getter
     @Builder
     public static class ErrorInfo {
-        private final String code;
         private final String message;
     }
 }
