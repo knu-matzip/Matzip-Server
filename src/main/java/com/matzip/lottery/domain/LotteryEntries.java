@@ -21,7 +21,7 @@ public class LotteryEntries {
     private Map<Long, Integer> calculateTicketsCount() {
         Map<Long, Integer> counts = new HashMap<>();
         for (LotteryEntry lotteryEntry : lotteryEntries) {
-            Long userId = lotteryEntry.getTicket().getUserId();
+            Long userId = lotteryEntry.getUserId();
             counts.merge(userId, 1, Integer::sum);
         }
         return counts;
@@ -45,7 +45,7 @@ public class LotteryEntries {
 
         Collections.shuffle(entries);
         for (LotteryEntry entry : entries) {
-            Long userId = entry.getTicket().getUserId();
+            Long userId = entry.getUserId();
             if (winners.add(userId) && winners.size() >= winnersCount) {
                 break;
             }

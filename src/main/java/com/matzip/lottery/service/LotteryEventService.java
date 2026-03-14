@@ -154,7 +154,7 @@ public class LotteryEventService {
     }
 
     private void doEnter(LotteryEvent lotteryEvent, Ticket ticket) {
-        LotteryEntry lotteryEntry = new LotteryEntry(lotteryEvent, ticket);
+        LotteryEntry lotteryEntry = LotteryEntry.fromTicket(lotteryEvent, ticket);
         lotteryEntryRepository.save(lotteryEntry);
         ticket.use();
     }
