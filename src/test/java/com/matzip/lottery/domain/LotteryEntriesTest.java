@@ -28,18 +28,12 @@ class LotteryEntriesTest {
     }
 
     @Test
-    @DisplayName("기존 ticket 기반 엔트리도 fallback으로 당첨자 추첨 대상에 포함된다")
-    void drawWithLegacyTicketFallback() {
+    @DisplayName("엔트리 기반으로 사용자 중복 없이 당첨자를 추첨한다")
+    void drawWithEntryBasedUsers() {
         LotteryEvent lotteryEvent = LotteryEvent.builder().build();
-        Ticket legacyTicket = Ticket.builder()
-                .userId(3L)
-                .placeId(30L)
-                .status(Ticket.Status.ACTIVE)
-                .build();
-
         LotteryEntries lotteryEntries = new LotteryEntries(List.of(
                 LotteryEntry.of(lotteryEvent, 1L, 10L),
-                LotteryEntry.fromTicket(lotteryEvent, legacyTicket)
+                LotteryEntry.of(lotteryEvent, 3L, 30L)
         ));
 
         Set<Long> winners = lotteryEntries.draw(2);
