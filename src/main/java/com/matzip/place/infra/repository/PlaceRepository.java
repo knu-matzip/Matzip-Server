@@ -64,6 +64,9 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     @Query("SELECT p FROM Place p WHERE p.campus = :campus AND p.status = 'APPROVED' ORDER BY p.likeCount DESC")
     List<Place> findTopByCampusOrderByLikeCount(@Param("campus") Campus campus, Pageable pageable);
 
+    @Query("SELECT p FROM Place p WHERE p.campus = :campus AND p.status = 'APPROVED' ORDER BY p.createdAt DESC")
+    List<Place> findTopByCampusOrderByCreatedAtDesc(@Param("campus") Campus campus, Pageable pageable);
+
     @EntityGraph(attributePaths = {"placeCategories.category", "placeTags.tag"})
     @Query("SELECT p FROM Place p " +
             "WHERE p.name LIKE CONCAT('%', :keyword, '%') " +
