@@ -43,6 +43,7 @@ public class PlaceReadService {
     private final RequestReviewRepository requestReviewRepository;
 
     private static final int RANKING_SIZE = 3;
+    private static final int LATEST_PLACES_SIZE = 5;
 
     @Transactional
     public PlaceDetailResponseDto getPlaceDetail(Long placeId, Long userId) {
@@ -99,7 +100,11 @@ public class PlaceReadService {
         if (sortType == SortType.VIEWS) {
             return getDailyRankingByViews(campus);
         }
-        
+
+        if (sortType == SortType.LATEST) {
+            return getRankingByLatest(campus);
+        }
+
         return getRankingByLikes(campus);
     }
 
@@ -131,6 +136,20 @@ public class PlaceReadService {
 
         Map<Long, PlaceRelatedData> relatedDataMap = getPlaceRelatedDataInBatch(places);
         
+        return places.stream()
+                .map(place -> {
+                    PlaceRelatedData relatedData = relatedDataMap.get(place.getId());
+                    return PlaceCommonResponseDto.from(place, relatedData.categories(), relatedData.tags());
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<PlaceCommonResponseDto> getRankingByLatest(Campus campus) {
+        Pageable topN = PageRequest.of(0, LATEST_PLACES_SIZE);
+        List<Place> places = placeRepository.findTopByCampusOrderByCreatedAtDesc(campus, topN);
+
+        Map<Long, PlaceRelatedData> relatedDataMap = getPlaceRelatedDataInBatch(places);
+
         return places.stream()
                 .map(place -> {
                     PlaceRelatedData relatedData = relatedDataMap.get(place.getId());
