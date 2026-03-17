@@ -24,7 +24,7 @@
 
 
 ### 🥶 Back-end Architecture
-<img width="1265" height="1047" alt="knu-matzip excalidraw" src="https://github.com/user-attachments/assets/163de521-1d74-4178-a6b3-fc43e381477f" />
+<img width="1265" height="1047" alt="knu-matzip excalidraw" src="https://github.com/user-attachments/assets/18840a9c-4d9d-4b55-9344-57d201d0a89e" />
 
 
 
