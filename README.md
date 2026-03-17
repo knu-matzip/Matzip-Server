@@ -24,7 +24,8 @@
 
 
 ### 🥶 Back-end Architecture
-<img width="1265" height="1047" alt="knu-matzip excalidraw" src="https://github.com/user-attachments/assets/637e1ff8-845e-4518-b961-f77442348040" />
+<img width="1265" height="1047" alt="knu-matzip excalidraw" src="https://github.com/user-attachments/assets/163de521-1d74-4178-a6b3-fc43e381477f" />
+
 
 
 ### 📱 주요 기능
