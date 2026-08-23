@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Builder
-public record PlaceRegisterRequestDetailResponse(Long placeId, String placeName, LocalDate requestDate, List<PhotoDto> photos,
+public record PlaceRegisterRequestDetailResponseDto(Long placeId, String placeName, LocalDate requestDate, List<PhotoDto> photos,
                                                  String address, LocationDto location, String description,
                                                  List<MenusResponse> menus, List<CategoryDto> categories, List<TagDto> tags) {
 
@@ -31,8 +31,8 @@ public record PlaceRegisterRequestDetailResponse(Long placeId, String placeName,
         }
     }
 
-    public static PlaceRegisterRequestDetailResponse from(Place place) {
-        return PlaceRegisterRequestDetailResponse.builder()
+    public static PlaceRegisterRequestDetailResponseDto from(Place place) {
+        return PlaceRegisterRequestDetailResponseDto.builder()
                 .placeId(place.getId())
                 .placeName(place.getName())
                 .requestDate(place.getCreatedAt().toLocalDate())

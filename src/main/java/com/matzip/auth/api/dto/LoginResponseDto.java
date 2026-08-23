@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class LoginResponse {
+public class LoginResponseDto {
 
     // 토큰 섹션
     private String tokenType;                 // "Bearer" 고정 사용?

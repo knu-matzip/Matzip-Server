@@ -6,18 +6,18 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record ParticipatedEventResponse(
+public record ParticipatedEventResponseDto(
         Long eventId,
-        LotteryEventResponse.PrizeResponse prize,
+        LotteryEventResponseDto.PrizeResponse prize,
         int totalWinnersCount,
         int participantsCount,
         LocalDateTime eventEndDate
 ) {
 
-    public static ParticipatedEventResponse of(LotteryEvent event, int participantsCount) {
-        return ParticipatedEventResponse.builder()
+    public static ParticipatedEventResponseDto of(LotteryEvent event, int participantsCount) {
+        return ParticipatedEventResponseDto.builder()
                 .eventId(event.getId())
-                .prize(LotteryEventResponse.PrizeResponse.from(event.getPrize()))
+                .prize(LotteryEventResponseDto.PrizeResponse.from(event.getPrize()))
                 .totalWinnersCount(event.getWinnersCount())
                 .participantsCount(participantsCount)
                 .eventEndDate(event.getEndDateTime())

@@ -1,9 +1,9 @@
 package com.matzip.auth.api;
 
-import com.matzip.auth.api.dto.KakaoLoginRequest;
-import com.matzip.auth.api.dto.LoginResponse;
-import com.matzip.auth.api.dto.TokenReissueRequest;
-import com.matzip.auth.api.dto.TokenResponse;
+import com.matzip.auth.api.dto.KakaoLoginRequestDto;
+import com.matzip.auth.api.dto.LoginResponseDto;
+import com.matzip.auth.api.dto.TokenReissueRequestDto;
+import com.matzip.auth.api.dto.TokenResponseDto;
 import com.matzip.auth.application.AuthService;
 import com.matzip.auth.application.util.KakaoAuthorizeUrlBuilder;
 import com.matzip.auth.application.dto.ReissueResult;
@@ -67,9 +67,9 @@ public class AuthController {
      * @return
      */
     @PostMapping("/token")
-    public ResponseEntity<ApiResponse<TokenResponse>> reissue(
+    public ResponseEntity<ApiResponse<TokenResponseDto>> reissue(
             @CookieValue(value = RT_COOKIE_NAME, required = false) String rtCookie,
-            @RequestBody(required = false) TokenReissueRequest body
+            @RequestBody(required = false) TokenReissueRequestDto body
     ) {
         String incomingRt = (body != null && StringUtils.hasText(body.getRefreshToken()))
                 ? body.getRefreshToken()
@@ -79,13 +79,13 @@ public class AuthController {
             throw new BusinessException(ErrorCode.UNAUTHORIZED, "리프레시 토큰이 없습니다.");
         }
 
-        ReissueResult result = authService.reissue(new TokenReissueRequest(incomingRt));
+        ReissueResult result = authService.reissue(new TokenReissueRequestDto(incomingRt));
 
         // 회전된 새 Refresh Token을 쿠키로 설정
         ResponseCookie rtCookieNew = buildRtCookie(result.refreshToken(), result.refreshTokenExpiresInMs());
 
         // 바디는 Access Token만
-        TokenResponse bodyDto = TokenResponse.builder()
+        TokenResponseDto bodyDto = TokenResponseDto.builder()
                 .tokenType("Bearer")
                 .accessToken(result.accessToken())
                 .accessTokenExpiresIn(result.accessTokenExpiresInMs())
@@ -129,8 +129,8 @@ public class AuthController {
         }
 
         try {
-            // KakaoLoginRequest의 redirectUri는 인가코드 받을 때 사용된 redirectUri
-            LoginResponse res = authService.login(new KakaoLoginRequest(code, "http://localhost:3000/login/loading/success"));
+            // KakaoLoginRequestDto의 redirectUri는 인가코드 받을 때 사용된 redirectUri
+            LoginResponseDto res = authService.login(new KakaoLoginRequestDto(code, "http://localhost:3000/login/loading/success"));
 
             // 로그인 성공
             ResponseCookie rtCookie = buildRtCookie(res.getRefreshToken(), res.getRefreshTokenExpiresIn());

@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class TokenResponse {
+public class TokenResponseDto {
 
     private String tokenType;
     private String accessToken;

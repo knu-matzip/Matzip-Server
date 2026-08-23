@@ -6,9 +6,9 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record EventEntryResultResponse(
+public record EventEntryResultResponseDto(
         Long eventId,
-        LotteryEventResponse.PrizeResponse prize,
+        LotteryEventResponseDto.PrizeResponse prize,
         int totalWinnersCount,
         int participantsCount,
         int usedTicketsCount,
@@ -17,11 +17,11 @@ public record EventEntryResultResponse(
         boolean isPhoneSubmitted
 ) {
 
-    public static EventEntryResultResponse of(LotteryEvent event, int participantsCount, int usedTicketsCount,
+    public static EventEntryResultResponseDto of(LotteryEvent event, int participantsCount, int usedTicketsCount,
                                               boolean isWinner, boolean isPhoneSubmitted) {
-        return EventEntryResultResponse.builder()
+        return EventEntryResultResponseDto.builder()
                 .eventId(event.getId())
-                .prize(LotteryEventResponse.PrizeResponse.from(event.getPrize()))
+                .prize(LotteryEventResponseDto.PrizeResponse.from(event.getPrize()))
                 .totalWinnersCount(event.getWinnersCount())
                 .participantsCount(participantsCount)
                 .usedTicketsCount(usedTicketsCount)

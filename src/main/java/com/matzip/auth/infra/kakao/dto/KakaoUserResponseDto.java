@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
  */
 @Getter
 @NoArgsConstructor
-public class KakaoUserResponse {
+public class KakaoUserResponseDto {
 
     // 카카오 고유 사용자 ID (Long)
     private Long id;

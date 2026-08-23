@@ -1,13 +1,13 @@
 package com.matzip.auth.application;
 
-import com.matzip.auth.api.dto.KakaoLoginRequest;
-import com.matzip.auth.api.dto.LoginResponse;
-import com.matzip.auth.api.dto.TokenReissueRequest;
+import com.matzip.auth.api.dto.KakaoLoginRequestDto;
+import com.matzip.auth.api.dto.LoginResponseDto;
+import com.matzip.auth.api.dto.TokenReissueRequestDto;
 import com.matzip.auth.application.dto.ReissueResult;
 import com.matzip.auth.domain.RefreshToken;
 import com.matzip.auth.infra.kakao.KakaoLoginApiClient;
-import com.matzip.auth.infra.kakao.dto.KakaoTokenResponse;
-import com.matzip.auth.infra.kakao.dto.KakaoUserResponse;
+import com.matzip.auth.infra.kakao.dto.KakaoTokenResponseDto;
+import com.matzip.auth.infra.kakao.dto.KakaoUserResponseDto;
 import com.matzip.common.config.ImageProperties;
 import com.matzip.common.config.JwtProperties;
 import com.matzip.common.exception.BusinessException;
@@ -45,15 +45,15 @@ public class AuthService {
     }
 
     @Transactional
-    public LoginResponse login(KakaoLoginRequest loginRequest) {
+    public LoginResponseDto login(KakaoLoginRequestDto loginRequest) {
         // 1) 인가 코드 -> 카카오 액세스 토큰 교환
-        KakaoTokenResponse kakaoToken = kakaoLoginApiClient.exchangeToken(loginRequest.getCode(), loginRequest.getRedirectUri());
+        KakaoTokenResponseDto kakaoToken = kakaoLoginApiClient.exchangeToken(loginRequest.getCode(), loginRequest.getRedirectUri());
         if (kakaoToken == null || kakaoToken.getAccessToken() == null) {
             throw new BusinessException(ErrorCode.KAKAO_LOGIN_FAILED, "카카오 토큰 응답이 비어 있습니다.");
         }
 
         // 2) 카카오 사용자 정보 조회
-        KakaoUserResponse kakaoUser = kakaoLoginApiClient.getUser(kakaoToken.getAccessToken());
+        KakaoUserResponseDto kakaoUser = kakaoLoginApiClient.getUser(kakaoToken.getAccessToken());
         if (kakaoUser == null || kakaoUser.getId() == null) {
             throw new BusinessException(ErrorCode.KAKAO_LOGIN_FAILED, "카카오 사용자 정보 조회 실패");
         }
@@ -94,7 +94,7 @@ public class AuthService {
             saved.updateToken(refreshToken); // 변경 감지에 의해 업데이트
         }
 
-        return LoginResponse.builder()
+        return LoginResponseDto.builder()
                 .tokenType("Bearer")
                 .accessToken(accessToken)
                 .accessTokenExpiresIn(accessTokenTtlMs())
@@ -109,7 +109,7 @@ public class AuthService {
     }
 
     @Transactional
-    public ReissueResult reissue(TokenReissueRequest request) {
+    public ReissueResult reissue(TokenReissueRequestDto request) {
         final String requestRt = request.getRefreshToken();
         if (requestRt == null || requestRt.isBlank()) {
             throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "리프레시 토큰은 필수입니다.");

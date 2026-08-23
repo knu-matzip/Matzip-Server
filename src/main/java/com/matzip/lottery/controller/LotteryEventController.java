@@ -2,11 +2,11 @@ package com.matzip.lottery.controller;
 
 import com.matzip.common.response.ApiResponse;
 import com.matzip.common.security.UserPrincipal;
-import com.matzip.lottery.controller.request.ApplyEventRequest;
-import com.matzip.lottery.controller.response.ApplyEventResponse;
-import com.matzip.lottery.controller.response.EventEntryResultResponse;
+import com.matzip.lottery.controller.request.ApplyEventRequestDto;
+import com.matzip.lottery.controller.response.ApplyEventResponseDto;
+import com.matzip.lottery.controller.response.EventEntryResultResponseDto;
 import com.matzip.lottery.controller.response.LotteryEventView;
-import com.matzip.lottery.controller.response.ParticipatedEventResponse;
+import com.matzip.lottery.controller.response.ParticipatedEventResponseDto;
 import com.matzip.lottery.service.LotteryEventService;
 
 import java.util.List;
@@ -37,23 +37,23 @@ public class LotteryEventController {
     }
 
     @GetMapping("/entries")
-    public ApiResponse<List<ParticipatedEventResponse>> getParticipatedEvents(@AuthenticationPrincipal UserPrincipal user) {
-        List<ParticipatedEventResponse> data = lotteryEventService.getParticipatedEvents(user.getUserId());
+    public ApiResponse<List<ParticipatedEventResponseDto>> getParticipatedEvents(@AuthenticationPrincipal UserPrincipal user) {
+        List<ParticipatedEventResponseDto> data = lotteryEventService.getParticipatedEvents(user.getUserId());
         return ApiResponse.success(data);
     }
 
     @GetMapping("/{eventId}/entries")
-    public ApiResponse<EventEntryResultResponse> getEntryResult(@PathVariable Long eventId,
+    public ApiResponse<EventEntryResultResponseDto> getEntryResult(@PathVariable Long eventId,
                                                                 @AuthenticationPrincipal UserPrincipal user) {
-        EventEntryResultResponse data = lotteryEventService.getEntryResult(eventId, user.getUserId());
+        EventEntryResultResponseDto data = lotteryEventService.getEntryResult(eventId, user.getUserId());
         return ApiResponse.success(data);
     }
 
     @PostMapping("/{eventId}/apply")
-    public ApiResponse<ApplyEventResponse> applyForPrize(@PathVariable Long eventId,
-                                                         @Validated @RequestBody ApplyEventRequest request,
+    public ApiResponse<ApplyEventResponseDto> applyForPrize(@PathVariable Long eventId,
+                                                         @Validated @RequestBody ApplyEventRequestDto request,
                                                          @AuthenticationPrincipal UserPrincipal user) {
-        ApplyEventResponse data = lotteryEventService.applyForPrize(eventId, user.getUserId(), request);
+        ApplyEventResponseDto data = lotteryEventService.applyForPrize(eventId, user.getUserId(), request);
         return ApiResponse.success(data);
     }
 }

@@ -1,7 +1,7 @@
 package com.matzip.auth.infra.kakao;
 
-import com.matzip.auth.infra.kakao.dto.KakaoTokenResponse;
-import com.matzip.auth.infra.kakao.dto.KakaoUserResponse;
+import com.matzip.auth.infra.kakao.dto.KakaoTokenResponseDto;
+import com.matzip.auth.infra.kakao.dto.KakaoUserResponseDto;
 import com.matzip.common.config.KakaoProperties;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
@@ -29,7 +29,7 @@ public class KakaoLoginApiClient {
     /**
      * 인가코드 - 카카오 액세스 토큰 교환
      */
-    public KakaoTokenResponse exchangeToken(String authorizationCode, String redirectUri) {
+    public KakaoTokenResponseDto exchangeToken(String authorizationCode, String redirectUri) {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
         form.add("grant_type", "authorization_code");
         form.add("client_id", kakaoProperties.getClientId());
@@ -56,7 +56,7 @@ public class KakaoLoginApiClient {
                                             ErrorCode.KAKAO_LOGIN_FAILED,
                                             "카카오 토큰 교환 실패: " + body)))
                     )
-                    .bodyToMono(KakaoTokenResponse.class)
+                    .bodyToMono(KakaoTokenResponseDto.class)
                     .block();
         } catch (BusinessException be) {
             throw be;
@@ -70,7 +70,7 @@ public class KakaoLoginApiClient {
      * 카카오 사용자 정보 조회
      * Authorization 헤더: Bearer {accessToken}
      */
-    public KakaoUserResponse getUser(String accessToken) {
+    public KakaoUserResponseDto getUser(String accessToken) {
         try {
             return webClientBuilder
                     .baseUrl(API_HOST)
@@ -88,7 +88,7 @@ public class KakaoLoginApiClient {
                                             ErrorCode.KAKAO_LOGIN_FAILED,
                                             "카카오 사용자 조회 실패: " + body)))
                     )
-                    .bodyToMono(KakaoUserResponse.class)
+                    .bodyToMono(KakaoUserResponseDto.class)
                     .block();
         } catch (BusinessException be) {
             throw be;

@@ -1,7 +1,7 @@
 package com.matzip.auth.api;
 
-import com.matzip.auth.api.dto.KakaoLoginRequest;
-import com.matzip.auth.api.dto.LoginResponse;
+import com.matzip.auth.api.dto.KakaoLoginRequestDto;
+import com.matzip.auth.api.dto.LoginResponseDto;
 import com.matzip.auth.application.AuthService;
 import com.matzip.common.response.ApiResponse;
 import org.springframework.http.HttpHeaders;
@@ -27,7 +27,7 @@ public class AuthControllerV2 {
     @GetMapping("/oauth2")
     public ResponseEntity<ApiResponse<String>> kakaoLogin(@RequestParam("code") String code,
                                                           @RequestParam("redirectUri") String redirectUri) {
-        LoginResponse loginResponse = authService.login(new KakaoLoginRequest(code, redirectUri));
+        LoginResponseDto loginResponse = authService.login(new KakaoLoginRequestDto(code, redirectUri));
 
 //        ResponseCookie accessTokenCookie =
 //                generateCookie("accessToken", loginResponse.getAccessToken(), Duration.ofHours(1));

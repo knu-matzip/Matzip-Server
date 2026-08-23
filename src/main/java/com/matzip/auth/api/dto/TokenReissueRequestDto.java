@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class TokenReissueRequest {
+public class TokenReissueRequestDto {
 
     @NotBlank(message = "리프레시 토큰은 필수입니다.")
     private String refreshToken;
