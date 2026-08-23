@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 
-public record ApplyEventRequest(
+public record ApplyEventRequestDto(
         @NotBlank(message = "핸드폰 번호를 입력해 주세요.")
         @Pattern(regexp = "^010-\\d{3,4}-\\d{4}$", message = "올바른 핸드폰 번호 형식이 아닙니다. (예: 010-1234-5678)")
         String phoneNumber,

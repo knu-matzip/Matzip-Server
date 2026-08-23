@@ -2,7 +2,7 @@ package com.matzip.lottery.service;
 
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
-import com.matzip.lottery.controller.response.EventEntryResultResponse;
+import com.matzip.lottery.controller.response.EventEntryResultResponseDto;
 import com.matzip.lottery.domain.LotteryEvent;
 import com.matzip.lottery.domain.Prize;
 import com.matzip.lottery.domain.Winner;
@@ -78,7 +78,7 @@ class LotteryEventServiceGetEntryResultTest {
             BDDMockito.given(winnerContactRepository.findByUserIdAndEventId(anyLong(), anyLong())).willReturn(Optional.empty());
 
             // when
-            EventEntryResultResponse result = lotteryEventService.getEntryResult(EVENT_ID, USER_ID);
+            EventEntryResultResponseDto result = lotteryEventService.getEntryResult(EVENT_ID, USER_ID);
 
             // then
             assertThat(result.eventId()).isEqualTo(EVENT_ID);
@@ -103,7 +103,7 @@ class LotteryEventServiceGetEntryResultTest {
             BDDMockito.given(winnerContactRepository.findByUserIdAndEventId(anyLong(), anyLong())).willReturn(Optional.empty());
 
             // when
-            EventEntryResultResponse result = lotteryEventService.getEntryResult(EVENT_ID, USER_ID);
+            EventEntryResultResponseDto result = lotteryEventService.getEntryResult(EVENT_ID, USER_ID);
 
             // then
             assertThat(result.eventId()).isEqualTo(EVENT_ID);

@@ -12,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class KakaoLoginRequest {
+public class KakaoLoginRequestDto {
 
     @NotBlank(message = "인가 코드는 필수입니다.")
     private String code;

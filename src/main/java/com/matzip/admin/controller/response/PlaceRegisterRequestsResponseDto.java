@@ -10,11 +10,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Builder
-public record PlaceRegisterRequestsResponse(Long placeId, String placeName, LocalDate requestDate, Campus campus,
+public record PlaceRegisterRequestsResponseDto(Long placeId, String placeName, LocalDate requestDate, Campus campus,
                                             List<CategoryDto> categories, List<TagDto> tags) {
 
-    public static PlaceRegisterRequestsResponse from(Place place) {
-        return PlaceRegisterRequestsResponse.builder()
+    public static PlaceRegisterRequestsResponseDto from(Place place) {
+        return PlaceRegisterRequestsResponseDto.builder()
                 .placeId(place.getId())
                 .placeName(place.getName())
                 .requestDate(place.getCreatedAt().toLocalDate())

@@ -6,19 +6,19 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record LotteryEventAnonymousResponse(Long eventId, LotteryEventResponse.PrizeResponse prize,
+public record LotteryEventAnonymousResponseDto(Long eventId, LotteryEventResponseDto.PrizeResponse prize,
                                             int totalWinnersCount, int participantsCount, LocalDateTime eventEndDate)
         implements LotteryEventView {
 
-    public static LotteryEventAnonymousResponse empty() {
-        return LotteryEventAnonymousResponse.builder()
+    public static LotteryEventAnonymousResponseDto empty() {
+        return LotteryEventAnonymousResponseDto.builder()
                 .build();
     }
 
-    public static LotteryEventAnonymousResponse of(LotteryEvent lotteryEvent, int participantsCount) {
-        return LotteryEventAnonymousResponse.builder()
+    public static LotteryEventAnonymousResponseDto of(LotteryEvent lotteryEvent, int participantsCount) {
+        return LotteryEventAnonymousResponseDto.builder()
                 .eventId(lotteryEvent.getId())
-                .prize(LotteryEventResponse.PrizeResponse.from(lotteryEvent.getPrize()))
+                .prize(LotteryEventResponseDto.PrizeResponse.from(lotteryEvent.getPrize()))
                 .totalWinnersCount(lotteryEvent.getWinnersCount())
                 .participantsCount(participantsCount)
                 .eventEndDate(lotteryEvent.getEndDateTime())

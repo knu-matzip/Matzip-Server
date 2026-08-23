@@ -1,7 +1,11 @@
 package com.matzip.place.api.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.matzip.place.domain.entity.*;
+import com.matzip.place.domain.entity.Category;
+import com.matzip.place.domain.entity.Menu;
+import com.matzip.place.domain.entity.Photo;
+import com.matzip.place.domain.entity.Place;
+import com.matzip.place.domain.entity.Tag;
 import com.matzip.place.dto.CategoryDto;
 import com.matzip.place.dto.LocationDto;
 import com.matzip.place.dto.PhotoDto;

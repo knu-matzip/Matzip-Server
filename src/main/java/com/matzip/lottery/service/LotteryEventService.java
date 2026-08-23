@@ -2,13 +2,13 @@ package com.matzip.lottery.service;
 
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
-import com.matzip.lottery.controller.request.ApplyEventRequest;
-import com.matzip.lottery.controller.response.ApplyEventResponse;
-import com.matzip.lottery.controller.response.EventEntryResultResponse;
-import com.matzip.lottery.controller.response.LotteryEventAnonymousResponse;
-import com.matzip.lottery.controller.response.LotteryEventResponse;
+import com.matzip.lottery.controller.request.ApplyEventRequestDto;
+import com.matzip.lottery.controller.response.ApplyEventResponseDto;
+import com.matzip.lottery.controller.response.EventEntryResultResponseDto;
+import com.matzip.lottery.controller.response.LotteryEventAnonymousResponseDto;
+import com.matzip.lottery.controller.response.LotteryEventResponseDto;
 import com.matzip.lottery.controller.response.LotteryEventView;
-import com.matzip.lottery.controller.response.ParticipatedEventResponse;
+import com.matzip.lottery.controller.response.ParticipatedEventResponseDto;
 import com.matzip.lottery.domain.LotteryEntries;
 import com.matzip.lottery.domain.LotteryEntry;
 import com.matzip.lottery.domain.LotteryEvent;
@@ -56,30 +56,30 @@ public class LotteryEventService {
                     int participantsCount = lotteryEntries.getParticipantsCount();
 
                     if (userId == null) {
-                        return LotteryEventAnonymousResponse.of(currentEvent, participantsCount);
+                        return LotteryEventAnonymousResponseDto.of(currentEvent, participantsCount);
                     }
 
                     int usedTicketsCount = lotteryEntries.countEntriesByUser(userId);
 
-                    return LotteryEventResponse.of(currentEvent, participantsCount, usedTicketsCount);
+                    return LotteryEventResponseDto.of(currentEvent, participantsCount, usedTicketsCount);
                 })
                 .orElse(null);
     }
 
     @Transactional(readOnly = true)
-    public List<ParticipatedEventResponse> getParticipatedEvents(Long userId) {
+    public List<ParticipatedEventResponseDto> getParticipatedEvents(Long userId) {
         List<LotteryEvent> events = lotteryEntryRepository.findDistinctEndedLotteryEventsByUserId(userId, LocalDateTime.now());
 
         return events.stream()
                 .map(event -> {
                     int participantsCount = lotteryEntryRepository.countParticipantsByLotteryEvent(event);
-                    return ParticipatedEventResponse.of(event, participantsCount);
+                    return ParticipatedEventResponseDto.of(event, participantsCount);
                 })
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public EventEntryResultResponse getEntryResult(Long eventId, Long userId) {
+    public EventEntryResultResponseDto getEntryResult(Long eventId, Long userId) {
         LotteryEvent event = lotteryEventRepository.findById(eventId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "이벤트가 존재하지 않습니다. eventId: " + eventId));
 
@@ -97,11 +97,11 @@ public class LotteryEventService {
         boolean isWinner = winnerRepository.findByUserIdAndEventId(userId, eventId).isPresent();
         boolean isPhoneSubmitted = winnerContactRepository.findByUserIdAndEventId(userId, eventId).isPresent();
 
-        return EventEntryResultResponse.of(event, participantsCount, usedTicketsCount, isWinner, isPhoneSubmitted);
+        return EventEntryResultResponseDto.of(event, participantsCount, usedTicketsCount, isWinner, isPhoneSubmitted);
     }
 
     @Transactional
-    public ApplyEventResponse applyForPrize(Long eventId, Long userId, ApplyEventRequest request) {
+    public ApplyEventResponseDto applyForPrize(Long eventId, Long userId, ApplyEventRequestDto request) {
         LotteryEvent event = lotteryEventRepository.findById(eventId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "이벤트가 존재하지 않습니다. eventId: " + eventId));
 
@@ -132,7 +132,7 @@ public class LotteryEventService {
 
         discordWinnerNotificationService.notifyWinnerContactSubmitted(event, userId, request.phoneNumber());
 
-        return ApplyEventResponse.from(contact);
+        return ApplyEventResponseDto.from(contact);
     }
 
     @Transactional

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  */
 @Getter
 @NoArgsConstructor
-public class KakaoTokenResponse {
+public class KakaoTokenResponseDto {
 
     // 토큰 타입, bearer로 고정
     @JsonProperty("token_type")
