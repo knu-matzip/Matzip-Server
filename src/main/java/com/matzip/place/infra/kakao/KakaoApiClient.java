@@ -1,7 +1,7 @@
 package com.matzip.place.infra.kakao;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.matzip.place.dto.MenuDto;
+import com.matzip.place.infra.kakao.dto.KakaoMenuDto;
 import com.matzip.place.dto.PhotoDto;
 import com.matzip.common.exception.KakaoApiException;
 import com.matzip.common.exception.code.ErrorCode;
@@ -77,7 +77,7 @@ public class KakaoApiClient {
             double longitude = KakaoApiParser.requireNumber(panel.at("/summary/point/lon"), "summary.point.lon");
 
             // 2) 메뉴/사진 추출
-            List<MenuDto> menus = KakaoApiParser.extractMenus(panel);
+            List<KakaoMenuDto> menus = KakaoApiParser.extractMenus(panel);
             List<PhotoDto> photos = KakaoApiParser.extractPhotos(panel);
 
             return new PanelSnapshot(confirmId, placeName, finalAddress, latitude, longitude, menus, photos);
@@ -98,7 +98,7 @@ public class KakaoApiClient {
             String address,
             double latitude,
             double longitude,
-            List<MenuDto> menus,
+            List<KakaoMenuDto> menus,
             List<PhotoDto> photos
     ) {}
 
