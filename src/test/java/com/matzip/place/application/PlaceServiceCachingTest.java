@@ -1,7 +1,7 @@
 package com.matzip.place.application;
 
 import com.matzip.common.infra.discord.DiscordWebhookSender;
-import com.matzip.place.dto.MenuDto;
+import com.matzip.place.infra.kakao.dto.KakaoMenuDto;
 import com.matzip.place.dto.PhotoDto;
 import com.matzip.place.application.service.PlaceService;
 import com.matzip.place.infra.kakao.KakaoApiClient;
@@ -130,7 +130,7 @@ class PlaceServiceCachingTest {
                 "충남 천안시 서북구 부성14길 46 지광빌딩 1층",
                 37.123456,
                 127.123456,
-                List.of(MenuDto.builder().menuId(1L).name("테스트 메뉴").price(10000).build()),
+                List.of(KakaoMenuDto.builder().menuId(1L).name("테스트 메뉴").price(10000).build()),
                 List.of(PhotoDto.builder().photoId(1L).photoUrl("http://test.com/photo.jpg").displayOrder(1).build())
         );
     }

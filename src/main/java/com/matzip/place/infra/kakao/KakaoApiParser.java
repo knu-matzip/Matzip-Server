@@ -1,7 +1,7 @@
 package com.matzip.place.infra.kakao;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.matzip.place.dto.MenuDto;
+import com.matzip.place.infra.kakao.dto.KakaoMenuDto;
 import com.matzip.place.dto.PhotoDto;
 import com.matzip.common.exception.KakaoApiException;
 import com.matzip.common.exception.code.ErrorCode;
@@ -17,8 +17,8 @@ public class KakaoApiParser {
      * panel3 응답에서 메뉴 정보를 추출
      * /menu/menus/items 경로에서 메뉴 데이터를 파싱
      */
-    public static List<MenuDto> extractMenus(JsonNode root) {
-        List<MenuDto> list = new ArrayList<>();
+    public static List<KakaoMenuDto> extractMenus(JsonNode root) {
+        List<KakaoMenuDto> list = new ArrayList<>();
 
         JsonNode items = root.at("/menu/menus/items");
         if (items != null && items.isArray()) {
@@ -48,7 +48,7 @@ public class KakaoApiParser {
                     price = parsePrice(priceText);
                 }
 
-                list.add(MenuDto.builder()
+                list.add(KakaoMenuDto.builder()
                         .menuId(productId)
                         .name(name)
                         .price(price)

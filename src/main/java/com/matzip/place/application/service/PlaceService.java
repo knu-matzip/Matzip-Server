@@ -1,7 +1,7 @@
 package com.matzip.place.application.service;
 
 import com.matzip.place.dto.LocationDto;
-import com.matzip.place.dto.MenuDto;
+import com.matzip.place.infra.kakao.dto.KakaoMenuDto;
 import com.matzip.place.dto.PhotoDto;
 import com.matzip.place.domain.entity.Category;
 import com.matzip.place.domain.entity.Menu;
@@ -89,9 +89,9 @@ public class PlaceService {
         placeTempStore.put(cachedSnapshot);
 
         List<MenuItem> menuItems = new ArrayList<>();
-        List<MenuDto> srcMenus = snap.menus();
+        List<KakaoMenuDto> srcMenus = snap.menus();
         if (srcMenus != null) {
-            for (MenuDto m : srcMenus) {
+            for (KakaoMenuDto m : srcMenus) {
                 MenuItem item = MenuItem.builder()
                         .menuId(m.getMenuId())
                         .name(m.getName())
@@ -265,7 +265,7 @@ public class PlaceService {
     private PlaceSnapshot createPlaceSnapshot(PanelSnapshot snap) {
         List<SMenu> sMenus = new ArrayList<>();
         if (snap.menus() != null) {
-            for (MenuDto md : snap.menus()) {
+            for (KakaoMenuDto md : snap.menus()) {
                 sMenus.add(new SMenu(md.getMenuId(), md.getName(), md.getPrice()));
             }
         }
