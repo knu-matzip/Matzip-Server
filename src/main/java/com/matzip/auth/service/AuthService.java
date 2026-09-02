@@ -17,7 +17,7 @@ import com.matzip.common.security.jwt.RefreshTokenRepository;
 import com.matzip.user.domain.ProfileBackground;
 import com.matzip.user.domain.ProfileImage;
 import com.matzip.user.domain.User;
-import com.matzip.user.infra.UserRepository;
+import com.matzip.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

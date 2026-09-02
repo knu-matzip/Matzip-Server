@@ -26,7 +26,7 @@ import com.matzip.place.repository.PlaceRepository;
 import com.matzip.place.repository.PlaceTagRepository;
 import com.matzip.place.repository.TagRepository;
 import com.matzip.user.domain.User;
-import com.matzip.user.infra.UserRepository;
+import com.matzip.user.repository.UserRepository;
 import com.matzip.common.infra.discord.DiscordWebhookSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

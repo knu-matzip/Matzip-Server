@@ -5,7 +5,7 @@ import com.matzip.fixture.UserFixtures;
 import com.matzip.place.domain.entity.Place;
 import com.matzip.place.repository.PlaceRepository;
 import com.matzip.user.domain.User;
-import com.matzip.user.infra.UserRepository;
+import com.matzip.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

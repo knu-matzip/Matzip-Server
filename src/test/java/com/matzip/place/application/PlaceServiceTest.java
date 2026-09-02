@@ -17,7 +17,7 @@ import com.matzip.place.repository.PlaceCategoryRepository;
 import com.matzip.place.repository.PlaceRepository;
 import com.matzip.place.repository.PlaceTagRepository;
 import com.matzip.place.repository.TagRepository;
-import com.matzip.user.infra.UserRepository;
+import com.matzip.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
