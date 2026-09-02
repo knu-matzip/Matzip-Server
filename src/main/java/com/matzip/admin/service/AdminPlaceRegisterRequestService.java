@@ -8,7 +8,7 @@ import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.place.domain.PlaceStatus;
 import com.matzip.place.domain.entity.Place;
-import com.matzip.place.infra.repository.PlaceRepository;
+import com.matzip.place.repository.PlaceRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

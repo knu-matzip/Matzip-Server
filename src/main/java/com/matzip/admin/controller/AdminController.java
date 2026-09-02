@@ -8,7 +8,7 @@ import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.common.response.ApiResponse;
 // import com.matzip.common.security.UserPrincipal;
-import com.matzip.place.infra.repository.PlaceRepository;
+import com.matzip.place.repository.PlaceRepository;
 // import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

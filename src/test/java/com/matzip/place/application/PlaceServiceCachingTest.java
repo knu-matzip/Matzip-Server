@@ -1,24 +1,25 @@
 package com.matzip.place.application;
 
 import com.matzip.common.infra.discord.DiscordWebhookSender;
-import com.matzip.place.infra.kakao.dto.KakaoMenuDto;
+import com.matzip.place.client.kakao.dto.KakaoMenuDto;
 import com.matzip.place.dto.PhotoDto;
-import com.matzip.place.application.service.PlaceService;
-import com.matzip.place.infra.kakao.KakaoApiClient;
-import com.matzip.place.api.request.PlaceCheckRequestDto;
-import com.matzip.place.api.request.PlaceRequestDto;
-import com.matzip.place.api.response.PlaceCheckResponseDto;
-import com.matzip.place.application.port.PlaceTempStore;
+import com.matzip.place.service.PlaceService;
+import com.matzip.place.client.kakao.KakaoApiClient;
+import com.matzip.place.dto.request.PlaceCheckRequestDto;
+import com.matzip.place.dto.request.PlaceRequestDto;
+import com.matzip.place.dto.response.PlaceCheckResponseDto;
+import com.matzip.place.client.PlaceTempStoreMemory;
+import com.matzip.place.client.PlaceSnapshot;
 import com.matzip.place.domain.entity.Category;
 import com.matzip.place.domain.Campus;
 import com.matzip.place.domain.PlaceStatus;
-import com.matzip.place.infra.repository.CategoryRepository;
-import com.matzip.place.infra.repository.MenuRepository;
-import com.matzip.place.infra.repository.PhotoRepository;
-import com.matzip.place.infra.repository.PlaceCategoryRepository;
-import com.matzip.place.infra.repository.PlaceRepository;
-import com.matzip.place.infra.repository.PlaceTagRepository;
-import com.matzip.place.infra.repository.TagRepository;
+import com.matzip.place.repository.CategoryRepository;
+import com.matzip.place.repository.MenuRepository;
+import com.matzip.place.repository.PhotoRepository;
+import com.matzip.place.repository.PlaceCategoryRepository;
+import com.matzip.place.repository.PlaceRepository;
+import com.matzip.place.repository.PlaceTagRepository;
+import com.matzip.place.repository.TagRepository;
 import com.matzip.user.infra.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static com.matzip.place.application.port.PlaceTempStore.PlaceSnapshot.*;
+import static com.matzip.place.client.PlaceSnapshot.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -45,7 +46,7 @@ class PlaceServiceCachingTest {
     private PlaceService placeService;
 
     @Mock private KakaoApiClient kakaoApiClient;
-    @Mock private PlaceTempStore placeTempStore;
+    @Mock private PlaceTempStoreMemory placeTempStore;
     @Mock private PlaceRepository placeRepository;
     @Mock private CategoryRepository categoryRepository;
     @Mock private TagRepository tagRepository;
@@ -78,7 +79,7 @@ class PlaceServiceCachingTest {
         assertThat(result.getAddress()).isEqualTo("충남 천안시 서북구 부성14길 46 지광빌딩 1층");
 
         // 캐시에 스냅샷이 저장되었는지 확인
-        verify(placeTempStore, times(1)).put(any(PlaceTempStore.PlaceSnapshot.class));
+        verify(placeTempStore, times(1)).put(any(PlaceSnapshot.class));
     }
 
     @Test
@@ -86,7 +87,7 @@ class PlaceServiceCachingTest {
     void register_ShouldUseCacheAndReduceKakaoApiCalls() {
         // given
         PlaceRequestDto request = createPlaceRequest();
-        PlaceTempStore.PlaceSnapshot cachedSnapshot = createMockPlaceSnapshot();
+        PlaceSnapshot cachedSnapshot = createMockPlaceSnapshot();
 
         Category category = createMockCategory(1L);
         when(placeRepository.findByKakaoPlaceIdAndStatus(eq(TEST_KAKAO_PLACE_ID), eq(PlaceStatus.APPROVED)))
@@ -135,8 +136,8 @@ class PlaceServiceCachingTest {
         );
     }
 
-    private PlaceTempStore.PlaceSnapshot createMockPlaceSnapshot() {
-        return new PlaceTempStore.PlaceSnapshot(
+    private PlaceSnapshot createMockPlaceSnapshot() {
+        return new PlaceSnapshot(
                 TEST_KAKAO_PLACE_ID,
                 "카페카키",
                 "충남 천안시 서북구 부성14길 46 지광빌딩 1층",

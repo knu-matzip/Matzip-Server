@@ -4,7 +4,7 @@ import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.lottery.service.LotteryEventService;
 import com.matzip.place.domain.entity.Place;
-import com.matzip.place.infra.repository.PlaceRepository;
+import com.matzip.place.repository.PlaceRepository;
 import com.matzip.user.domain.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;

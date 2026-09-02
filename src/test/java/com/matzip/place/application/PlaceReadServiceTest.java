@@ -1,11 +1,11 @@
 package com.matzip.place.application;
 
-import com.matzip.place.application.service.PlaceReadService;
+import com.matzip.place.service.PlaceReadService;
 import com.matzip.place.domain.Campus;
 import com.matzip.place.domain.PlaceStatus;
 import com.matzip.place.domain.entity.Place;
-import com.matzip.place.infra.repository.DailyViewCountRepository;
-import com.matzip.place.infra.repository.PlaceRepository;
+import com.matzip.place.repository.DailyViewCountRepository;
+import com.matzip.place.repository.PlaceRepository;
 import com.matzip.user.domain.User;
 import com.matzip.user.infra.UserRepository;
 import lombok.extern.slf4j.Slf4j;

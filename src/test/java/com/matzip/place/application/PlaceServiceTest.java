@@ -1,21 +1,22 @@
 package com.matzip.place.application;
 
 import com.matzip.common.infra.discord.DiscordWebhookSender;
-import com.matzip.place.api.request.PlaceRequestDto;
-import com.matzip.place.application.port.PlaceTempStore;
-import com.matzip.place.application.service.PlaceService;
+import com.matzip.place.dto.request.PlaceRequestDto;
+import com.matzip.place.client.PlaceTempStoreMemory;
+import com.matzip.place.client.PlaceSnapshot;
+import com.matzip.place.service.PlaceService;
 import com.matzip.place.domain.Campus;
 import com.matzip.place.domain.PlaceStatus;
 import com.matzip.place.domain.entity.Category;
 import com.matzip.place.domain.entity.PlaceCategory;
-import com.matzip.place.infra.kakao.KakaoApiClient;
-import com.matzip.place.infra.repository.CategoryRepository;
-import com.matzip.place.infra.repository.MenuRepository;
-import com.matzip.place.infra.repository.PhotoRepository;
-import com.matzip.place.infra.repository.PlaceCategoryRepository;
-import com.matzip.place.infra.repository.PlaceRepository;
-import com.matzip.place.infra.repository.PlaceTagRepository;
-import com.matzip.place.infra.repository.TagRepository;
+import com.matzip.place.client.kakao.KakaoApiClient;
+import com.matzip.place.repository.CategoryRepository;
+import com.matzip.place.repository.MenuRepository;
+import com.matzip.place.repository.PhotoRepository;
+import com.matzip.place.repository.PlaceCategoryRepository;
+import com.matzip.place.repository.PlaceRepository;
+import com.matzip.place.repository.PlaceTagRepository;
+import com.matzip.place.repository.TagRepository;
 import com.matzip.user.infra.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,8 +30,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static com.matzip.place.application.port.PlaceTempStore.PlaceSnapshot.SMenu;
-import static com.matzip.place.application.port.PlaceTempStore.PlaceSnapshot.SPhoto;
+import static com.matzip.place.client.PlaceSnapshot.SMenu;
+import static com.matzip.place.client.PlaceSnapshot.SPhoto;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -44,7 +45,7 @@ class PlaceServiceTest {
     private PlaceService placeService;
 
     @Mock private KakaoApiClient kakaoApiClient;
-    @Mock private PlaceTempStore placeTempStore;
+    @Mock private PlaceTempStoreMemory placeTempStore;
     @Mock private PlaceRepository placeRepository;
     @Mock private CategoryRepository categoryRepository;
     @Mock private TagRepository tagRepository;
@@ -93,8 +94,8 @@ class PlaceServiceTest {
         return request;
     }
 
-    private PlaceTempStore.PlaceSnapshot createMockPlaceSnapshot() {
-        return new PlaceTempStore.PlaceSnapshot(
+    private PlaceSnapshot createMockPlaceSnapshot() {
+        return new PlaceSnapshot(
                 TEST_KAKAO_PLACE_ID,
                 "카페카키",
                 "충남 천안시 서북구 부성14길 46 지광빌딩 1층",
