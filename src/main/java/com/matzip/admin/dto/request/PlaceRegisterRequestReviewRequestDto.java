@@ -1,4 +1,4 @@
-package com.matzip.admin.controller.request;
+package com.matzip.admin.dto.request;
 
 import com.matzip.admin.domain.RequestReviewStatus;
 

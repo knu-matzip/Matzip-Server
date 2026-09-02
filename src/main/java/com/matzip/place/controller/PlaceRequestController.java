@@ -1,6 +1,6 @@
 package com.matzip.place.controller;
 
-import com.matzip.admin.controller.response.PlaceRegisterRequestDetailResponseDto;
+import com.matzip.admin.dto.response.PlaceRegisterRequestDetailResponseDto;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.common.response.ApiResponse;

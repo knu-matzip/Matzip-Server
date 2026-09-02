@@ -1,4 +1,4 @@
-package com.matzip.admin.controller.response;
+package com.matzip.admin.dto.response;
 
 import com.matzip.place.domain.Campus;
 import com.matzip.place.domain.entity.Place;
