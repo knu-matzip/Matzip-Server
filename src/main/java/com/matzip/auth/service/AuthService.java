@@ -1,13 +1,13 @@
-package com.matzip.auth.application;
+package com.matzip.auth.service;
 
-import com.matzip.auth.api.dto.KakaoLoginRequestDto;
-import com.matzip.auth.api.dto.LoginResponseDto;
-import com.matzip.auth.api.dto.TokenReissueRequestDto;
-import com.matzip.auth.application.dto.ReissueResult;
+import com.matzip.auth.dto.request.KakaoLoginRequestDto;
+import com.matzip.auth.dto.response.LoginResponseDto;
+import com.matzip.auth.dto.request.TokenReissueRequestDto;
+import com.matzip.auth.dto.ReissueResult;
 import com.matzip.auth.domain.RefreshToken;
-import com.matzip.auth.infra.kakao.KakaoLoginApiClient;
-import com.matzip.auth.infra.kakao.dto.KakaoTokenResponseDto;
-import com.matzip.auth.infra.kakao.dto.KakaoUserResponseDto;
+import com.matzip.auth.client.kakao.KakaoLoginApiClient;
+import com.matzip.auth.client.kakao.dto.KakaoTokenResponseDto;
+import com.matzip.auth.client.kakao.dto.KakaoUserResponseDto;
 import com.matzip.common.config.ImageProperties;
 import com.matzip.common.config.JwtProperties;
 import com.matzip.common.exception.BusinessException;

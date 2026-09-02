@@ -1,4 +1,4 @@
-package com.matzip.auth.application.util;
+package com.matzip.auth.service.util;
 
 import com.matzip.common.config.AuthRedirectProperties;
 import com.matzip.common.exception.BusinessException;

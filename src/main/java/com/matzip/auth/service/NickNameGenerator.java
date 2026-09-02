@@ -1,4 +1,4 @@
-package com.matzip.auth.application;
+package com.matzip.auth.service;
 
 import org.springframework.stereotype.Component;
 

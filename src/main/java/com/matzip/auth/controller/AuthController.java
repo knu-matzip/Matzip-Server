@@ -1,13 +1,13 @@
-package com.matzip.auth.api;
+package com.matzip.auth.controller;
 
-import com.matzip.auth.api.dto.KakaoLoginRequestDto;
-import com.matzip.auth.api.dto.LoginResponseDto;
-import com.matzip.auth.api.dto.TokenReissueRequestDto;
-import com.matzip.auth.api.dto.TokenResponseDto;
-import com.matzip.auth.application.AuthService;
-import com.matzip.auth.application.util.KakaoAuthorizeUrlBuilder;
-import com.matzip.auth.application.dto.ReissueResult;
-import com.matzip.auth.application.util.StatelessStateSigner;
+import com.matzip.auth.dto.request.KakaoLoginRequestDto;
+import com.matzip.auth.dto.response.LoginResponseDto;
+import com.matzip.auth.dto.request.TokenReissueRequestDto;
+import com.matzip.auth.dto.response.TokenResponseDto;
+import com.matzip.auth.service.AuthService;
+import com.matzip.auth.service.util.KakaoAuthorizeUrlBuilder;
+import com.matzip.auth.dto.ReissueResult;
+import com.matzip.auth.service.util.StatelessStateSigner;
 import com.matzip.common.config.AuthRedirectProperties;
 import com.matzip.common.config.KakaoProperties;
 import com.matzip.common.exception.BusinessException;
