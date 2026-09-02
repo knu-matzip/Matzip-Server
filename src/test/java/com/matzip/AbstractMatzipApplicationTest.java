@@ -3,7 +3,7 @@ package com.matzip;
 import com.matzip.fixture.PlaceFixtures;
 import com.matzip.fixture.UserFixtures;
 import com.matzip.place.domain.entity.Place;
-import com.matzip.place.infra.repository.PlaceRepository;
+import com.matzip.place.repository.PlaceRepository;
 import com.matzip.user.domain.User;
 import com.matzip.user.infra.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
