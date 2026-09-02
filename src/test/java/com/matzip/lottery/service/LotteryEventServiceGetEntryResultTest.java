@@ -2,7 +2,7 @@ package com.matzip.lottery.service;
 
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
-import com.matzip.lottery.controller.response.EventEntryResultResponseDto;
+import com.matzip.lottery.dto.response.EventEntryResultResponseDto;
 import com.matzip.lottery.domain.LotteryEvent;
 import com.matzip.lottery.domain.Prize;
 import com.matzip.lottery.domain.Winner;

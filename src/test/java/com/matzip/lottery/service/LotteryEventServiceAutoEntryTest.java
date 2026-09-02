@@ -6,7 +6,7 @@ import com.matzip.lottery.repository.LotteryEntryRepository;
 import com.matzip.lottery.repository.LotteryEventRepository;
 import com.matzip.lottery.repository.WinnerContactRepository;
 import com.matzip.lottery.repository.WinnerRepository;
-import com.matzip.lottery.infra.discord.DiscordWinnerNotificationService;
+import com.matzip.lottery.client.discord.DiscordWinnerNotificationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
