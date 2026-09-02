@@ -1,8 +1,8 @@
-package com.matzip.auth.api;
+package com.matzip.auth.controller;
 
-import com.matzip.auth.api.dto.KakaoLoginRequestDto;
-import com.matzip.auth.api.dto.LoginResponseDto;
-import com.matzip.auth.application.AuthService;
+import com.matzip.auth.dto.request.KakaoLoginRequestDto;
+import com.matzip.auth.dto.response.LoginResponseDto;
+import com.matzip.auth.service.AuthService;
 import com.matzip.common.response.ApiResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;

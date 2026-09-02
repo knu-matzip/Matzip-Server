@@ -1,4 +1,4 @@
-package com.matzip.auth.application;
+package com.matzip.auth.service;
 
 import com.matzip.user.domain.ProfileBackground;
 import com.matzip.user.domain.ProfileImage;

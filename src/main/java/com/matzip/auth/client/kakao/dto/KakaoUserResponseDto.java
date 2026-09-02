@@ -1,4 +1,4 @@
-package com.matzip.auth.infra.kakao.dto;
+package com.matzip.auth.client.kakao.dto;
 
 
 import lombok.Getter;

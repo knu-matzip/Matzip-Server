@@ -1,4 +1,4 @@
-package com.matzip.auth.api.dto;
+package com.matzip.auth.dto.response;
 
 import lombok.*;
 

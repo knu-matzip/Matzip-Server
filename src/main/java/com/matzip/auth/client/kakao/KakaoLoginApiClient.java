@@ -1,7 +1,7 @@
-package com.matzip.auth.infra.kakao;
+package com.matzip.auth.client.kakao;
 
-import com.matzip.auth.infra.kakao.dto.KakaoTokenResponseDto;
-import com.matzip.auth.infra.kakao.dto.KakaoUserResponseDto;
+import com.matzip.auth.client.kakao.dto.KakaoTokenResponseDto;
+import com.matzip.auth.client.kakao.dto.KakaoUserResponseDto;
 import com.matzip.common.config.KakaoProperties;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;

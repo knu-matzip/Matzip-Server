@@ -1,4 +1,4 @@
-package com.matzip.auth.application.dto;
+package com.matzip.auth.dto;
 
 public record ReissueResult(
         String accessToken,
