@@ -1,9 +1,9 @@
-package com.matzip.user.api.controller;
+package com.matzip.user.controller;
 
 import com.matzip.common.response.ApiResponse;
 import com.matzip.common.security.UserPrincipal;
-import com.matzip.user.api.response.UserProfileResponseDto;
-import com.matzip.user.application.UserService;
+import com.matzip.user.dto.response.UserProfileResponseDto;
+import com.matzip.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;

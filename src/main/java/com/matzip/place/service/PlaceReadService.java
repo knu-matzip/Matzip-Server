@@ -35,7 +35,7 @@ import com.matzip.place.repository.PlaceLikeRepository;
 import com.matzip.place.repository.PlaceRepository;
 import com.matzip.place.repository.PlaceTagRepository;
 import com.matzip.user.domain.User;
-import com.matzip.user.infra.UserRepository;
+import com.matzip.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

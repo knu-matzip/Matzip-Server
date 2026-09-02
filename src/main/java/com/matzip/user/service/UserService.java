@@ -1,11 +1,11 @@
-package com.matzip.user.application;
+package com.matzip.user.service;
 
 import com.matzip.common.config.ImageProperties;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
-import com.matzip.user.api.response.UserProfileResponseDto;
+import com.matzip.user.dto.response.UserProfileResponseDto;
 import com.matzip.user.domain.User;
-import com.matzip.user.infra.UserRepository;
+import com.matzip.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,4 +1,4 @@
-package com.matzip.user.infra;
+package com.matzip.user.repository;
 
 import com.matzip.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;

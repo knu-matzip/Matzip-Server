@@ -1,4 +1,4 @@
-package com.matzip.user.api.response;
+package com.matzip.user.dto.response;
 
 import com.matzip.user.domain.User;
 import lombok.Builder;

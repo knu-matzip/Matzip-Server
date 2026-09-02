@@ -7,7 +7,7 @@ import com.matzip.place.domain.entity.Place;
 import com.matzip.place.repository.DailyViewCountRepository;
 import com.matzip.place.repository.PlaceRepository;
 import com.matzip.user.domain.User;
-import com.matzip.user.infra.UserRepository;
+import com.matzip.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
