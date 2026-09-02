@@ -1,4 +1,4 @@
-package com.matzip.lottery.controller.response;
+package com.matzip.lottery.dto.response;
 
 import com.matzip.lottery.domain.WinnerContact;
 import lombok.Builder;

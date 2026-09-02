@@ -1,4 +1,4 @@
-package com.matzip.lottery.infra.discord;
+package com.matzip.lottery.client.discord;
 
 import com.matzip.common.infra.discord.DiscordWebhookSender;
 import com.matzip.lottery.domain.LotteryEvent;

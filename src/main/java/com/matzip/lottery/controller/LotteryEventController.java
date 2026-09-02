@@ -2,11 +2,11 @@ package com.matzip.lottery.controller;
 
 import com.matzip.common.response.ApiResponse;
 import com.matzip.common.security.UserPrincipal;
-import com.matzip.lottery.controller.request.ApplyEventRequestDto;
-import com.matzip.lottery.controller.response.ApplyEventResponseDto;
-import com.matzip.lottery.controller.response.EventEntryResultResponseDto;
-import com.matzip.lottery.controller.response.LotteryEventView;
-import com.matzip.lottery.controller.response.ParticipatedEventResponseDto;
+import com.matzip.lottery.dto.request.ApplyEventRequestDto;
+import com.matzip.lottery.dto.response.ApplyEventResponseDto;
+import com.matzip.lottery.dto.response.EventEntryResultResponseDto;
+import com.matzip.lottery.dto.response.LotteryEventView;
+import com.matzip.lottery.dto.response.ParticipatedEventResponseDto;
 import com.matzip.lottery.service.LotteryEventService;
 
 import java.util.List;

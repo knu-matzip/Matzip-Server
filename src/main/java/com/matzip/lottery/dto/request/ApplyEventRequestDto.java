@@ -1,4 +1,4 @@
-package com.matzip.lottery.controller.request;
+package com.matzip.lottery.dto.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
