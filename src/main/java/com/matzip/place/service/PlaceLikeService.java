@@ -45,8 +45,8 @@ public class PlaceLikeService {
         }
 
         placeLikeRepository.save(PlaceLike.of(user, place));
-        place.incrementLikeCount();
-        
+        placeRepository.incrementLikeCount(placeId);
+
         return PlaceLikeResponseDto.addLike(placeId);
     }
 
@@ -57,7 +57,7 @@ public class PlaceLikeService {
 
         placeLikeRepository.findByUserAndPlace(user, place).ifPresent(placeLike -> {
             placeLikeRepository.delete(placeLike);
-            place.decrementLikeCount();
+            placeRepository.decrementLikeCount(placeId);
         });
         
         return PlaceLikeResponseDto.removeLike(placeId);

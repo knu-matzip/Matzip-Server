@@ -120,13 +120,4 @@ public class Place extends BaseEntity {
                 .toList();
     }
 
-    public void incrementLikeCount() {
-        this.likeCount++;
-    }
-
-    public void decrementLikeCount() {
-        if (this.likeCount > 0) {
-            this.likeCount--;
-        }
-    }
 }
