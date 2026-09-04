@@ -22,17 +22,13 @@ public class KakaoApiClient {
 
     private final RestClient restClient;
 
-    public KakaoApiClient() {
-        this(RestClient.builder()
+    public KakaoApiClient(RestClient.Builder restClientBuilder) {
+        this.restClient = restClientBuilder
                 .baseUrl(BASE_URL)
                 .defaultHeader("Pf", "web")
                 .defaultHeader(HttpHeaders.REFERER, REFERER)
                 .defaultHeader(HttpHeaders.USER_AGENT, USER_AGENT)
-                .build());
-    }
-
-    public KakaoApiClient(RestClient restClient) {
-        this.restClient = restClient;
+                .build();
     }
 
     /**
