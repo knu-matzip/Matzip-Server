@@ -130,46 +130,48 @@ public class PlaceReadService {
         return getRankingByLikes(campus);
     }
 
+    /**
+     * 오늘의 맛집(조회수 랭킹). 오늘 조회 데이터가 부족한 새벽/저트래픽 구간에 빈 값이 반환되지 않도록
+     * 오늘(3곳 이상) → 어제(3곳 이상) → 전체 누적 조회수 순으로 폴백한다.
+     */
     private List<PlaceCommonResponseDto> getDailyRankingByViews(Campus campus) {
-        LocalDate today = LocalDate.now();
         Pageable topN = PageRequest.of(0, RANKING_SIZE);
+        LocalDate today = LocalDate.now();
 
-        List<DailyViewCount> dailyRankings = dailyViewCountRepository.findDailyRankingByCampus(campus, today, topN);
-        List<Place> places = dailyRankings.stream()
+        List<Place> todayRanking = findDailyRankingPlaces(campus, today, topN);
+        if (todayRanking.size() >= RANKING_SIZE) {
+            return buildRankingResponse(todayRanking);
+        }
+
+        List<Place> yesterdayRanking = findDailyRankingPlaces(campus, today.minusDays(1), topN);
+        if (yesterdayRanking.size() >= RANKING_SIZE) {
+            return buildRankingResponse(yesterdayRanking);
+        }
+
+        List<Place> viewCountRanking = placeRepository.findTopByCampusOrderByViewCount(campus, topN);
+        return buildRankingResponse(viewCountRanking);
+    }
+
+    private List<Place> findDailyRankingPlaces(Campus campus, LocalDate date, Pageable pageable) {
+        return dailyViewCountRepository.findDailyRankingByCampus(campus, date, pageable).stream()
                 .map(DailyViewCount::getPlace)
-                .collect(Collectors.toList());
-
-        Map<Long, PlaceRelatedData> relatedDataMap = getPlaceRelatedDataInBatch(places);
-
-        return dailyRankings.stream()
-                .map(dailyViewCount -> {
-                    Place place = dailyViewCount.getPlace();
-
-                    PlaceRelatedData relatedData = relatedDataMap.get(place.getId());
-                    return PlaceCommonResponseDto.from(place, relatedData.categories(), relatedData.tags());
-                })
                 .collect(Collectors.toList());
     }
 
     private List<PlaceCommonResponseDto> getRankingByLikes(Campus campus) {
         Pageable topN = PageRequest.of(0, RANKING_SIZE);
-        
-        List<Place> places = placeRepository.findTopByCampusOrderByLikeCount(campus, topN);
-
-        Map<Long, PlaceRelatedData> relatedDataMap = getPlaceRelatedDataInBatch(places);
-        
-        return places.stream()
-                .map(place -> {
-                    PlaceRelatedData relatedData = relatedDataMap.get(place.getId());
-                    return PlaceCommonResponseDto.from(place, relatedData.categories(), relatedData.tags());
-                })
-                .collect(Collectors.toList());
+        return buildRankingResponse(placeRepository.findTopByCampusOrderByLikeCount(campus, topN));
     }
 
     private List<PlaceCommonResponseDto> getRankingByLatest(Campus campus) {
         Pageable topN = PageRequest.of(0, LATEST_PLACES_SIZE);
-        List<Place> places = placeRepository.findTopByCampusOrderByCreatedAtDesc(campus, topN);
+        return buildRankingResponse(placeRepository.findTopByCampusOrderByCreatedAtDesc(campus, topN));
+    }
 
+    /**
+     * Place 목록을 연관 데이터(카테고리/태그)와 함께 응답 DTO로 변환하는 공통 로직.
+     */
+    private List<PlaceCommonResponseDto> buildRankingResponse(List<Place> places) {
         Map<Long, PlaceRelatedData> relatedDataMap = getPlaceRelatedDataInBatch(places);
 
         return places.stream()
