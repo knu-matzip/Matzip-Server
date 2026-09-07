@@ -52,6 +52,14 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     @Query("UPDATE Place p SET p.viewCount = p.viewCount + 1 WHERE p.id = :placeId")
     void incrementViewCount(@Param("placeId") Long placeId);
 
+    @Modifying
+    @Query("UPDATE Place p SET p.likeCount = p.likeCount + 1 WHERE p.id = :placeId")
+    void incrementLikeCount(@Param("placeId") Long placeId);
+
+    @Modifying
+    @Query("UPDATE Place p SET p.likeCount = p.likeCount - 1 WHERE p.id = :placeId AND p.likeCount > 0")
+    void decrementLikeCount(@Param("placeId") Long placeId);
+
     @EntityGraph(attributePaths = {"placeCategories.category", "placeTags.tag"})
     @Query("SELECT DISTINCT p FROM Place p " +
             "JOIN p.placeCategories pc " +
