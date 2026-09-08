@@ -8,6 +8,8 @@ import com.matzip.auth.domain.RefreshToken;
 import com.matzip.auth.client.kakao.KakaoLoginApiClient;
 import com.matzip.auth.client.kakao.dto.KakaoTokenResponseDto;
 import com.matzip.auth.client.kakao.dto.KakaoUserResponseDto;
+import com.matzip.common.analytics.AnalyticsRecorder;
+import com.matzip.common.analytics.domain.EventType;
 import com.matzip.common.config.ImageProperties;
 import com.matzip.common.config.JwtProperties;
 import com.matzip.common.exception.BusinessException;
@@ -36,6 +38,7 @@ public class AuthService {
 
     private final NickNameGenerator nickNameGenerator;
     private final ProfileAssignment profileAssignment;
+    private final AnalyticsRecorder analyticsRecorder;
 
     private long accessTokenTtlMs() {
         return jwtProps.getExpirationTime();
@@ -93,6 +96,12 @@ public class AuthService {
         } else {
             saved.updateToken(refreshToken); // 변경 감지에 의해 업데이트
         }
+
+        // 5) 분석 이벤트 기록 (GA가 못 보는 회원 가입/로그인 신호)
+        if (firstLogin) {
+            analyticsRecorder.record(EventType.SIGNUP, user.getId());
+        }
+        analyticsRecorder.record(EventType.LOGIN, user.getId());
 
         return LoginResponseDto.builder()
                 .tokenType("Bearer")

@@ -1,5 +1,6 @@
 package com.matzip.place.application;
 
+import com.matzip.common.analytics.AnalyticsRecorder;
 import com.matzip.common.infra.discord.DiscordWebhookSender;
 import com.matzip.place.dto.request.PlaceRequestDto;
 import com.matzip.place.client.PlaceTempStoreMemory;
@@ -55,6 +56,7 @@ class PlaceServiceTest {
     @Mock private PlaceCategoryRepository placeCategoryRepository;
     @Mock private PlaceTagRepository placeTagRepository;
     @Mock private DiscordWebhookSender discordWebhookSender;
+    @Mock private AnalyticsRecorder analyticsRecorder;
 
     @Test
     @DisplayName("카테고리는 요청 categoryIds 순서대로 저장된다")

@@ -1,5 +1,6 @@
 package com.matzip.place.application;
 
+import com.matzip.common.analytics.AnalyticsRecorder;
 import com.matzip.common.infra.discord.DiscordWebhookSender;
 import com.matzip.place.client.kakao.dto.KakaoMenuDto;
 import com.matzip.place.dto.PhotoDto;
@@ -56,6 +57,7 @@ class PlaceServiceCachingTest {
     @Mock private PlaceCategoryRepository placeCategoryRepository;
     @Mock private PlaceTagRepository placeTagRepository;
     @Mock private DiscordWebhookSender discordWebhookSender;
+    @Mock private AnalyticsRecorder analyticsRecorder;
 
     private static final String TEST_KAKAO_PLACE_ID = "1852074823";
 
