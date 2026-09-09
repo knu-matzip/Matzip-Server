@@ -28,6 +28,9 @@ import com.matzip.place.repository.TagRepository;
 import com.matzip.user.domain.User;
 import com.matzip.user.repository.UserRepository;
 import com.matzip.common.infra.discord.DiscordWebhookSender;
+import com.matzip.common.analytics.AnalyticsRecorder;
+import com.matzip.common.analytics.domain.EventType;
+import com.matzip.common.analytics.domain.TargetType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +61,7 @@ public class PlaceService {
     private final UserRepository userRepository;
     private final PlaceTempStoreMemory placeTempStore;
     private final DiscordWebhookSender discordWebhookSender;
+    private final AnalyticsRecorder analyticsRecorder;
 
     public PlaceCheckResponseDto preview(PlaceCheckRequestDto req) {
         final String kakaoPlaceId = req.getKakaoPlaceId();
@@ -149,6 +153,12 @@ public class PlaceService {
                 .status(PlaceStatus.PENDING) // 승인 대기 상태로 저장
                 .build();
         placeRepository.save(place);
+
+        analyticsRecorder.record(
+                EventType.PLACE_REGISTER_REQUESTED,
+                registeredBy == null ? null : registeredBy.getId(),
+                TargetType.PLACE,
+                place.getId());
 
         List<Long> categoryIds = req.getCategoryIds();
         if (categoryIds.size() != new LinkedHashSet<>(categoryIds).size()) {
