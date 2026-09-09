@@ -12,6 +12,10 @@ spring:
         jdbc.time_zone: Asia/Seoul
 
 
+logging:
+  pattern:
+    level: "%5p [%X{traceId:-}]"
+
 server:
   port: 8080
 
