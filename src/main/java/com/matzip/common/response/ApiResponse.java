@@ -61,31 +61,12 @@ public class ApiResponse<T> {
     }
     
     /**
-     * 실패 응답 생성
-     */
-    public static <T> ApiResponse<T> error(String code, String message) {
-        return ApiResponse.<T>builder()
-                .status("ERROR")
-                .timestamp(LocalDateTime.now())
-                .error(ErrorInfo.builder()
-                        .message(message)
-                        .build())
-                .build();
-    }
-    
-    /**
      * 실패 응답 생성 (ErrorCode 사용)
      */
     public static <T> ApiResponse<T> error(ErrorCode errorCode) {
-        return ApiResponse.<T>builder()
-                .status("ERROR")
-                .timestamp(LocalDateTime.now())
-                .error(ErrorInfo.builder()
-                        .message(errorCode.getMessage())
-                        .build())
-                .build();
+        return error(errorCode, errorCode.getMessage());
     }
-    
+
     /**
      * 실패 응답 생성 (ErrorCode + 상세 메시지)
      */
@@ -94,14 +75,16 @@ public class ApiResponse<T> {
                 .status("ERROR")
                 .timestamp(LocalDateTime.now())
                 .error(ErrorInfo.builder()
+                        .code(errorCode.name())
                         .message(detailMessage)
                         .build())
                 .build();
     }
-    
+
     @Getter
     @Builder
     public static class ErrorInfo {
+        private final String code;
         private final String message;
     }
 }

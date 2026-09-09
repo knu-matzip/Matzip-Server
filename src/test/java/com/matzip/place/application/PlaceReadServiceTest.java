@@ -1,13 +1,22 @@
 package com.matzip.place.application;
 
-import com.matzip.place.application.service.PlaceReadService;
+import com.matzip.place.service.PlaceReadService;
 import com.matzip.place.domain.Campus;
+import com.matzip.place.domain.DailyViewCount;
 import com.matzip.place.domain.PlaceStatus;
+import com.matzip.place.domain.SortType;
 import com.matzip.place.domain.entity.Place;
-import com.matzip.place.infra.repository.DailyViewCountRepository;
-import com.matzip.place.infra.repository.PlaceRepository;
+import com.matzip.place.dto.response.PlaceCommonResponseDto;
+import com.matzip.place.repository.DailyViewCountRepository;
+import com.matzip.place.repository.PlaceRepository;
 import com.matzip.user.domain.User;
-import com.matzip.user.infra.UserRepository;
+import com.matzip.user.repository.UserRepository;
+
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import java.time.LocalDate;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +47,9 @@ public class PlaceReadServiceTest {
 
     @Autowired
     private DailyViewCountRepository dailyViewCountRepository;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     private Place testPlace;
     private User testUser;
@@ -113,5 +125,92 @@ public class PlaceReadServiceTest {
 //                    log.info("[동시] Awaitility 폴링 중... 최종 조회수: {}", finalPlace.getViewCount());
                     assertThat(finalPlace.getViewCount()).isEqualTo(numberOfThreads);
                 });
+    }
+
+    @Test
+    @DisplayName("오늘의 맛집: 오늘 조회수 랭킹이 3곳 이상이면 오늘 랭킹을 반환한다")
+    void dailyRanking_returnsToday_whenTodayHasEnough() {
+        // given
+        LocalDate today = LocalDate.now();
+        Place p1 = createApprovedPlace("t1");
+        Place p2 = createApprovedPlace("t2");
+        Place p3 = createApprovedPlace("t3");
+        saveDailyCount(p1, today, 10);
+        saveDailyCount(p2, today, 30);
+        saveDailyCount(p3, today, 20);
+
+        // when
+        List<PlaceCommonResponseDto> result = placeReadService.getRanking(Campus.CHEONAN, SortType.VIEWS);
+
+        // then: 오늘 count DESC 순
+        assertThat(result).extracting(PlaceCommonResponseDto::getPlaceId)
+                .containsExactly(p2.getId(), p3.getId(), p1.getId());
+    }
+
+    @Test
+    @DisplayName("오늘의 맛집: 오늘이 3곳 미만이면 어제 랭킹(3곳 이상)으로 폴백한다")
+    void dailyRanking_fallsBackToYesterday_whenTodayInsufficient() {
+        // given
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+        Place p1 = createApprovedPlace("y1");
+        Place p2 = createApprovedPlace("y2");
+        Place p3 = createApprovedPlace("y3");
+        saveDailyCount(p1, today, 5); // 오늘은 1곳뿐 (3 미만)
+        saveDailyCount(p1, yesterday, 10);
+        saveDailyCount(p2, yesterday, 30);
+        saveDailyCount(p3, yesterday, 20);
+
+        // when
+        List<PlaceCommonResponseDto> result = placeReadService.getRanking(Campus.CHEONAN, SortType.VIEWS);
+
+        // then: 빈 값이 아니라 어제 랭킹으로 폴백
+        assertThat(result).extracting(PlaceCommonResponseDto::getPlaceId)
+                .containsExactly(p2.getId(), p3.getId(), p1.getId());
+    }
+
+    @Test
+    @DisplayName("오늘의 맛집: 오늘·어제 모두 3곳 미만이면 전체 누적 조회수로 폴백한다")
+    void dailyRanking_fallsBackToTotalViewCount_whenNoRecentData() {
+        // given: 오늘/어제 daily 데이터 없음, 누적 조회수만 존재
+        Place p1 = createApprovedPlace("v1");
+        Place p2 = createApprovedPlace("v2");
+        Place p3 = createApprovedPlace("v3");
+        bumpViewCount(p1, 10);
+        bumpViewCount(p2, 30);
+        bumpViewCount(p3, 20);
+
+        // when
+        List<PlaceCommonResponseDto> result = placeReadService.getRanking(Campus.CHEONAN, SortType.VIEWS);
+
+        // then: 빈 값이 아니라 누적 조회수 DESC로 폴백
+        assertThat(result).isNotEmpty();
+        assertThat(result).extracting(PlaceCommonResponseDto::getPlaceId)
+                .containsExactly(p2.getId(), p3.getId(), p1.getId());
+    }
+
+    private Place createApprovedPlace(String suffix) {
+        return placeRepository.save(Place.builder()
+                .name("맛집_" + suffix)
+                .address("주소_" + suffix)
+                .kakaoPlaceId("kakao_" + suffix)
+                .campus(Campus.CHEONAN)
+                .latitude(36.1)
+                .longitude(127.1)
+                .status(PlaceStatus.APPROVED)
+                .build());
+    }
+
+    private void saveDailyCount(Place place, LocalDate date, int count) {
+        dailyViewCountRepository.save(new DailyViewCount(place, date, count));
+    }
+
+    private void bumpViewCount(Place place, int times) {
+        // incrementViewCount는 @Modifying이라 트랜잭션이 필요하다 (운영에선 서비스 @Transactional 안에서 호출됨)
+        new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            for (int i = 0; i < times; i++) {
+                placeRepository.incrementViewCount(place.getId());
+            }
+        });
     }
 }

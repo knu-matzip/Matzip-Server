@@ -4,11 +4,14 @@ import com.matzip.admin.domain.RequestReview;
 import com.matzip.admin.domain.RequestReviewStatus;
 import com.matzip.admin.event.RequestReviewEvent;
 import com.matzip.admin.repository.RequestReviewRepository;
+import com.matzip.common.analytics.AnalyticsRecorder;
+import com.matzip.common.analytics.domain.EventType;
+import com.matzip.common.analytics.domain.TargetType;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.place.domain.PlaceStatus;
 import com.matzip.place.domain.entity.Place;
-import com.matzip.place.infra.repository.PlaceRepository;
+import com.matzip.place.repository.PlaceRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +26,13 @@ public class AdminPlaceRegisterRequestService {
     private final PlaceRepository placeRepository;
     private final RequestReviewRepository requestReviewRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final AnalyticsRecorder analyticsRecorder;
 
-    public AdminPlaceRegisterRequestService(PlaceRepository placeRepository, RequestReviewRepository requestReviewRepository, ApplicationEventPublisher applicationEventPublisher) {
+    public AdminPlaceRegisterRequestService(PlaceRepository placeRepository, RequestReviewRepository requestReviewRepository, ApplicationEventPublisher applicationEventPublisher, AnalyticsRecorder analyticsRecorder) {
         this.placeRepository = placeRepository;
         this.requestReviewRepository = requestReviewRepository;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.analyticsRecorder = analyticsRecorder;
     }
 
     @Transactional
@@ -44,6 +49,11 @@ public class AdminPlaceRegisterRequestService {
         }
 
         applicationEventPublisher.publishEvent(new RequestReviewEvent(placeId, status));
+
+        EventType eventType = status == RequestReviewStatus.APPROVED
+                ? EventType.PLACE_APPROVED
+                : EventType.PLACE_REJECTED;
+        analyticsRecorder.record(eventType, null, TargetType.PLACE, placeId);
     }
 
     private void approve(Place place/*, Long adminId*/) {

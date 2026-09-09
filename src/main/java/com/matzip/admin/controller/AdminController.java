@@ -1,14 +1,14 @@
 package com.matzip.admin.controller;
 
-import com.matzip.admin.controller.request.PlaceRegisterRequestReviewRequest;
-import com.matzip.admin.controller.response.PlaceRegisterRequestDetailResponse;
-import com.matzip.admin.controller.response.PlaceRegisterRequestsResponse;
+import com.matzip.admin.dto.request.PlaceRegisterRequestReviewRequestDto;
+import com.matzip.admin.dto.response.PlaceRegisterRequestDetailResponseDto;
+import com.matzip.admin.dto.response.PlaceRegisterRequestsResponseDto;
 import com.matzip.admin.service.AdminPlaceRegisterRequestService;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.common.response.ApiResponse;
 // import com.matzip.common.security.UserPrincipal;
-import com.matzip.place.infra.repository.PlaceRepository;
+import com.matzip.place.repository.PlaceRepository;
 // import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,21 +32,21 @@ public class AdminController {
     }
 
     @GetMapping("/requests/places")
-    public ApiResponse<List<PlaceRegisterRequestsResponse>> findPlaceRegisterRequests() {
-        List<PlaceRegisterRequestsResponse> data = placeRepository.findPendingPlaces()
+    public ApiResponse<List<PlaceRegisterRequestsResponseDto>> findPlaceRegisterRequests() {
+        List<PlaceRegisterRequestsResponseDto> data = placeRepository.findPendingPlaces()
                 .stream()
-                .map(PlaceRegisterRequestsResponse::from)
+                .map(PlaceRegisterRequestsResponseDto::from)
                 .toList();
 
         return ApiResponse.success(data);
     }
 
     @GetMapping("/requests/places/{placeId}")
-    public ApiResponse<PlaceRegisterRequestDetailResponse> findPlaceRegisterRequestDetail(
+    public ApiResponse<PlaceRegisterRequestDetailResponseDto> findPlaceRegisterRequestDetail(
             @PathVariable("placeId") Long placeId
     ) {
-        PlaceRegisterRequestDetailResponse data = placeRepository.findByIdWithCategoriesAndTags(placeId)
-                .map(PlaceRegisterRequestDetailResponse::from)
+        PlaceRegisterRequestDetailResponseDto data = placeRepository.findByIdWithCategoriesAndTags(placeId)
+                .map(PlaceRegisterRequestDetailResponseDto::from)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
 
         return ApiResponse.success(data);
@@ -55,7 +55,7 @@ public class AdminController {
     @PostMapping("/requests/places/{placeId}/review")
     public ApiResponse<?> reviewPlaceRegisterRequest(
             @PathVariable("placeId") Long placeId,
-            @RequestBody PlaceRegisterRequestReviewRequest request
+            @RequestBody PlaceRegisterRequestReviewRequestDto request
             // , @AuthenticationPrincipal UserPrincipal admin
     ) {
         adminPlaceRegisterRequestService.review(

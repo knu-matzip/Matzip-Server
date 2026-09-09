@@ -1,0 +1,40 @@
+package com.matzip.lottery.dto.response;
+
+import com.matzip.lottery.domain.LotteryEvent;
+import com.matzip.lottery.domain.Prize;
+import lombok.Builder;
+
+import java.time.LocalDateTime;
+
+@Builder
+public record LotteryEventResponseDto(Long eventId, PrizeResponse prize, int totalWinnersCount, int participantsCount,
+                                   int usedTicketsCount, LocalDateTime eventEndDate)
+        implements LotteryEventView {
+
+    public static LotteryEventResponseDto empty() {
+        return LotteryEventResponseDto.builder()
+                .build();
+    }
+
+    public static LotteryEventResponseDto of(LotteryEvent lotteryEvent, int participantsCount, int usedTicketsCount) {
+        return LotteryEventResponseDto.builder()
+                .eventId(lotteryEvent.getId())
+                .prize(PrizeResponse.from(lotteryEvent.getPrize()))
+                .totalWinnersCount(lotteryEvent.getWinnersCount())
+                .participantsCount(participantsCount)
+                .usedTicketsCount(usedTicketsCount)
+                .eventEndDate(lotteryEvent.getEndDateTime())
+                .build();
+    }
+
+    @Builder
+    record PrizeResponse(String description, String imageUrl) {
+
+        public static PrizeResponse from(Prize prize) {
+            return PrizeResponse.builder()
+                    .description(prize.getDescription())
+                    .imageUrl(prize.getImageUrl())
+                    .build();
+        }
+    }
+}

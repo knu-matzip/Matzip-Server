@@ -1,0 +1,42 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://mysql:3306/knu_matzip?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul}
+    username: ${DB_USERNAME:matzip}
+    password: ${DB_PASSWORD:dummy-password}
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc.time_zone: Asia/Seoul
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY:dummy-jwt-secret}
+  expiration-time: 3600000
+  refresh-expiration-time: 1209600000
+
+oauth2:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID:dummy-client-id}
+    redirect-uri: ${KAKAO_REDIRECT_URI:http://localhost:8080/api/v1/auth/callback}
+
+app:
+  auth:
+    allowed-origins:
+      - http://localhost:3000
+      - http://localhost:8080
+    success-path: ${AUTH_SUCCESS_PATH:/login/success}
+    failure-path: ${AUTH_FAILURE_PATH:/login/failure}
+    state-secret: ${STATE_SECRET_KEY:dummy-state-secret}
+    cookie-secure: false
+    cookie-same-site: Lax
+
+image:
+  base-url: ${IMAGE_BASE_URL:http://localhost:8080}
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.orm.jdbc.bind: WARN

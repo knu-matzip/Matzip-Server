@@ -10,7 +10,7 @@
 
 ### 🗓️ 기간
 
-2025.09 ~ 2025.11
+2025.09 ~ 현재 [운영 중]
 
 ### ⚙️ 기술 스택
 
@@ -21,6 +21,11 @@
 #### Front-end
 
 ![React](https://go-skill-icons.vercel.app/api/icons?i=ts,nextjs,zustand,reactquery,tailwind,storybook,pnpm,turborepo,googleanalytics,sentry&perline=5)
+
+
+### 🥶 Back-end Architecture
+<img width="1265" height="1047" alt="knu-matzip excalidraw" src="https://github.com/user-attachments/assets/18840a9c-4d9d-4b55-9344-57d201d0a89e" />
+
 
 
 ### 📱 주요 기능

@@ -3,6 +3,7 @@ package com.matzip.common.exception;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.common.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
@@ -25,9 +26,15 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BaseException.class)
     protected ResponseEntity<ApiResponse<Void>> handleBaseException(BaseException e) {
-        log.error("{}: {}", e.getClass().getSimpleName(), e.getMessage());
+        HttpStatus status = e.getErrorCode().getStatus();
+        // 5xx(서버/외부연동 장애)만 스택트레이스와 함께 error, 4xx(예상된 규칙 위반)는 warn
+        if (status.is5xxServerError()) {
+            log.error("{}: {}", e.getClass().getSimpleName(), e.getMessage(), e);
+        } else {
+            log.warn("{}: {}", e.getClass().getSimpleName(), e.getMessage());
+        }
         return ResponseEntity
-                .status(e.getErrorCode().getStatus())
+                .status(status)
                 .body(ApiResponse.error(e.getErrorCode(), e.getMessage()));
     }
 
@@ -36,7 +43,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.error("MethodArgumentNotValidException: {}", e.getMessage());
+        log.warn("MethodArgumentNotValidException: {}", e.getMessage());
         String detail = e.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
         return ResponseEntity
                 .status(ErrorCode.VALIDATION_ERROR.getStatus())
@@ -48,7 +55,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BindException.class)
     protected ResponseEntity<ApiResponse<Void>> handleBindException(BindException e) {
-        log.error("BindException: {}", e.getMessage());
+        log.warn("BindException: {}", e.getMessage());
         String detail = e.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
         return ResponseEntity
                 .status(ErrorCode.VALIDATION_ERROR.getStatus())
@@ -60,7 +67,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     protected ResponseEntity<ApiResponse<Void>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
-        log.error("HttpRequestMethodNotSupportedException: {}", e.getMessage());
+        log.warn("HttpRequestMethodNotSupportedException: {}", e.getMessage());
         return ResponseEntity
                 .status(ErrorCode.METHOD_NOT_ALLOWED.getStatus())
                 .body(ApiResponse.error(ErrorCode.METHOD_NOT_ALLOWED));
@@ -71,7 +78,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     protected ResponseEntity<ApiResponse<Void>> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
-        log.error("MissingServletRequestParameterException: {}", e.getMessage());
+        log.warn("MissingServletRequestParameterException: {}", e.getMessage());
         String message = getMissingParameterMessage(e.getParameterName());
         return ResponseEntity
                 .status(ErrorCode.INVALID_INPUT_VALUE.getStatus())
@@ -93,7 +100,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     protected ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        log.error("HttpMessageNotReadableException: {}", e.getMessage());
+        log.warn("HttpMessageNotReadableException: {}", e.getMessage());
         return ResponseEntity
                 .status(ErrorCode.INVALID_INPUT_VALUE.getStatus())
                 .body(ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE, "잘못된 요청 본문입니다."));
@@ -104,7 +111,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<ApiResponse<Void>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-        log.error("MethodArgumentTypeMismatchException: {}", e.getMessage());
+        log.warn("MethodArgumentTypeMismatchException: {}", e.getMessage());
         return ResponseEntity
                 .status(ErrorCode.INVALID_TYPE_VALUE.getStatus())
                 .body(ApiResponse.error(ErrorCode.INVALID_TYPE_VALUE, e.getMessage()));
@@ -126,7 +133,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(NoHandlerFoundException.class)
     protected ResponseEntity<ApiResponse<Void>> handleNoHandlerFoundException(NoHandlerFoundException e) {
-        log.error("NoHandlerFoundException: {}", e.getMessage());
+        log.warn("NoHandlerFoundException: {}", e.getMessage());
         return ResponseEntity
                 .status(ErrorCode.INVALID_INPUT_VALUE.getStatus())
                 .body(ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE, "요청한 리소스를 찾을 수 없습니다."));
