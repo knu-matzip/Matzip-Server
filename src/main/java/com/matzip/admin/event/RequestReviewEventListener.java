@@ -28,7 +28,7 @@ public class RequestReviewEventListener {
         this.analyticsRecorder = analyticsRecorder;
     }
 
-    @Async
+    @Async("generalExecutor")
     @TransactionalEventListener(condition = "#event.reviewStatus().name() == 'APPROVED'")
     public void enterCurrentEventOnApproval(RequestReviewEvent event) {
         Place place = placeRepository.findById(event.placeId())
