@@ -24,7 +24,7 @@ public class AnalyticsEventListener {
         this.eventLogRepository = eventLogRepository;
     }
 
-    @Async
+    @Async("generalExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void on(AnalyticsEvent event) {
         try {

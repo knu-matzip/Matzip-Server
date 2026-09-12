@@ -21,7 +21,7 @@ public class DiscordWebhookSender {
         this.discordWebhookProperties = discordWebhookProperties;
     }
 
-    @Async
+    @Async("externalExecutor")
     public void sendAsync(String content) {
         String webhookUrl = discordWebhookProperties.getWebhookUrl();
         if (!StringUtils.hasText(webhookUrl)) {

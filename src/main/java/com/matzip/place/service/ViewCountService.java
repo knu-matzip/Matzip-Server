@@ -18,7 +18,7 @@ public class ViewCountService {
     private final PlaceRepository placeRepository;
     private final DailyViewCountRepository dailyViewCountRepository;
 
-    @Async
+    @Async("generalExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void incrementAllCounts(Long placeId) {
         placeRepository.incrementViewCount(placeId);
