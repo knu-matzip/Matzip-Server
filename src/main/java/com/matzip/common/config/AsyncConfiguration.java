@@ -1,8 +1,10 @@
 package com.matzip.common.config;
 
+import com.matzip.common.logging.MdcTaskDecorator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -42,10 +44,15 @@ public class AsyncConfiguration implements AsyncConfigurer {
         executor.setQueueCapacity(queueCapacity);
         executor.setThreadNamePrefix(threadNamePrefix);
         executor.setRejectedExecutionHandler(rejectedHandler);
+        executor.setTaskDecorator(mdcTaskDecorator());
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(SHUTDOWN_AWAIT_SECONDS);
         executor.initialize();
         return executor;
+    }
+
+    private TaskDecorator mdcTaskDecorator() {
+        return new MdcTaskDecorator();
     }
 
     // ViewCountService가 REQUIRES_NEW라 CallerRunsPolicy는 커넥션 데드락 위험이 있어 log & discard 사용
