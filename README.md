@@ -68,6 +68,10 @@ controller → service → repository → DB
                     ↘ client (외부 API·캐시 어댑터)
 ```
 
+## ERD
+<img width="1000" alt="knu-matzip-erd" src="https://github.com/user-attachments/assets/912e44c8-7cd8-4363-aae3-a79cf1c747dc" />
+
+
 ## 📱 주요 기능
 
 | 기능 | 설명                                      |
