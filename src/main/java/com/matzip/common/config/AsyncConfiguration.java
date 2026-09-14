@@ -17,6 +17,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
 
     public static final String GENERAL_EXECUTOR = "generalExecutor";
     public static final String EXTERNAL_EXECUTOR = "externalExecutor";
+
     private static final int SHUTDOWN_AWAIT_SECONDS = 15;
 
     @Override
