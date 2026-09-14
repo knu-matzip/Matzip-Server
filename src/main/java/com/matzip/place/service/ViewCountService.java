@@ -1,5 +1,6 @@
 package com.matzip.place.service;
 
+import com.matzip.common.config.AsyncConfiguration;
 import com.matzip.place.domain.DailyViewCount;
 import com.matzip.place.repository.DailyViewCountRepository;
 import com.matzip.place.repository.PlaceRepository;
@@ -18,7 +19,7 @@ public class ViewCountService {
     private final PlaceRepository placeRepository;
     private final DailyViewCountRepository dailyViewCountRepository;
 
-    @Async("generalExecutor")
+    @Async(AsyncConfiguration.GENERAL_EXECUTOR)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void incrementAllCounts(Long placeId) {
         placeRepository.incrementViewCount(placeId);

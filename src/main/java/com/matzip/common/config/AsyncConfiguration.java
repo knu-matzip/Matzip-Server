@@ -18,6 +18,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 public class AsyncConfiguration implements AsyncConfigurer {
 
+    public static final String GENERAL_EXECUTOR = "generalExecutor";
+    public static final String EXTERNAL_EXECUTOR = "externalExecutor";
     private static final int SHUTDOWN_AWAIT_SECONDS = 15;
 
     @Override
@@ -25,13 +27,13 @@ public class AsyncConfiguration implements AsyncConfigurer {
         return generalExecutor();
     }
 
-    @Bean
+    @Bean(GENERAL_EXECUTOR)
     public ThreadPoolTaskExecutor generalExecutor() {
         // Hikari 기본 커넥션 풀(10)을 웹 요청과 나눠 쓰도록 max 4로 제한
         return buildExecutor("async-", 3, 4, 200, loggingDiscardPolicy());
     }
 
-    @Bean
+    @Bean(EXTERNAL_EXECUTOR)
     public ThreadPoolTaskExecutor externalExecutor() {
         return buildExecutor("ext-", 1, 2, 30, new ThreadPoolExecutor.DiscardPolicy());
     }
