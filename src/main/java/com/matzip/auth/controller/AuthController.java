@@ -13,6 +13,8 @@ import com.matzip.common.config.KakaoProperties;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.common.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Duration;
 
 
+@Tag(name = "인증", description = "카카오 로그인 및 JWT 토큰 발급 API")
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -39,6 +42,7 @@ public class AuthController {
     private final StatelessStateSigner stateSigner;
     private final KakaoAuthorizeUrlBuilder kakaoAuthorizeUrlBuilder;
 
+    @Operation(summary = "카카오 인가 URL 리다이렉트", description = "허용된 clientOrigin을 검증하고 카카오 로그인 페이지(302)로 리다이렉트한다.")
     @GetMapping("/authorize")
     public ResponseEntity<Void> authorize(@RequestParam("clientOrigin") String clientOrigin) {
 
@@ -66,6 +70,7 @@ public class AuthController {
      * @param body
      * @return
      */
+    @Operation(summary = "액세스 토큰 재발급", description = "쿠키 또는 요청 본문의 리프레시 토큰으로 액세스 토큰을 재발급하고, 회전된 리프레시 토큰을 쿠키로 설정한다.")
     @PostMapping("/token")
     public ResponseEntity<ApiResponse<TokenResponseDto>> reissue(
             @CookieValue(value = RT_COOKIE_NAME, required = false) String rtCookie,
@@ -106,6 +111,7 @@ public class AuthController {
                 .build();
     }
 
+    @Operation(summary = "카카오 로그인 콜백", description = "카카오 인가 코드를 받아 로그인을 처리하고, 성공/실패에 따라 프론트 페이지로 리다이렉트(302)한다.")
     @GetMapping("/callback")
     public ResponseEntity<Void> kakaoCallback(
             @RequestParam("code") @NotBlank String code,
