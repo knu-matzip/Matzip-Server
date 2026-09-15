@@ -41,6 +41,7 @@ public class LotteryEventController {
     }
 
     @Operation(summary = "내가 응모한 이벤트 목록", description = "인증된 사용자가 응모한 이벤트 목록을 조회한다. 인증 필요.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공", useReturnTypeSchema = true)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증이 필요합니다.")
     @GetMapping("/entries")
     public ApiResponse<List<ParticipatedEventResponseDto>> getParticipatedEvents(@AuthenticationPrincipal UserPrincipal user) {
@@ -49,6 +50,7 @@ public class LotteryEventController {
     }
 
     @Operation(summary = "이벤트 응모 결과 조회", description = "특정 이벤트에 대한 응모/당첨 결과를 조회한다. 인증 필요.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공", useReturnTypeSchema = true)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증이 필요합니다.")
     @GetMapping("/{eventId}/entries")
     public ApiResponse<EventEntryResultResponseDto> getEntryResult(@PathVariable Long eventId,
@@ -58,6 +60,7 @@ public class LotteryEventController {
     }
 
     @Operation(summary = "이벤트 응모", description = "연락처와 약관 동의 정보로 이벤트에 응모한다. 인증 필요.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "응모 성공", useReturnTypeSchema = true)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증이 필요합니다.")
     @PostMapping("/{eventId}/apply")
     public ApiResponse<ApplyEventResponseDto> applyForPrize(@PathVariable Long eventId,

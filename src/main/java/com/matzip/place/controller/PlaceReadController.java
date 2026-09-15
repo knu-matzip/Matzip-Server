@@ -27,6 +27,7 @@ public class PlaceReadController {
     private final PlaceReadService placeReadService;
 
     @Operation(summary = "맛집 상세 조회", description = "맛집 상세 정보를 조회한다. 로그인 시 찜 여부(isLiked)가 함께 내려간다.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공", useReturnTypeSchema = true)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "맛집을 찾을 수 없습니다.")
     @GetMapping("/{placeId}")
     public ApiResponse<PlaceDetailResponseDto> getPlaceDetail(

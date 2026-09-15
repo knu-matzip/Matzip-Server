@@ -28,6 +28,7 @@ public class PlaceRequestController {
     private final PlaceReadService placeReadService;
 
     @Operation(summary = "내 맛집 등록 요청 목록", description = "인증된 사용자가 등록 요청한 맛집들의 승인 상태 목록을 조회한다. 인증 필요.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공", useReturnTypeSchema = true)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "로그인이 필요합니다.")
     @GetMapping
     public ApiResponse<List<PlaceRegisterStatusResponseDto>> getMyPlaceRequests(
@@ -42,6 +43,7 @@ public class PlaceRequestController {
     }
 
     @Operation(summary = "내 맛집 등록 요청 상세", description = "인증된 사용자의 특정 맛집 등록 요청 상세와 승인/거절 사유를 조회한다. 인증 필요.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공", useReturnTypeSchema = true)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "로그인이 필요합니다.")
     @GetMapping("/{placeId}")
     public ApiResponse<PlaceRegisterStatusDetailResponseDto> getMyPlaceRequestDetail(

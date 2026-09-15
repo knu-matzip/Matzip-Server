@@ -24,6 +24,7 @@ public class PlaceLikeController {
 
 
     @Operation(summary = "맛집 찜 추가", description = "맛집을 찜 목록에 추가한다. 인증 필요.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "찜 추가 성공", useReturnTypeSchema = true)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증이 필요합니다.")
     @PostMapping("/{placeId}/like")
     public ApiResponse<PlaceLikeResponseDto> addLike(
@@ -35,6 +36,7 @@ public class PlaceLikeController {
     }
 
     @Operation(summary = "맛집 찜 취소", description = "맛집을 찜 목록에서 제거한다. 인증 필요.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "찜 취소 성공", useReturnTypeSchema = true)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증이 필요합니다.")
     @DeleteMapping("/{placeId}/like")
     public ApiResponse<PlaceLikeResponseDto> removeLike(
@@ -46,6 +48,7 @@ public class PlaceLikeController {
     }
 
     @Operation(summary = "내가 찜한 맛집 목록", description = "인증된 사용자가 찜한 맛집 목록을 조회한다. 인증 필요.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공", useReturnTypeSchema = true)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증이 필요합니다.")
     @GetMapping("/like")
     public ApiResponse<List<PlaceCommonResponseDto>> getMyLikedPlaces(

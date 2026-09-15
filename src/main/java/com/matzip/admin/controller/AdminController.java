@@ -46,6 +46,7 @@ public class AdminController {
     }
 
     @Operation(summary = "맛집 등록 요청 상세 (어드민)", description = "특정 맛집 등록 요청의 상세 정보를 조회한다.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공", useReturnTypeSchema = true)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "맛집을 찾을 수 없습니다.")
     @GetMapping("/requests/places/{placeId}")
     public ApiResponse<PlaceRegisterRequestDetailResponseDto> findPlaceRegisterRequestDetail(
