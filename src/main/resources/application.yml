@@ -22,3 +22,12 @@ server:
 app:
   discord:
     webhook-url: ${DISCORD_WEBHOOK_URL:}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    persist-authorization: true
+  # 로컬 테스트용 토큰 발급 API는 문서에서 제외
+  paths-to-exclude: /api/v1/auth/dev/**

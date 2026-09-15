@@ -1,0 +1,36 @@
+package com.matzip.common.config;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(properties = "springdoc.paths-to-exclude=/api/v1/auth/dev/**")
+class OpenApiSmokeTest {
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Test
+    void apiDocs_토큰없이_200_반환하고_경로포함() {
+        ResponseEntity<String> response = restTemplate.getForEntity("/v3/api-docs", String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).contains("/api/v1/places");
+        assertThat(response.getBody()).contains("bearerAuth");
+        assertThat(response.getBody()).doesNotContain("/api/v1/auth/dev/token");
+    }
+
+    @Test
+    void swaggerUi_토큰없이_401아님() {
+        ResponseEntity<String> response = restTemplate.getForEntity("/swagger-ui/index.html", String.class);
+
+        assertThat(response.getStatusCode()).isNotEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+}

@@ -46,3 +46,10 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+
+# 운영 환경에서는 API 문서/Swagger UI 비활성화
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
