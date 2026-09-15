@@ -10,6 +10,7 @@ import com.matzip.place.dto.CategoryDto;
 import com.matzip.place.dto.LocationDto;
 import com.matzip.place.dto.PhotoDto;
 import com.matzip.place.dto.TagDto;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,16 +21,26 @@ import java.util.stream.Collectors;
 @Builder
 public class PlaceDetailResponseDto {
 
+    @Schema(description = "맛집 ID", example = "15")
     private Long placeId;
+
+    @Schema(description = "맛집 이름", example = "우돈탄 다산본점")
     private String placeName;
+
+    @Schema(description = "주소", example = "경기 남양주시 다산중앙로82번길 25")
     private String address;
+
     private LocationDto location;
     private List<PhotoDto> photos;
+
+    @Schema(description = "맛집 설명", example = "직원이 엄청 친절해요! 근데 화장실에 갔고 냄새나요 ㅠㅠㅠ 그래도 맛은 있어서 괜찮아요")
     private String description;
+
     private List<MenuResponseDto> menus;
     private List<TagDto> tags;
     private List<CategoryDto> categories;
 
+    @Schema(description = "로그인 사용자의 찜 여부", example = "true")
     @Getter(onMethod_ = @JsonProperty("isLiked"))
     private boolean isLiked;
 
