@@ -4,6 +4,8 @@ import com.matzip.auth.dto.request.KakaoLoginRequestDto;
 import com.matzip.auth.dto.response.LoginResponseDto;
 import com.matzip.auth.service.AuthService;
 import com.matzip.common.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
 
+@Tag(name = "인증", description = "카카오 로그인 및 JWT 토큰 발급 API")
 @RequestMapping("/api/v2/auth")
 @RestController
 public class AuthControllerV2 {
@@ -24,6 +27,7 @@ public class AuthControllerV2 {
         this.authService = authService;
     }
 
+    @Operation(summary = "카카오 로그인 (v2)", description = "인가 코드와 redirectUri로 로그인하고, 액세스 토큰을 본문으로, 리프레시 토큰을 쿠키로 반환한다.")
     @GetMapping("/oauth2")
     public ResponseEntity<ApiResponse<String>> kakaoLogin(@RequestParam("code") String code,
                                                           @RequestParam("redirectUri") String redirectUri) {

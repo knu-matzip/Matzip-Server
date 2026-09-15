@@ -28,6 +28,17 @@ class OpenApiSmokeTest {
     }
 
     @Test
+    void apiDocs_컨트롤러_어노테이션_반영() {
+        ResponseEntity<String> response = restTemplate.getForEntity("/v3/api-docs", String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        // @Tag: 도메인 한글 태그로 그룹화
+        assertThat(response.getBody()).contains("\"맛집\"");
+        // @Operation: 엔드포인트 요약
+        assertThat(response.getBody()).contains("맛집 상세 조회");
+    }
+
+    @Test
     void swaggerUi_토큰없이_401아님() {
         ResponseEntity<String> response = restTemplate.getForEntity("/swagger-ui/index.html", String.class);
 
