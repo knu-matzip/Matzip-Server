@@ -2,7 +2,7 @@ package com.matzip.common.security.jwt.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.matzip.common.exception.code.ErrorCode;
-import com.matzip.common.response.ApiResponse;
+import com.matzip.common.response.ErrorResponse;
 import com.matzip.common.security.jwt.JwtProvider;
 import com.matzip.common.security.UserPrincipal;
 import io.jsonwebtoken.JwtException;
@@ -124,7 +124,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
         
-        ApiResponse<Void> apiResponse = ApiResponse.error(errorCode);
+        ErrorResponse apiResponse = ErrorResponse.error(errorCode);
         String jsonResponse = objectMapper.writeValueAsString(apiResponse);
         response.getWriter().write(jsonResponse);
     }
@@ -133,7 +133,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
 
-        ApiResponse<Void> apiResponse = ApiResponse.error(ErrorCode.UNAUTHORIZED);
+        ErrorResponse apiResponse = ErrorResponse.error(ErrorCode.UNAUTHORIZED);
         String jsonResponse = objectMapper.writeValueAsString(apiResponse);
         response.getWriter().write(jsonResponse);
     }

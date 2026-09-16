@@ -51,7 +51,7 @@ controller -> service -> repository -> DB
 
 ### DTO
 
-- 모든 DTO는 `Dto` 접미사를 붙인다. 유일한 예외는 응답 래퍼 `ApiResponse`.
+- 모든 DTO는 `Dto` 접미사를 붙인다. 유일한 예외는 응답 래퍼 `ApiResponse`, `ErrorResponse`다.
 - HTTP 요청/응답 DTO는 `dto/request`·`dto/response`. 요청/응답이 공유하는 조각은 `dto/` 루트. 외부 API 응답 파싱 DTO는 해당 `client/.../dto`.
 - 프레임워크·엔티티 타입을 응답 DTO 대신 그대로 노출하지 않는다.
 
