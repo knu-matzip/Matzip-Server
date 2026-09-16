@@ -2,6 +2,7 @@ package com.matzip.common.analytics;
 
 import com.matzip.common.analytics.domain.entity.EventLog;
 import com.matzip.common.analytics.repository.EventLogRepository;
+import com.matzip.common.config.AsyncConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ public class AnalyticsEventListener {
         this.eventLogRepository = eventLogRepository;
     }
 
-    @Async
+    @Async(AsyncConfiguration.GENERAL_EXECUTOR)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void on(AnalyticsEvent event) {
         try {

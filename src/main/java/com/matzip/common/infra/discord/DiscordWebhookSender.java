@@ -1,5 +1,6 @@
 package com.matzip.common.infra.discord;
 
+import com.matzip.common.config.AsyncConfiguration;
 import com.matzip.common.config.DiscordWebhookProperties;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ public class DiscordWebhookSender {
         this.discordWebhookProperties = discordWebhookProperties;
     }
 
-    @Async
+    @Async(AsyncConfiguration.EXTERNAL_EXECUTOR)
     public void sendAsync(String content) {
         String webhookUrl = discordWebhookProperties.getWebhookUrl();
         if (!StringUtils.hasText(webhookUrl)) {

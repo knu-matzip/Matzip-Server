@@ -3,6 +3,7 @@ package com.matzip.admin.event;
 import com.matzip.common.analytics.AnalyticsRecorder;
 import com.matzip.common.analytics.domain.EventType;
 import com.matzip.common.analytics.domain.TargetType;
+import com.matzip.common.config.AsyncConfiguration;
 import com.matzip.common.exception.BusinessException;
 import com.matzip.common.exception.code.ErrorCode;
 import com.matzip.lottery.service.LotteryEventService;
@@ -28,7 +29,7 @@ public class RequestReviewEventListener {
         this.analyticsRecorder = analyticsRecorder;
     }
 
-    @Async
+    @Async(AsyncConfiguration.GENERAL_EXECUTOR)
     @TransactionalEventListener(condition = "#event.reviewStatus().name() == 'APPROVED'")
     public void enterCurrentEventOnApproval(RequestReviewEvent event) {
         Place place = placeRepository.findById(event.placeId())

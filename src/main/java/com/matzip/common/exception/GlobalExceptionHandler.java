@@ -1,7 +1,7 @@
 package com.matzip.common.exception;
 
 import com.matzip.common.exception.code.ErrorCode;
-import com.matzip.common.response.ApiResponse;
+import com.matzip.common.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
      * BaseException을 상속받는 모든 커스텀 예외 처리
      */
     @ExceptionHandler(BaseException.class)
-    protected ResponseEntity<ApiResponse<Void>> handleBaseException(BaseException e) {
+    protected ResponseEntity<ErrorResponse> handleBaseException(BaseException e) {
         HttpStatus status = e.getErrorCode().getStatus();
         // 5xx(서버/외부연동 장애)만 스택트레이스와 함께 error, 4xx(예상된 규칙 위반)는 warn
         if (status.is5xxServerError()) {
@@ -35,54 +35,54 @@ public class GlobalExceptionHandler {
         }
         return ResponseEntity
                 .status(status)
-                .body(ApiResponse.error(e.getErrorCode(), e.getMessage()));
+                .body(ErrorResponse.error(e.getErrorCode(), e.getMessage()));
     }
 
     /**
      * @Valid 검증 실패 예외 처리
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.warn("MethodArgumentNotValidException: {}", e.getMessage());
         String detail = e.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
         return ResponseEntity
                 .status(ErrorCode.VALIDATION_ERROR.getStatus())
-                .body(ApiResponse.error(ErrorCode.VALIDATION_ERROR, detail));
+                .body(ErrorResponse.error(ErrorCode.VALIDATION_ERROR, detail));
     }
 
     /**
      * BindException 처리
      */
     @ExceptionHandler(BindException.class)
-    protected ResponseEntity<ApiResponse<Void>> handleBindException(BindException e) {
+    protected ResponseEntity<ErrorResponse> handleBindException(BindException e) {
         log.warn("BindException: {}", e.getMessage());
         String detail = e.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
         return ResponseEntity
                 .status(ErrorCode.VALIDATION_ERROR.getStatus())
-                .body(ApiResponse.error(ErrorCode.VALIDATION_ERROR, detail));
+                .body(ErrorResponse.error(ErrorCode.VALIDATION_ERROR, detail));
     }
     
     /**
      * HTTP 메서드 지원하지 않는 예외 처리
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    protected ResponseEntity<ApiResponse<Void>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+    protected ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         log.warn("HttpRequestMethodNotSupportedException: {}", e.getMessage());
         return ResponseEntity
                 .status(ErrorCode.METHOD_NOT_ALLOWED.getStatus())
-                .body(ApiResponse.error(ErrorCode.METHOD_NOT_ALLOWED));
+                .body(ErrorResponse.error(ErrorCode.METHOD_NOT_ALLOWED));
     }
     
     /**
      * 요청 파라미터 누락 예외 처리
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    protected ResponseEntity<ApiResponse<Void>> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+    protected ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
         log.warn("MissingServletRequestParameterException: {}", e.getMessage());
         String message = getMissingParameterMessage(e.getParameterName());
         return ResponseEntity
                 .status(ErrorCode.INVALID_INPUT_VALUE.getStatus())
-                .body(ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE, message));
+                .body(ErrorResponse.error(ErrorCode.INVALID_INPUT_VALUE, message));
     }
 
     private String getMissingParameterMessage(String parameterName) {
@@ -99,54 +99,54 @@ public class GlobalExceptionHandler {
      * HTTP 메시지 읽기 실패 예외 처리
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    protected ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+    protected ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         log.warn("HttpMessageNotReadableException: {}", e.getMessage());
         return ResponseEntity
                 .status(ErrorCode.INVALID_INPUT_VALUE.getStatus())
-                .body(ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE, "잘못된 요청 본문입니다."));
+                .body(ErrorResponse.error(ErrorCode.INVALID_INPUT_VALUE, "잘못된 요청 본문입니다."));
     }
     
     /**
      * 메서드 인자 타입 불일치 예외 처리
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    protected ResponseEntity<ApiResponse<Void>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+    protected ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
         log.warn("MethodArgumentTypeMismatchException: {}", e.getMessage());
         return ResponseEntity
                 .status(ErrorCode.INVALID_TYPE_VALUE.getStatus())
-                .body(ApiResponse.error(ErrorCode.INVALID_TYPE_VALUE, e.getMessage()));
+                .body(ErrorResponse.error(ErrorCode.INVALID_TYPE_VALUE, e.getMessage()));
     }
 
     /**
      * 매핑/정적 리소스 모두 없을 때
      */
     @ExceptionHandler(NoResourceFoundException.class)
-    protected ResponseEntity<ApiResponse<Void>> handleNoResourceFound(NoResourceFoundException e) {
+    protected ResponseEntity<ErrorResponse> handleNoResourceFound(NoResourceFoundException e) {
         log.warn("NoResourceFoundException: {}", e.getMessage());
         return ResponseEntity
                 .status(ErrorCode.NOT_FOUND.getStatus())
-                .body(ApiResponse.error(ErrorCode.NOT_FOUND, ErrorCode.NOT_FOUND.getMessage()));
+                .body(ErrorResponse.error(ErrorCode.NOT_FOUND, ErrorCode.NOT_FOUND.getMessage()));
     }
 
     /**
      * 핸들러를 찾을 수 없는 예외 처리
      */
     @ExceptionHandler(NoHandlerFoundException.class)
-    protected ResponseEntity<ApiResponse<Void>> handleNoHandlerFoundException(NoHandlerFoundException e) {
+    protected ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException e) {
         log.warn("NoHandlerFoundException: {}", e.getMessage());
         return ResponseEntity
                 .status(ErrorCode.INVALID_INPUT_VALUE.getStatus())
-                .body(ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE, "요청한 리소스를 찾을 수 없습니다."));
+                .body(ErrorResponse.error(ErrorCode.INVALID_INPUT_VALUE, "요청한 리소스를 찾을 수 없습니다."));
     }
     
     /**
      * 기타 모든 예외 처리
      */
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
+    protected ResponseEntity<ErrorResponse> handleException(Exception e) {
         log.error("Unexpected Exception: {}", e.getMessage(), e);
         return ResponseEntity
                 .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
-                .body(ApiResponse.error(ErrorCode.INTERNAL_SERVER_ERROR));
+                .body(ErrorResponse.error(ErrorCode.INTERNAL_SERVER_ERROR));
     }
 }
