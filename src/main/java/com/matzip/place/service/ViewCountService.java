@@ -21,18 +21,17 @@ public class ViewCountService {
 
     @Async(AsyncConfiguration.GENERAL_EXECUTOR)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void incrementAllCounts(Long placeId) {
+    public void incrementAllCounts(Long placeId, LocalDate viewDate) {
         placeRepository.incrementViewCount(placeId);
-        incrementDailyViewCount(placeId);
+        incrementDailyViewCount(placeId, viewDate);
     }
 
-    private void incrementDailyViewCount(Long placeId) {
-        LocalDate today = LocalDate.now();
-        int updatedRows = dailyViewCountRepository.incrementDailyViewCount(placeId, today);
+    private void incrementDailyViewCount(Long placeId, LocalDate viewDate) {
+        int updatedRows = dailyViewCountRepository.incrementDailyViewCount(placeId, viewDate);
 
         if (updatedRows == 0) {
             placeRepository.findById(placeId).ifPresent(place -> {
-                DailyViewCount newDailyViewCount = new DailyViewCount(place, today, 1);
+                DailyViewCount newDailyViewCount = new DailyViewCount(place, viewDate, 1);
                 dailyViewCountRepository.save(newDailyViewCount);
             });
         }
