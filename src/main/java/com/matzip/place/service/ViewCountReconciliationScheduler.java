@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 
-/**
- * 매일 새벽 전날까지의 조회수를 검증 보정하고 보존 기간이 지난 원본 로그를 정리한다.
- * 보정 자체는 ViewCountReconciliationService가 날짜별 트랜잭션으로 수행한다(self-invocation 회피용 분리).
- */
+// 날짜별 트랜잭션은 self-invocation을 피하려고 ViewCountReconciliationService로 분리했다
 @Slf4j
 @Service
 @RequiredArgsConstructor

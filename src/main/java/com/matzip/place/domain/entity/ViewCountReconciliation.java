@@ -10,11 +10,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-/**
- * 하루치 조회수 검증 보정 결과. 보정 전 집계와 원본 로그를 비교한 값을 남긴다.
- * - missingCount: 로그보다 집계가 적었던 만큼의 합 (비동기 증가 유실분)
- * - overCount: 로그보다 집계가 많았던 만큼의 합 (집계 후 롤백된 요청 등)
- */
 @Entity
 @Table(name = "view_count_reconciliation")
 @Getter

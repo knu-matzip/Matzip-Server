@@ -23,10 +23,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * 원본 조회 로그(place_view_log)를 기준으로 하루치 조회수를 검증하고 보정한다.
- * 보정 후에는 집계와 로그가 같아지므로 같은 날짜를 다시 보정해도 delta는 0이다.
- */
+// 보정 후에는 집계와 로그가 같아지므로 같은 날짜를 다시 보정해도 delta는 0이다
 @Service
 @RequiredArgsConstructor
 public class ViewCountReconciliationService {

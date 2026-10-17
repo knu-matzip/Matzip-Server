@@ -11,10 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-/**
- * 맛집 상세 조회 1건의 원본 로그. 조회수 일별 검증 보정의 기준 데이터다.
- * 조회 시각은 createdAt을 사용하고, 쓰기를 가볍게 하려고 place는 연관관계 없이 id만 둔다.
- */
+// 쓰기를 가볍게 하려고 place는 연관관계 없이 id만 둔다
 @Entity
 @Table(name = "place_view_log",
         indexes = @Index(name = "idx_place_view_log_date_place", columnList = "view_date, place_id"))

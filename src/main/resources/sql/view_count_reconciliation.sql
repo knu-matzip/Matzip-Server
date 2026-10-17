@@ -1,6 +1,4 @@
 -- 조회수 원본 로그(place_view_log) 및 일별 검증 보정 결과(view_count_reconciliation) 참고 스크립트
--- 적재 경로: PlaceReadService.getPlaceDetail 이 요청 트랜잭션에서 place_view_log 를 동기 적재
--- 검증 보정: ViewCountReconciliationScheduler 가 매일 04:00(KST) 전날까지 로그와 daily_view_count 를 비교해 보정
 
 -- =====================================================================
 -- [필수] prod 배포 전 수동 DDL

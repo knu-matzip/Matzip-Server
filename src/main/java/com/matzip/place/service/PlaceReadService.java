@@ -90,7 +90,6 @@ public class PlaceReadService {
         return PlaceDetailResponseDto.from(place, relatedData.photos(), menus, relatedData.categories(), relatedData.tags(), isLiked);
     }
 
-    // 원본 로그는 요청 트랜잭션에서 동기로 남기고, 집계는 비동기로 올린다
     // 조회 날짜를 여기서 고정해 넘겨야 자정 직전 요청이 지연돼도 로그와 집계 날짜가 갈라지지 않는다
     private void recordView(Long placeId, Long userId) {
         LocalDate viewDate = LocalDate.now();
