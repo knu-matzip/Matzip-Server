@@ -92,15 +92,35 @@ class ViewCountReconciliationSchedulerTest {
     }
 
     @Test
-    void 한_날짜가_실패해도_다음_날짜를_처리하고_실패를_알린다() {
-        given(viewCountReconciliationService.findLastReconciledDate()).willReturn(Optional.of(TODAY.minusDays(3)));
+    void 날짜가_실패하면_이후_날짜는_처리하지_않는다() {
+        given(viewCountReconciliationService.findLastReconciledDate()).willReturn(Optional.of(TODAY.minusDays(4)));
+        given(viewCountReconciliationService.reconcile(TODAY.minusDays(3))).willReturn(result(TODAY.minusDays(3), 100, 0, 0));
         given(viewCountReconciliationService.reconcile(TODAY.minusDays(2))).willThrow(new IllegalStateException("db down"));
-        given(viewCountReconciliationService.reconcile(TODAY.minusDays(1))).willReturn(result(TODAY.minusDays(1), 100, 0, 0));
 
         scheduler.reconcileUntil(TODAY);
 
-        verify(viewCountReconciliationService).reconcile(TODAY.minusDays(1));
-        verify(discordWebhookSender).sendAsync(contains("실패"));
+        verify(viewCountReconciliationService, never()).reconcile(TODAY.minusDays(1));
+        verify(viewCountReconciliationService).purgeLogsBefore(TODAY.minusDays(60));
+    }
+
+    @Test
+    void 재시도한_날짜가_다시_실패하면_알린다() {
+        given(viewCountReconciliationService.findLastReconciledDate()).willReturn(Optional.of(TODAY.minusDays(3)));
+        given(viewCountReconciliationService.reconcile(TODAY.minusDays(2))).willThrow(new IllegalStateException("db down"));
+
+        scheduler.reconcileUntil(TODAY);
+
+        verify(discordWebhookSender).sendAsync(contains("재시도 실패"));
+    }
+
+    @Test
+    void 어제_날짜의_첫_실패는_알리지_않는다() {
+        given(viewCountReconciliationService.findLastReconciledDate()).willReturn(Optional.of(TODAY.minusDays(2)));
+        given(viewCountReconciliationService.reconcile(TODAY.minusDays(1))).willThrow(new IllegalStateException("db down"));
+
+        scheduler.reconcileUntil(TODAY);
+
+        verify(discordWebhookSender, never()).sendAsync(anyString());
     }
 
     @Test

@@ -38,8 +38,11 @@ public class ViewCountReconciliationScheduler {
             from = oldestRetained;
         }
 
+        // 실패한 날짜를 넘어가면 다음 실행의 시작일(마지막 보정일 + 1)이 그 날짜를 건너뛰므로 멈춘다
         for (LocalDate date = from; !date.isAfter(yesterday); date = date.plusDays(1)) {
-            reconcileSafely(date);
+            if (!reconcileSafely(date, yesterday)) {
+                break;
+            }
         }
 
         try {
@@ -50,7 +53,7 @@ public class ViewCountReconciliationScheduler {
         }
     }
 
-    private void reconcileSafely(LocalDate date) {
+    private boolean reconcileSafely(LocalDate date, LocalDate yesterday) {
         try {
             ViewCountReconciliation result = viewCountReconciliationService.reconcile(date);
             log.info("[조회수 검증 보정] date={}, logged={}, aggregated={}, missing={}, over={}",
@@ -59,13 +62,19 @@ public class ViewCountReconciliationScheduler {
             if (needsAlert(result)) {
                 notifyMismatch(result);
             }
+            return true;
         } catch (Exception e) {
             log.error("[조회수 검증 보정] 실패. date={}", date, e);
-            discordWebhookSender.sendAsync("""
-                    **조회수 검증 보정 실패**
-                    - 날짜: %s
-                    - 오류: %s
-                    """.formatted(date, e.getMessage()));
+            // 어제보다 이전 날짜는 이전 실행에서 이미 실패한 재시도라 자동 복구되지 않은 것으로 보고 알린다
+            if (date.isBefore(yesterday)) {
+                discordWebhookSender.sendAsync("""
+                        **조회수 검증 보정 재시도 실패**
+                        - 날짜: %s
+                        - 오류: %s
+                        - 이후 날짜는 이 날짜가 보정될 때까지 처리하지 않는다
+                        """.formatted(date, e.getMessage()));
+            }
+            return false;
         }
     }
 
