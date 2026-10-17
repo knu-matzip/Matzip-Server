@@ -32,6 +32,13 @@ CREATE TABLE view_count_reconciliation (
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
+-- 배포 당일은 배포 전 조회에 원본 로그가 없어 보정하면 실제 조회수가 깎인다.
+-- 배포일을 보정 완료로 기록해 스케줄러가 다음 날부터 보정하게 한다.
+-- 날짜는 반드시 배포일 이후로 넣는다(늦게 넣으면 그 사이 날짜가 보정되지 않을 뿐 안전하다).
+INSERT INTO view_count_reconciliation
+    (target_date, logged_count, aggregated_count, missing_count, over_count, created_at, updated_at)
+VALUES ('YYYY-MM-DD', 0, 0, 0, 0, NOW(6), NOW(6));
+
 -- =====================================================================
 -- 조회 쿼리
 -- =====================================================================

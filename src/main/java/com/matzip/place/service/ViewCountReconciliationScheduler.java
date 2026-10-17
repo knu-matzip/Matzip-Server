@@ -30,7 +30,7 @@ public class ViewCountReconciliationScheduler {
         LocalDate yesterday = today.minusDays(1);
         LocalDate oldestRetained = today.minusDays(properties.getRetentionDays());
 
-        // 이력이 없으면 어제만 처리한다. 로그 도입 이전 날짜를 보정하면 집계가 0으로 덮이기 때문이다
+        // prod는 배포 DDL이 배포일 이력을 넣어 두므로 이 분기를 타지 않는다(sql/view_count_reconciliation.sql)
         LocalDate from = viewCountReconciliationService.findLastReconciledDate()
                 .map(last -> last.plusDays(1))
                 .orElse(yesterday);
