@@ -9,6 +9,9 @@ import com.matzip.place.domain.entity.Place;
 import com.matzip.place.dto.response.PlaceCommonResponseDto;
 import com.matzip.place.repository.DailyViewCountRepository;
 import com.matzip.place.repository.PlaceRepository;
+import com.matzip.place.repository.PlaceViewLogRepository;
+import com.matzip.place.domain.entity.PlaceViewLog;
+import com.matzip.common.exception.BusinessException;
 import com.matzip.user.domain.User;
 import com.matzip.user.repository.UserRepository;
 
@@ -30,6 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 
 @Slf4j
@@ -49,6 +53,9 @@ public class PlaceReadServiceTest {
     private DailyViewCountRepository dailyViewCountRepository;
 
     @Autowired
+    private PlaceViewLogRepository placeViewLogRepository;
+
+    @Autowired
     private PlatformTransactionManager transactionManager;
 
     private Place testPlace;
@@ -58,6 +65,7 @@ public class PlaceReadServiceTest {
     void setUp() {
         // 모든 테스트 전에 실행될 초기 데이터 설정
         dailyViewCountRepository.deleteAll();
+        placeViewLogRepository.deleteAll();
         placeRepository.deleteAll();
         userRepository.deleteAll();
 
@@ -89,6 +97,55 @@ public class PlaceReadServiceTest {
                     Place updatedPlace = placeRepository.findById(testPlace.getId()).get();
 //                    log.info("[단일] Awaitility 폴링 중... 현재 조회수: {}", updatedPlace.getViewCount());
                     assertThat(updatedPlace.getViewCount()).isEqualTo(1);
+                });
+    }
+
+    @Test
+    @DisplayName("상세 페이지를 조회하면 원본 로그가 남고, 같은 날짜의 일별 조회수가 증가한다")
+    void getPlaceDetail_recordsViewLogAndDailyCountOnSameDate() {
+        // when
+        placeReadService.getPlaceDetail(testPlace.getId(), testUser.getId());
+
+        // then
+        List<PlaceViewLog> logs = placeViewLogRepository.findAll();
+        assertThat(logs).hasSize(1);
+        PlaceViewLog viewLog = logs.get(0);
+        assertThat(viewLog.getPlaceId()).isEqualTo(testPlace.getId());
+        assertThat(viewLog.getUserId()).isEqualTo(testUser.getId());
+
+        await().atMost(5, TimeUnit.SECONDS)
+                .untilAsserted(() -> assertThat(dailyViewCountRepository.findAll())
+                        .singleElement()
+                        .satisfies(daily -> {
+                            assertThat(daily.getViewDate()).isEqualTo(viewLog.getViewDate());
+                            assertThat(daily.getCount()).isEqualTo(1);
+                        }));
+    }
+
+    @Test
+    @DisplayName("미승인 맛집 상세 조회는 원본 로그와 조회수를 남기지 않는다")
+    void getPlaceDetail_pendingPlace_doesNotRecordView() {
+        // given
+        Place pendingPlace = placeRepository.save(Place.builder()
+                .name("미승인 맛집")
+                .address("주소")
+                .kakaoPlaceId("pending")
+                .campus(Campus.CHEONAN)
+                .latitude(36.1)
+                .longitude(127.1)
+                .status(PlaceStatus.PENDING)
+                .build());
+
+        // when
+        assertThatThrownBy(() -> placeReadService.getPlaceDetail(pendingPlace.getId(), testUser.getId()))
+                .isInstanceOf(BusinessException.class);
+
+        // then: 비동기 증가가 호출되지 않았음을 확인하려고 잠시 기다린 뒤 검증한다
+        await().during(1, TimeUnit.SECONDS).atMost(2, TimeUnit.SECONDS)
+                .untilAsserted(() -> {
+                    assertThat(placeViewLogRepository.count()).isZero();
+                    assertThat(dailyViewCountRepository.count()).isZero();
+                    assertThat(placeRepository.findById(pendingPlace.getId()).get().getViewCount()).isZero();
                 });
     }
 
