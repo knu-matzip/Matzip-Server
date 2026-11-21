@@ -22,6 +22,11 @@ server:
 app:
   discord:
     webhook-url: ${DISCORD_WEBHOOK_URL:}
+  view-count:
+    reconciliation:
+      cron: "0 0 4 * * *"
+      retention-days: 60
+      alert-loss-rate-threshold: 0.01
 
 springdoc:
   swagger-ui:

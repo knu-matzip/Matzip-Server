@@ -23,9 +23,11 @@ import com.matzip.place.domain.entity.Photo;
 import com.matzip.place.domain.entity.Place;
 import com.matzip.place.domain.entity.PlaceCategory;
 import com.matzip.place.domain.entity.PlaceTag;
+import com.matzip.place.domain.entity.PlaceViewLog;
 import com.matzip.place.domain.entity.Tag;
 import com.matzip.place.dto.CategoryDto;
 import com.matzip.place.dto.TagDto;
+import com.matzip.place.event.PlaceViewedEvent;
 import com.matzip.place.repository.CategoryRepository;
 import com.matzip.place.repository.DailyViewCountRepository;
 import com.matzip.place.repository.MenuRepository;
@@ -34,9 +36,11 @@ import com.matzip.place.repository.PlaceCategoryRepository;
 import com.matzip.place.repository.PlaceLikeRepository;
 import com.matzip.place.repository.PlaceRepository;
 import com.matzip.place.repository.PlaceTagRepository;
+import com.matzip.place.repository.PlaceViewLogRepository;
 import com.matzip.user.domain.User;
 import com.matzip.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -58,10 +62,11 @@ public class PlaceReadService {
     private final PlaceCategoryRepository placeCategoryRepository;
     private final PlaceTagRepository placeTagRepository;
     private final DailyViewCountRepository dailyViewCountRepository;
+    private final PlaceViewLogRepository placeViewLogRepository;
     private final CategoryRepository categoryRepository;
     private final PlaceLikeRepository placeLikeRepository;
     private final UserRepository userRepository;
-    private final ViewCountService viewCountService;
+    private final ApplicationEventPublisher eventPublisher;
     private final RequestReviewRepository requestReviewRepository;
 
     private static final int RANKING_SIZE = 3;
@@ -70,8 +75,6 @@ public class PlaceReadService {
     @Transactional
     public PlaceDetailResponseDto getPlaceDetail(Long placeId, Long userId) {
 
-        viewCountService.incrementAllCounts(placeId);
-
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
 
@@ -79,12 +82,21 @@ public class PlaceReadService {
             throw new BusinessException(ErrorCode.PLACE_NOT_FOUND);
         }
 
+        recordView(placeId, userId);
+
         PlaceRelatedData relatedData = getPlaceRelatedData(place);
         List<Menu> menus = menuRepository.findByPlaceOrderByIsRecommendedDescNameAsc(place);
 
         boolean isLiked = checkIfUserLikedPlace(userId, place);
 
         return PlaceDetailResponseDto.from(place, relatedData.photos(), menus, relatedData.categories(), relatedData.tags(), isLiked);
+    }
+
+    // 조회 날짜를 여기서 고정해 넘겨야 자정 직전 요청이 지연돼도 로그와 집계 날짜가 갈라지지 않는다
+    private void recordView(Long placeId, Long userId) {
+        LocalDate viewDate = LocalDate.now();
+        placeViewLogRepository.save(PlaceViewLog.of(placeId, userId, viewDate));
+        eventPublisher.publishEvent(new PlaceViewedEvent(placeId, viewDate));
     }
 
     public List<MapSearchResponseDto> findPlacesInMapBounds(MapSearchRequestDto requestDto) {
