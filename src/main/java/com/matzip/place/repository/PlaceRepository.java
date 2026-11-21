@@ -53,6 +53,10 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     void incrementViewCount(@Param("placeId") Long placeId);
 
     @Modifying
+    @Query("UPDATE Place p SET p.viewCount = p.viewCount + :delta WHERE p.id = :placeId")
+    void addViewCount(@Param("placeId") Long placeId, @Param("delta") long delta);
+
+    @Modifying
     @Query("UPDATE Place p SET p.likeCount = p.likeCount + 1 WHERE p.id = :placeId")
     void incrementLikeCount(@Param("placeId") Long placeId);
 
