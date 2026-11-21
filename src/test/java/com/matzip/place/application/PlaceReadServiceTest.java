@@ -150,6 +150,24 @@ public class PlaceReadServiceTest {
     }
 
     @Test
+    @DisplayName("요청 트랜잭션이 롤백되면 원본 로그와 조회수가 모두 남지 않는다")
+    void getPlaceDetail_rolledBack_doesNotIncrementViewCount() {
+        // when
+        new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            placeReadService.getPlaceDetail(testPlace.getId(), testUser.getId());
+            status.setRollbackOnly();
+        });
+
+        // then: 비동기 증가가 호출되지 않았음을 확인하려고 잠시 기다린 뒤 검증한다
+        await().during(1, TimeUnit.SECONDS).atMost(2, TimeUnit.SECONDS)
+                .untilAsserted(() -> {
+                    assertThat(placeViewLogRepository.count()).isZero();
+                    assertThat(dailyViewCountRepository.count()).isZero();
+                    assertThat(placeRepository.findById(testPlace.getId()).get().getViewCount()).isZero();
+                });
+    }
+
+    @Test
     @DisplayName("여러 요청이 동시에 들어와도 조회수가 정확하게 증가한다")
     void getPlaceDetail_concurrentAccess() throws InterruptedException {
         // given

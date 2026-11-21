@@ -1,13 +1,10 @@
 package com.matzip.place.service;
 
-import com.matzip.common.config.AsyncConfiguration;
 import com.matzip.place.domain.DailyViewCount;
 import com.matzip.place.repository.DailyViewCountRepository;
 import com.matzip.place.repository.PlaceRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -19,8 +16,7 @@ public class ViewCountService {
     private final PlaceRepository placeRepository;
     private final DailyViewCountRepository dailyViewCountRepository;
 
-    @Async(AsyncConfiguration.GENERAL_EXECUTOR)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void incrementAllCounts(Long placeId, LocalDate viewDate) {
         placeRepository.incrementViewCount(placeId);
         incrementDailyViewCount(placeId, viewDate);
